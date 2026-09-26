@@ -1,0 +1,43 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "AstraFlare NASA FIRMS Ingestion Backend with PostgreSQL and GeoJSON",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "tsx src/server.ts",
+    "ingest": "tsx src/ingestionCli.ts",
+    "db:shell": "docker exec -it astraflare_postgres psql -U postgres -d astraflare_db",
+    "db:stats": "docker exec astraflare_postgres psql -U postgres -d astraflare_db -c 'SELECT count(*) AS total_thermal_anomalies FROM thermal_anomalies;' -c 'SELECT count(*) AS total_predictions FROM prediction_analyses;'"
+  },
+  "keywords": [
+    "nasa",
+    "firms",
+    "wildfire",
+    "gis",
+    "geojson",
+    "postgresql",
+    "postgis"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.2",
+    "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
