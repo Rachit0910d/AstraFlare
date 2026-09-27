@@ -100,7 +100,93 @@ export async function initDb(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_predictions_created ON prediction_analyses (created_at DESC);
     `);
 
-    console.log('✅ PostgreSQL database schema verified (thermal_anomalies & prediction_analyses)');
+    // 3. Create global countries directory table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS countries (
+        code VARCHAR(3) PRIMARY KEY,
+        code_2 VARCHAR(2) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        continent VARCHAR(50) NOT NULL,
+        capital VARCHAR(100),
+        min_lat DOUBLE PRECISION NOT NULL,
+        max_lat DOUBLE PRECISION NOT NULL,
+        min_lng DOUBLE PRECISION NOT NULL,
+        max_lng DOUBLE PRECISION NOT NULL,
+        center_lat DOUBLE PRECISION NOT NULL,
+        center_lng DOUBLE PRECISION NOT NULL,
+        zoom INT DEFAULT 5,
+        population BIGINT,
+        area_sq_km BIGINT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_countries_continent ON countries (continent);
+      CREATE INDEX IF NOT EXISTS idx_countries_bounds ON countries (min_lat, max_lat, min_lng, max_lng);
+      CREATE INDEX IF NOT EXISTS idx_countries_name ON countries (name);
+    `);
+
+    // 4. Create infrastructure_nodes table for critical assets & facilities
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS infrastructure_nodes (
+        id SERIAL PRIMARY KEY,
+        country_code VARCHAR(3) REFERENCES countries(code) ON DELETE CASCADE,
+        name VARCHAR(150) NOT NULL,
+        sector VARCHAR(100) NOT NULL,
+        latitude DOUBLE PRECISION NOT NULL,
+        longitude DOUBLE PRECISION NOT NULL,
+        critical_materials TEXT[] DEFAULT ARRAY[]::TEXT[],
+        default_action VARCHAR(100) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        CONSTRAINT uq_facility_location UNIQUE (country_code, name, latitude, longitude)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_infra_country ON infrastructure_nodes (country_code);
+      CREATE INDEX IF NOT EXISTS idx_infra_coords ON infrastructure_nodes (latitude, longitude);
+    `);
+
+    // 5. Seed countries into database if empty
+    const countryCountRes = await client.query('SELECT COUNT(*) as count FROM countries;');
+    if (parseInt(countryCountRes.rows[0].count) === 0) {
+      console.log('🌱 Seeding global countries into PostgreSQL...');
+      const { COUNTRIES_DATA } = await import('./data/countriesData.js');
+      for (const c of COUNTRIES_DATA) {
+        await client.query(`
+          INSERT INTO countries (
+            code, code_2, name, continent, capital,
+            min_lat, max_lat, min_lng, max_lng,
+            center_lat, center_lng, zoom, population, area_sq_km
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          ON CONFLICT (code) DO NOTHING;
+        `, [
+          c.code, c.code_2, c.name, c.continent, c.capital,
+          c.min_lat, c.max_lat, c.min_lng, c.max_lng,
+          c.center_lat, c.center_lng, c.zoom, c.population, c.area_sq_km
+        ]);
+      }
+      console.log(`✅ Seeded ${COUNTRIES_DATA.length} global countries into PostgreSQL`);
+    }
+
+    // 6. Seed/Sync infrastructure nodes into database
+    console.log('🌱 Syncing critical infrastructure facilities into PostgreSQL...');
+    const { INFRASTRUCTURE_SEED_DATA } = await import('./data/infrastructureData.js');
+    for (const inf of INFRASTRUCTURE_SEED_DATA) {
+      await client.query(`
+        INSERT INTO infrastructure_nodes (
+          country_code, name, sector, latitude, longitude,
+          critical_materials, default_action
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (country_code, name, latitude, longitude) DO UPDATE
+        SET sector = EXCLUDED.sector,
+            critical_materials = EXCLUDED.critical_materials,
+            default_action = EXCLUDED.default_action;
+      `, [
+        inf.country_code, inf.name, inf.sector, inf.latitude, inf.longitude,
+        inf.critical_materials, inf.default_action
+      ]);
+    }
+    console.log(`✅ Synced ${INFRASTRUCTURE_SEED_DATA.length} industrial complexes into PostgreSQL`);
+
+    console.log('✅ PostgreSQL database schema verified (thermal_anomalies, prediction_analyses, countries & infrastructure_nodes)');
   } finally {
     client.release();
   }

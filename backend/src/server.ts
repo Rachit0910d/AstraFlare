@@ -8,6 +8,8 @@ import {
   verifyAndStorePrediction,
   getVerifiedPredictions,
 } from './services/verificationService.js';
+import { getCountryPredictiveAnalysis } from './services/countryPredictiveService.js';
+import { getOsmIndustriesNearHotspots } from './services/osmIndustryService.js';
 import type { PredictionSubmission } from './types/index.js';
 
 dotenv.config();
@@ -230,6 +232,121 @@ app.get('/api/anomalies/csv', async (req: Request, res: Response) => {
     return res.send(fullCsv);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: msg });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GLOBAL COUNTRIES DIRECTORY & PREDICTIVE DATABASE ENDPOINTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/countries
+ * Returns all countries of the world from the PostgreSQL database directory,
+ * with optional continent filter or text search.
+ */
+app.get('/api/countries', async (req: Request, res: Response) => {
+  try {
+    const continent = req.query.continent as string | undefined;
+    const query = req.query.query as string | undefined;
+
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (continent && continent !== 'ALL') {
+      params.push(continent);
+      conditions.push(`continent ILIKE $${params.length}`);
+    }
+
+    if (query && query.trim()) {
+      params.push(`%${query.trim()}%`);
+      conditions.push(`(name ILIKE $${params.length} OR code ILIKE $${params.length} OR capital ILIKE $${params.length})`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const sql = `
+      SELECT code, code_2, name, continent, capital,
+             center_lat, center_lng, min_lat, max_lat, min_lng, max_lng,
+             zoom, population, area_sq_km
+      FROM countries
+      ${whereClause}
+      ORDER BY CASE WHEN code = 'WLD' THEN 0 WHEN code = 'IND' THEN 1 ELSE 2 END, name ASC;
+    `;
+
+    const dbRes = await pool.query(sql, params);
+    res.json({
+      success: true,
+      total: dbRes.rows.length,
+      countries: dbRes.rows.map((r) => ({
+        code: r.code,
+        code_2: r.code_2,
+        name: r.name,
+        continent: r.continent,
+        capital: r.capital,
+        center: [parseFloat(r.center_lat), parseFloat(r.center_lng)],
+        bbox: `${r.min_lng},${r.min_lat},${r.max_lng},${r.max_lat}`,
+        zoom: parseInt(r.zoom) || 5,
+        population: parseInt(r.population) || 0,
+        area_sq_km: parseInt(r.area_sq_km) || 0,
+      })),
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('Error fetching countries from database:', msg);
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * GET /api/countries/:code/predictive-analysis
+ * Executes real-time SQL queries against PostgreSQL to compute:
+ * - Thermal anomaly cluster metrics within country bounds
+ * - Endangered infrastructure facilities and proximity to fires
+ * - 7-day risk forecast trajectory aggregated from DB records
+ * - Dynamic population impact and vulnerable zones
+ */
+app.get('/api/countries/:code/predictive-analysis', async (req: Request, res: Response) => {
+  try {
+    const code = String(req.params.code);
+    const analysis = await getCountryPredictiveAnalysis(code);
+
+    if (!analysis) {
+      return res.status(404).json({ error: `Country '${code}' not found in database directory` });
+    }
+
+    res.json({
+      success: true,
+      country: code,
+      analysis,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('Error computing country predictive analysis:', msg);
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * GET /api/osm/industries
+ * Queries OpenStreetMap & spatial database infrastructure to find industrial facilities
+ * near active NASA FIRMS fire hotspots within the requested boundary box.
+ */
+app.get('/api/osm/industries', async (req: Request, res: Response) => {
+  try {
+    const bbox = (req.query.bbox as string) || DEFAULT_BBOX;
+    const maxDist = req.query.maxDistanceKm ? parseFloat(req.query.maxDistanceKm as string) : 50.0;
+    const industries = await getOsmIndustriesNearHotspots(bbox, maxDist);
+
+    res.json({
+      success: true,
+      bbox,
+      count: industries.length,
+      source: 'OpenStreetMap (OSM) & PostgreSQL Spatial Engine',
+      industries,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('Error querying OSM industries near hotspots:', msg);
     res.status(500).json({ error: msg });
   }
 });

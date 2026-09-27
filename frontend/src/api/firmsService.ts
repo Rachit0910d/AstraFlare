@@ -121,6 +121,18 @@ export const REGION_BOUNDS: Record<string, { name: string; bbox: string; center:
     center: [-15, -60],
     zoom: 4,
   },
+  AFRICA: {
+    name: 'Africa (Sub-Saharan)',
+    bbox: '-20,-35,55,38',
+    center: [2, 22],
+    zoom: 4,
+  },
+  EAST_ASIA: {
+    name: 'East Asia',
+    bbox: '73,18,145,54',
+    center: [35, 105],
+    zoom: 4,
+  },
 };
 
 /**
