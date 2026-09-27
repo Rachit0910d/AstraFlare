@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Fire, List, X, Broadcast } from '@phosphor-icons/react';
+import { List, X, Broadcast } from '@phosphor-icons/react';
 
 const NAV_LINKS = ['Home', 'Live Map', 'Predictive Analysis', 'Analytics', 'Report', 'Alert'];
 
@@ -30,8 +30,8 @@ export default function Header({
           onClick={() => handleNavigate('Home')}
           className="flex items-center gap-2.5 shrink-0 cursor-pointer select-none"
         >
-          <div className="w-[34px] h-[34px] bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
-            <Fire size={17} weight="fill" className="text-white" />
+          <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center shrink-0">
+            <img src="/astraflare-logo.png" alt="AstraFlare Logo" className="w-8 h-8 object-contain" />
           </div>
           <div className="leading-none">
             <p className="text-2xl font-bold tracking-tight text-gray-900">

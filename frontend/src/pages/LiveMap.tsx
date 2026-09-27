@@ -548,9 +548,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
               )}
             </div>
           </div>
-          <p className="text-[12.5px] text-gray-400 mt-1.5">
-            Real-time thermal anomalies from VIIRS (Suomi NPP, NOAA-20) & MODIS · Default India with Worldwide Viewport Exploration
-          </p>
+         
         </div>
 
         {/* Header Action Dropdowns & Buttons */}
@@ -559,7 +557,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
           <div className="relative">
             <button
               onClick={() => setIsRegionDropdownOpen(!isRegionDropdownOpen)}
-              className="flex items-center gap-2 h-[38px] px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors"
+              className="flex items-center gap-2 h-9.5 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors"
             >
               <GlobeHemisphereEast size={16} className="text-blue-500" weight="bold" />
               <span>{REGION_BOUNDS[activeRegionKey]?.name || 'Region'}</span>
@@ -592,7 +590,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
           <div className="relative">
             <button
               onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-              className="flex items-center gap-2 h-[38px] px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors cursor-pointer"
+              className="flex items-center gap-2 h-9.5 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors cursor-pointer"
             >
               <MapPin size={15} className="text-orange-500" weight="fill" />
               <span>{currentState.name}</span>
@@ -636,7 +634,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
           <div className="relative">
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="flex items-center gap-2 h-[38px] px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors cursor-pointer"
+              className="flex items-center gap-2 h-9.5 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors cursor-pointer"
             >
               <CalendarBlank size={16} className="text-gray-500" />
               <span>{timeWindow}</span>
@@ -673,7 +671,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
               });
             }}
             title="Download CSV of real-time anomalies for current view"
-            className="flex items-center gap-1.5 h-[38px] px-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors"
+            className="flex items-center gap-1.5 h-9.5 px-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-semibold text-gray-700 shadow-sm transition-colors"
           >
             <DownloadSimple size={16} weight="bold" className="text-blue-600" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -684,7 +682,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
             onClick={handleSyncNow}
             disabled={isSyncing}
             title="Fetch real-time updates from NASA FIRMS & ingest into PostgreSQL"
-            className="flex items-center gap-1.5 h-[38px] px-3.5 bg-[#ef4444] hover:bg-red-600 disabled:bg-red-400 text-white rounded-lg text-[13px] font-bold shadow-sm transition-all"
+            className="flex items-center gap-1.5 h-9.5 px-3.5 bg-[#ef4444] hover:bg-red-600 disabled:bg-red-400 text-white rounded-lg text-[13px] font-bold shadow-sm transition-all"
           >
             <ArrowsCounterClockwise
               size={16}
@@ -730,20 +728,18 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
             </div>
 
             <div className="text-[12px] text-gray-500 font-medium flex items-center gap-2">
-              <span className="text-gray-400">Pan/zoom to any country or forest area</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
               <span className="text-gray-700 font-semibold">{currentState.name}</span>
               <span className="text-gray-400">({filteredAnomalies.length} active detections)</span>
             </div>
           </div>
 
           {/* Map Container */}
-          <div className="relative flex-1 rounded-xl overflow-hidden border border-gray-200 shadow-md min-h-[460px] bg-slate-900">
+          <div className="relative flex-1 rounded-xl overflow-hidden border border-gray-200 shadow-md min-h-115 bg-slate-900">
             {/* Leaflet DOM element */}
             <div ref={mapContainerRef} className="w-full h-full z-0" />
 
             {/* Left Float Controls */}
-            <div className="absolute top-4 left-4 z-[20] flex flex-col gap-1.5">
+            <div className="absolute top-4 left-4 z-20 flex flex-col gap-1.5">
               <button
                 title="Reset to All India"
                 onClick={() => {

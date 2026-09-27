@@ -268,6 +268,41 @@ export async function triggerIngestion(bbox = '68,6,98,38', dayRange = 1): Promi
   }
 }
 
+export interface AnomalyStats {
+  total_detections: number;
+  high_intensity: number;
+  medium_intensity: number;
+  low_intensity: number;
+  total_frp_mw: number;
+  avg_brightness_k: number;
+  latest_acquisition?: string;
+}
+
+/**
+ * Fetch real-time aggregate statistics from PostgreSQL backend
+ */
+export async function fetchAnomalyStats(bbox?: string): Promise<AnomalyStats | null> {
+  try {
+    const url = bbox ? `${BACKEND_BASE}/api/anomalies/stats?bbox=${encodeURIComponent(bbox)}` : `${BACKEND_BASE}/api/anomalies/stats`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    if (res.ok) {
+      const data = await res.json();
+      return {
+        total_detections: parseInt(data.total_detections || '0'),
+        high_intensity: parseInt(data.high_intensity || '0'),
+        medium_intensity: parseInt(data.medium_intensity || '0'),
+        low_intensity: parseInt(data.low_intensity || '0'),
+        total_frp_mw: parseFloat(data.total_frp_mw || '0'),
+        avg_brightness_k: parseFloat(data.avg_brightness_k || '0'),
+        latest_acquisition: data.latest_acquisition,
+      };
+    }
+  } catch (err) {
+    console.warn('Could not fetch anomaly stats:', err);
+  }
+  return null;
+}
+
 /**
  * Check backend and DB status
  */
