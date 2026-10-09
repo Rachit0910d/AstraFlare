@@ -1,1160 +1,1025 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Fire,
   Tree,
   Warning,
-  Planet,
   DownloadSimple,
-  CalendarBlank,
-  CaretDown,
   ArrowRight,
   ArrowLeft,
   ShareNetwork,
   FilePdf,
-  FileX,
-  FileArchive,
   CheckCircle,
-  Sparkle,
-  ChartBar,
+  Factory,
+  Users,
+  Compass,
+  MapPin,
+  CaretDown,
+  Globe,
   ShieldCheck,
-  Plant,
-  Printer,
   Check,
+  Clock,
+  Printer,
+  Sparkle,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
 
 interface ReportProps {
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, incident?: any) => void;
+  selectedIncident?: any;
 }
 
-// ─── Incidents Data ───────────────────────────────────────────────────────────
-interface IncidentReport {
+// ─── Data Definitions ─────────────────────────────────────────────────────────
+
+interface IncidentData {
   id: string;
-  reportId: string;
   title: string;
+  incidentType: string;
   location: string;
-  districts: string;
   state: string;
-  firstDetected: string;
-  generatedOn: string;
-  affectedArea: string;
-  affectedAreaNum: number;
-  maxConfidence: number;
-  status: 'Active' | 'Monitoring' | 'Contained';
-  statusColor: string;
+  country: string;
+  dateRange: string;
+  durationDays: number;
+  lat: number;
+  lng: number;
+  coordinates?: string;
+  isDynamicPoint?: boolean;
+  severity: 'Critical' | 'High' | 'Moderate';
+  habitat: string;
+  confidenceScore: number;
+  totalIndustrialSites: number;
+  estimatedPopulation10km: number;
+  estimatedPopulation20km: number;
+  affectedAreaKm2: number;
+  frpMw: number;
   summary: string;
-  districtsCount: number;
-  increaseRate: string;
-  detections: {
-    time: string;
-    sensor: string;
-    frp: string;
-    temp: string;
-    coords: string;
-    confidence: number;
-  }[];
-  landCover: {
+  fullSummary: string;
+  keyTakeaways: string[];
+  airQualityPm25: string;
+  waterBodiesAffected: number;
+  forestAreaLostKm2: number;
+  soilContamination: string;
+  demographics: {
+    childrenPct: number;
+    adultsPct: number;
+    elderlyPct: number;
+  };
+  nearbyIndustries: {
+    name: string;
+    distanceKm: number;
+    threat: 'Critical' | 'High' | 'Medium' | 'Low' | 'Safe';
+    threatColor: string;
     type: string;
-    percentage: number;
-    area: string;
-    color: string;
+  }[];
+  timeline: {
+    date: string;
+    title: string;
+    statusColor: string;
   }[];
   actions: {
     title: string;
+    priority: string;
     desc: string;
-    status: 'Completed' | 'In Progress' | 'Pending';
+    status: 'Active' | 'Enforced' | 'Completed';
+    icon: string;
   }[];
 }
 
-const INCIDENTS_DATA: IncidentReport[] = [
-  {
-    id: 'inc-1',
-    reportId: 'REP-2025-001',
-    title: 'Assam Forest Fire Report',
-    location: 'Dibrugarh',
-    districts: 'Dibrugarh, Tinsukia and Sivasagar Districts',
-    state: 'Assam',
-    firstDetected: '9 Sep 2025, 10:18 AM',
-    generatedOn: '9 Sep 2025, 11:42 AM',
-    affectedArea: '4,200 ha',
-    affectedAreaNum: 4200,
-    maxConfidence: 87,
-    status: 'Active',
-    statusColor: 'bg-red-50 text-red-600 border border-red-200',
-    summary:
-      'Multiple fire hotspots detected across Dibrugarh, Tinsukia and Sivasagar districts. Estimated affected area is ~ 4,200 ha with high risk of further spread due to dry vegetation and human activities.',
-    districtsCount: 3,
-    increaseRate: '+65%',
-    detections: [
-      { time: '9 Sep, 10:18 AM', sensor: 'VIIRS (375m)', frp: '142.5 MW', temp: '685 K', coords: '27.47° N, 94.91° E', confidence: 87 },
-      { time: '9 Sep, 09:42 AM', sensor: 'VIIRS (375m)', frp: '98.0 MW', temp: '640 K', coords: '27.49° N, 95.34° E', confidence: 82 },
-      { time: '9 Sep, 06:28 AM', sensor: 'MODIS (1km)', frp: '74.2 MW', temp: '612 K', coords: '26.98° N, 94.64° E', confidence: 76 },
-      { time: '8 Sep, 11:15 PM', sensor: 'VIIRS (375m)', frp: '52.1 MW', temp: '580 K', coords: '27.45° N, 94.92° E', confidence: 71 },
-    ],
-    landCover: [
-      { type: 'Dense Tree Canopy (NSA WorldCover)', percentage: 58, area: '2,436 ha', color: 'bg-emerald-600' },
-      { type: 'Shrubland & Buffer Zone', percentage: 24, area: '1,008 ha', color: 'bg-amber-500' },
-      { type: 'Agricultural Fringe (OSM)', percentage: 12, area: '504 ha', color: 'bg-yellow-500' },
-      { type: 'Settlement Perimeter', percentage: 6, area: '252 ha', color: 'bg-red-500' },
-    ],
-    actions: [
-      { title: 'Airborne Water Drop Coordinates Dispatched', desc: 'State Disaster Response Force (SDRF) notified with GPS vector grid.', status: 'Completed' },
-      { title: 'Evacuation Pre-alert for 3 Fringe Settlements', desc: 'Naharkatiya and Chabua perimeter alerted via civic siren telemetry.', status: 'In Progress' },
-      { title: 'Continuous Sentinel-2 SWIR Overpass Tracking', desc: 'Next scheduled infrared scene ingest at 14:20 IST.', status: 'In Progress' },
-    ],
-  },
-  {
-    id: 'inc-2',
-    reportId: 'REP-2025-002',
-    title: 'Tinsukia Rural Fringe Hotspot Analysis',
-    location: 'Tinsukia',
-    districts: 'Tinsukia & Margherita Forest Belts',
-    state: 'Assam',
-    firstDetected: '9 Sep 2025, 09:42 AM',
-    generatedOn: '9 Sep 2025, 11:15 AM',
-    affectedArea: '3,100 ha',
-    affectedAreaNum: 3100,
-    maxConfidence: 72,
-    status: 'Active',
-    statusColor: 'bg-red-50 text-red-600 border border-red-200',
-    summary:
-      'Thermal anomalies spreading east along the Brahmaputra tributary forest belt. MODIS and VIIRS confirm moderate smoke canopy dispersion with high particulate concentration.',
-    districtsCount: 2,
-    increaseRate: '+48%',
-    detections: [
-      { time: '9 Sep, 09:42 AM', sensor: 'VIIRS (375m)', frp: '112.4 MW', temp: '645 K', coords: '27.52° N, 95.38° E', confidence: 72 },
-      { time: '9 Sep, 06:10 AM', sensor: 'MODIS (1km)', frp: '68.0 MW', temp: '605 K', coords: '27.48° N, 95.31° E', confidence: 68 },
-    ],
-    landCover: [
-      { type: 'Secondary Forest Cover', percentage: 65, area: '2,015 ha', color: 'bg-emerald-600' },
-      { type: 'Grassland & Bamboo Groves', percentage: 25, area: '775 ha', color: 'bg-amber-500' },
-      { type: 'Rural Farmland Fringe', percentage: 10, area: '310 ha', color: 'bg-yellow-500' },
-    ],
-    actions: [
-      { title: 'Ground Firebreak Creation in Progress', desc: 'Forest department bulldozers clearing combustible brush lines.', status: 'In Progress' },
-      { title: 'Health Advisory for Particulate Exposure', desc: 'AQI warnings broadcast to local administrative panchayats.', status: 'Completed' },
-    ],
-  },
-  {
-    id: 'inc-3',
-    reportId: 'REP-2025-003',
-    title: 'Korba Industrial & Coal Mining Thermal Anomaly',
-    location: 'Korba',
-    districts: 'Korba Energy Basin & Katghora',
-    state: 'Chhattisgarh',
-    firstDetected: '9 Sep 2025, 08:15 AM',
-    generatedOn: '9 Sep 2025, 10:30 AM',
-    affectedArea: '2,800 ha',
-    affectedAreaNum: 2800,
-    maxConfidence: 81,
-    status: 'Monitoring',
-    statusColor: 'bg-amber-50 text-amber-600 border border-amber-200',
-    summary:
-      'Persistent industrial thermal emissions cross-referenced with open-cast coal storage piles. Moderate fire radiative power detected inside OSM industrial polygon.',
-    districtsCount: 2,
-    increaseRate: '+15%',
-    detections: [
-      { time: '9 Sep, 08:15 AM', sensor: 'VIIRS (375m)', frp: '185.0 MW', temp: '715 K', coords: '22.35° N, 82.68° E', confidence: 81 },
-      { time: '8 Sep, 02:40 PM', sensor: 'VIIRS (375m)', frp: '160.2 MW', temp: '690 K', coords: '22.36° N, 82.70° E', confidence: 79 },
-    ],
-    landCover: [
-      { type: 'Industrial Mining & Waste Dumps (OSM)', percentage: 70, area: '1,960 ha', color: 'bg-slate-700' },
-      { type: 'Scrub & Bare Land', percentage: 20, area: '560 ha', color: 'bg-amber-600' },
-      { type: 'Dry Deciduous Buffer', percentage: 10, area: '280 ha', color: 'bg-emerald-600' },
-    ],
-    actions: [
-      { title: 'Automated Industrial Flare Filter Applied', desc: 'Classification model verified known thermal recurrence score of 0.96.', status: 'Completed' },
-      { title: 'Thermal Camera Telemetry Ingestion', desc: 'Industrial facility on-site sensors linked to live dashboard.', status: 'In Progress' },
-    ],
-  },
-  {
-    id: 'inc-4',
-    reportId: 'REP-2025-004',
-    title: 'Sivasagar Historical Buffer Zone Containment',
-    location: 'Sivasagar',
-    districts: 'Sivasagar & Nazira Forest Range',
-    state: 'Assam',
-    firstDetected: '9 Sep 2025, 06:28 AM',
-    generatedOn: '9 Sep 2025, 09:40 AM',
-    affectedArea: '1,950 ha',
-    affectedAreaNum: 1950,
-    maxConfidence: 65,
-    status: 'Contained',
-    statusColor: 'bg-emerald-50 text-emerald-600 border border-emerald-200',
-    summary:
-      'Fire perimeter successfully contained after joint deployment of forest rangers and local civic defense. Residual thermal embers remain under continuous satellite surveillance.',
-    districtsCount: 1,
-    increaseRate: '-32%',
-    detections: [
-      { time: '9 Sep, 06:28 AM', sensor: 'MODIS (1km)', frp: '42.0 MW', temp: '540 K', coords: '26.98° N, 94.64° E', confidence: 65 },
-    ],
-    landCover: [
-      { type: 'Regenerating Forest Cover', percentage: 80, area: '1,560 ha', color: 'bg-emerald-600' },
-      { type: 'Tea Garden Fringe', percentage: 20, area: '390 ha', color: 'bg-lime-600' },
-    ],
-    actions: [
-      { title: 'Containment Line Confirmed by Sentinel-2', desc: 'Zero thermal resurgence detected during 10:00 AM overpass.', status: 'Completed' },
-      { title: 'Post-Fire Damage Assessment Report', desc: 'NDVI delta compilation initiated for state forestry ministry.', status: 'Completed' },
-    ],
-  },
-  {
-    id: 'inc-5',
-    reportId: 'REP-2025-005',
-    title: 'Singrauli Thermal Basin & Super Thermal Plant',
-    location: 'Singrauli',
-    districts: 'Singrauli & Waidhan Belt',
-    state: 'Madhya Pradesh',
-    firstDetected: '9 Sep 2025, 05:11 AM',
-    generatedOn: '9 Sep 2025, 08:20 AM',
-    affectedArea: '1,620 ha',
-    affectedAreaNum: 1620,
-    maxConfidence: 68,
-    status: 'Monitoring',
-    statusColor: 'bg-amber-50 text-amber-600 border border-amber-200',
-    summary:
-      'Controlled power generation thermal discharge verified. AI classification filters persistent industrial heat emissions from rural biomass fire alerts.',
-    districtsCount: 1,
-    increaseRate: '+8%',
-    detections: [
-      { time: '9 Sep, 05:11 AM', sensor: 'VIIRS (375m)', frp: '155.4 MW', temp: '702 K', coords: '24.19° N, 82.66° E', confidence: 68 },
-    ],
-    landCover: [
-      { type: 'Power Generation Complex (OSM)', percentage: 75, area: '1,215 ha', color: 'bg-slate-700' },
-      { type: 'Reservoir Fringe', percentage: 25, area: '405 ha', color: 'bg-blue-600' },
-    ],
-    actions: [
-      { title: 'Persistent Anomaly Flag Active', desc: 'No wildfire suppression units required.', status: 'Completed' },
-    ],
-  },
-];
+/**
+ * Dynamically builds a comprehensive, high-fidelity incident dossier
+ * from any targeted hotspot or point analyzed on the PredictiveAnalysis page.
+ */
+function createDynamicReportFromIncident(raw: any): IncidentData {
+  const lat = typeof raw.lat === 'number' ? raw.lat : 22.005;
+  const lng = typeof raw.lng === 'number' ? raw.lng : 82.671;
+  const frp = typeof raw.frp === 'number' ? raw.frp : (parseFloat(raw.frp) || 24.8);
+  const brightness = typeof raw.brightness === 'number' ? raw.brightness : (parseFloat(raw.brightness) || 342.6);
+  const location = raw.location || `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`;
+  const instrument = raw.instrument || 'VIIRS';
+  const satellite = raw.satellite || 'Suomi NPP';
+  const time = raw.time || 'NRT Telemetry';
+  const date = raw.date || 'Today';
+  const level = raw.level || (frp >= 20 ? 'Critical' : frp >= 6 ? 'High' : 'Moderate');
 
-// ─── Downloadable Reports List ────────────────────────────────────────────────
-const DOWNLOADABLE_REPORTS = [
-  {
-    id: 'dl-1',
-    title: 'Fire Activity Report',
-    format: 'PDF',
-    size: '2.4 MB',
-    icon: FilePdf,
-    iconColor: 'bg-red-50 text-red-600 border border-red-200',
-    btnText: 'Download',
-    incidentId: 'inc-1',
-  },
-  {
-    id: 'dl-2',
-    title: 'Affected Area Report',
-    format: 'XLSX',
-    size: '1.1 MB',
-    icon: FileX,
-    iconColor: 'bg-emerald-50 text-emerald-600 border border-emerald-200',
-    btnText: 'Download',
-    incidentId: 'inc-2',
-  },
-  {
-    id: 'dl-3',
-    title: 'Risk Analysis Report',
-    format: 'PDF',
-    size: '1.8 MB',
-    icon: FilePdf,
-    iconColor: 'bg-blue-50 text-blue-600 border border-blue-200',
-    btnText: 'Download',
-    incidentId: 'inc-3',
-  },
-  {
-    id: 'dl-4',
-    title: 'Incident Maps & Geodata',
-    format: 'ZIP',
-    size: '12.6 MB',
-    icon: FileArchive,
-    iconColor: 'bg-purple-50 text-purple-600 border border-purple-200',
-    btnText: 'Download',
-    incidentId: 'inc-1',
-  },
-];
+  // Parse location components if present
+  const locationParts = location.split(',').map((s: string) => s.trim());
+  const siteName = locationParts[0] || `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`;
+  const stateOrRegion = locationParts[1] || 'Industrial Sector';
+  const country = locationParts[2] || 'India';
 
-// ─── Trend Data for SVG Chart ─────────────────────────────────────────────────
-const TREND_DATA = [
-  { day: '1 Sep', viirs: 300, modis: 220, total: 520, x: 30 },
-  { day: '2 Sep', viirs: 410, modis: 280, total: 690, x: 80 },
-  { day: '3 Sep', viirs: 520, modis: 310, total: 830, x: 130 },
-  { day: '4 Sep', viirs: 580, modis: 360, total: 940, x: 180 },
-  { day: '5 Sep', viirs: 620, modis: 400, total: 1020, x: 230 },
-  { day: '6 Sep', viirs: 820, modis: 540, total: 1360, x: 280 },
-  { day: '7 Sep', viirs: 1010, modis: 580, total: 1590, x: 330 },
-  { day: '8 Sep', viirs: 1180, modis: 620, total: 1800, x: 380 },
-  { day: '9 Sep', viirs: 1040, modis: 510, total: 1550, x: 430 },
-];
+  const title = `Predictive Hazard Dossier: ${siteName}`;
+  const incidentType =
+    frp >= 20
+      ? 'Industrial Thermal Flare'
+      : frp >= 8
+      ? 'High-Intensity Thermal Hotspot'
+      : 'Vegetation / Surface Hotspot';
 
-export default function Report({ onNavigate }: ReportProps) {
-  // Navigation between Main Dashboard and Report Preview
-  const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
-  const [dateRange] = useState('1 Sep 2025 – 9 Sep 2025');
-  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState<number | null>(7); // 8 Sep selected by default
-  const [copiedLink, setCopiedLink] = useState(false);
+  let confidenceScore = 94;
+  if (typeof raw.confidence === 'number') {
+    confidenceScore = Math.round(raw.confidence);
+  } else if (typeof raw.confidence === 'string') {
+    const match = raw.confidence.match(/\d+/);
+    if (match) confidenceScore = parseInt(match[0], 10);
+  }
 
-  // Handle opening a specific report preview
-  const handleOpenReport = (incident: IncidentReport) => {
-    setSelectedIncident(incident);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Model-driven estimations grounded in FRP
+  const affectedAreaKm2 = parseFloat((frp * 0.42 + 1.5).toFixed(1));
+  const estimatedPopulation10km = Math.round(frp * 260 + 3800);
+  const estimatedPopulation20km = Math.round(estimatedPopulation10km * 3.6);
 
-  // Handle returning back to reports list
-  const handleBackToDashboard = () => {
-    setSelectedIncident(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleShare = () => {
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const handleDownloadExcel = () => {
-    if (!selectedIncident) return;
-    const rows = [
-      ['Report ID', selectedIncident.reportId],
-      ['Title', `"${selectedIncident.title}"`],
-      ['Location', `"${selectedIncident.location}"`],
-      ['Districts', `"${selectedIncident.districts}"`],
-      ['State', `"${selectedIncident.state}"`],
-      ['Affected Area', `"${selectedIncident.affectedArea}"`],
-      ['Status', selectedIncident.status],
-      ['Generated On', selectedIncident.generatedOn],
-      [],
-      ['Detection Time', 'Sensor', 'FRP', 'Temperature', 'Coordinates', 'Confidence %'],
-      ...selectedIncident.detections.map((d) => [
-        `"${d.time}"`,
-        `"${d.sensor}"`,
-        `"${d.frp}"`,
-        `"${d.temp}"`,
-        `"${d.coords}"`,
-        d.confidence,
-      ]),
+  // Map real facilities from PredictiveAnalysis if present, otherwise realistic proximal assets
+  let nearbyIndustries: IncidentData['nearbyIndustries'] = [];
+  if (Array.isArray(raw.nearbyFacilities) && raw.nearbyFacilities.length > 0) {
+    nearbyIndustries = raw.nearbyFacilities.map((fac: any) => ({
+      name: fac.name,
+      distanceKm:
+        typeof fac.distanceKm === 'number'
+          ? fac.distanceKm
+          : parseFloat(fac.distance) || 1.8,
+      threat:
+        fac.threat === 'Critical' ? 'Critical' : fac.threat === 'High' ? 'High' : 'Medium',
+      threatColor:
+        fac.threat === 'Critical'
+          ? '#dc2626'
+          : fac.threat === 'High'
+          ? '#ea580c'
+          : '#f59e0b',
+      type: fac.sector || fac.material || 'Critical Infrastructure',
+    }));
+  } else if (Array.isArray(raw.nearbyIndustries) && raw.nearbyIndustries.length > 0) {
+    nearbyIndustries = raw.nearbyIndustries;
+  } else {
+    nearbyIndustries = [
+      {
+        name: `Regional Substation & High-Voltage Grid Feed`,
+        distanceKm: 1.4,
+        threat: 'Critical',
+        threatColor: '#dc2626',
+        type: 'Electrical Transmission & Transformers',
+      },
+      {
+        name: `Chemical & Hydrocarbon Bulk Storage Terminal`,
+        distanceKm: 2.8,
+        threat: 'High',
+        threatColor: '#ea580c',
+        type: 'Petroleum & Solvent Logistics',
+      },
+      {
+        name: `Heavy Industrial Processing Compound`,
+        distanceKm: 4.6,
+        threat: 'Medium',
+        threatColor: '#f59e0b',
+        type: 'Manufacturing & Heavy Metallurgy',
+      },
+      {
+        name: `Agricultural Grain Logistics Terminal`,
+        distanceKm: 6.8,
+        threat: 'Low',
+        threatColor: '#3b82f6',
+        type: 'Warehousing & Bulk Storage',
+      },
     ];
-    const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((r) => r.join(',')).join('\n');
-    const encoded = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encoded);
-    link.setAttribute('download', `${selectedIncident.reportId}_analysis.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  }
+
+  const summary = `On ${date} at ${time}, spaceborne thermal infrared radiometers (${satellite} ${instrument}) acquired an active surface thermal anomaly at coordinates ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E with Fire Radiative Power (FRP) of ${frp.toFixed(1)} MW and brightness temperature of ${brightness.toFixed(0)} K (~${(brightness - 273.15).toFixed(0)}°C). Automated predictive risk modeling projects direct thermal propagation across ~${affectedAreaKm2} km², with ${nearbyIndustries.length} monitored critical infrastructure assets situated in the proximal impact perimeter.`;
+
+  const fullSummary = `Cross-referencing OpenStreetMap infrastructure telemetry and NASA FIRMS middle-infrared bands indicates active thermal combustion requiring emergency perimeter containment. Downwind dispersion projections model airborne PM2.5 levels exceeding ${(frp > 15 ? 4.8 : 2.5).toFixed(1)}x baseline standards, potentially impacting an estimated ${estimatedPopulation10km.toLocaleString()} citizens residing within the 10 km radial sector. Priority suppression directives recommend immediate foam deluge deployment around high-risk facilities and automated alerts to civil disaster authorities.`;
+
+  const keyTakeaways = [
+    `Radiative emission of ${frp.toFixed(1)} MW detected via ${instrument} sensor aboard ${satellite}.`,
+    `Direct heat and smoke plume perimeter covers approximately ~${affectedAreaKm2} km² of terrain.`,
+    `${nearbyIndustries.length} critical infrastructure facilities in threat perimeter (${nearbyIndustries[0]?.name || 'Primary Asset'} at ${nearbyIndustries[0]?.distanceKm || 0} km).`,
+    `Over ${estimatedPopulation10km.toLocaleString()} residents situated in the 10 km inner containment buffer.`,
+  ];
+
+  const actions: IncidentData['actions'] = [
+    {
+      title: 'Deploy High-Capacity Deluge & Foam Umbrella',
+      priority: 'Immediate · Critical',
+      desc: `Mobilize rapid response tender units to establish cooling perimeters around high-risk assets within 2.5 km of coordinates (${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E).`,
+      status: 'Active',
+      icon: '💧',
+    },
+    {
+      title: 'Establish 2.5 km Exclusion & Containment Buffer',
+      priority: 'High Priority',
+      desc: 'Enforce perimeter isolation and alert emergency services to prevent downwind toxic plume inhalation across proximal human settlements.',
+      status: 'Enforced',
+      icon: '🛡️',
+    },
+    {
+      title: 'Isolate High-Voltage Infrastructure Feeds',
+      priority: 'Tactical Intervention',
+      desc: 'De-energize high-tension transformers and volatile storage pipelines within primary threat corridor to avert secondary arc ignition.',
+      status: 'Active',
+      icon: '⚡',
+    },
+    {
+      title: 'Satellite Sensor & UAV Nocturnal Overwatch',
+      priority: 'Telemetry',
+      desc: 'Continue automated ingest of NASA FIRMS VIIRS 375m passes and thermal UAV sweeps to monitor fire line containment and ember migration.',
+      status: 'Enforced',
+      icon: '🛰️',
+    },
+  ];
+
+  const timeline = [
+    {
+      date: `${date} ${time}`,
+      title: `NASA FIRMS ${satellite} (${instrument}) acquired thermal infrared hotspot at ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
+      statusColor: 'bg-red-500',
+    },
+    {
+      date: `${date} +5 min`,
+      title: `AstraFlare AI engine verified anomaly with ${confidenceScore}% confidence (FRP: ${frp.toFixed(1)} MW)`,
+      statusColor: 'bg-orange-500',
+    },
+    {
+      date: `${date} +12 min`,
+      title: `PostgreSQL spatial engine cross-referenced ${nearbyIndustries.length} nearby OpenStreetMap critical infrastructure facilities`,
+      statusColor: 'bg-amber-500',
+    },
+    {
+      date: `${date} +20 min`,
+      title: `Automated predictive dossier compiled; containment protocols and tactical alerts dispatched`,
+      statusColor: 'bg-emerald-500',
+    },
+  ];
+
+  return {
+    id: raw.id || `point-${lat.toFixed(4)}-${lng.toFixed(4)}`,
+    title,
+    incidentType,
+    location: siteName,
+    state: stateOrRegion,
+    country,
+    dateRange: `${date} (${time})`,
+    durationDays: 1,
+    lat,
+    lng,
+    coordinates: `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
+    isDynamicPoint: true,
+    severity: level === 'Critical' ? 'Critical' : level === 'High' ? 'High' : 'Moderate',
+    habitat: `${stateOrRegion} Environmental & Industrial Zone`,
+    confidenceScore,
+    totalIndustrialSites: nearbyIndustries.length,
+    estimatedPopulation10km,
+    estimatedPopulation20km,
+    affectedAreaKm2,
+    frpMw: frp,
+    summary,
+    fullSummary,
+    keyTakeaways,
+    airQualityPm25: `${(frp > 15 ? 4.8 : 2.5).toFixed(1)}x`,
+    waterBodiesAffected: frp > 20 ? 2 : 1,
+    forestAreaLostKm2: parseFloat((frp * 0.15).toFixed(1)),
+    soilContamination: frp > 20 ? 'Elevated Hydrocarbons' : 'Moderate Combustion Fallout',
+    demographics: {
+      childrenPct: 22,
+      adultsPct: 48,
+      elderlyPct: 30,
+    },
+    nearbyIndustries,
+    timeline,
+    actions,
+  };
+}
+
+const INCIDENTS_CATALOG: IncidentData[] = [
+  {
+    id: 'assam-baghjan',
+    title: 'Assam Oil Well Fire',
+    incidentType: 'Industrial Fire',
+    location: 'Baghjan, Tinsukia',
+    state: 'Assam',
+    country: 'India',
+    dateRange: '27 May 2020 – 9 Nov 2020',
+    durationDays: 166,
+    lat: 27.589,
+    lng: 95.382,
+    coordinates: '27.5890°N, 95.3820°E',
+    isDynamicPoint: false,
+    severity: 'Critical',
+    habitat: 'Dibru-Saikhowa Biosphere & Maguri-Motapung Wetland Eco-zone',
+    confidenceScore: 92,
+    totalIndustrialSites: 12,
+    estimatedPopulation10km: 14230,
+    estimatedPopulation20km: 52860,
+    affectedAreaKm2: 25,
+    frpMw: 450.8,
+    summary:
+      'On 27 May 2020, a major gas blowout occurred at Oil India Limited\'s (Baghjan Well #5) in Tinsukia, Assam, triggering an uncontrolled condensate eruption that subsequently ignited on 9 June 2020. The intense inferno burned continuously for 166 days before specialized snubbing and blowout capping teams brought it under control.',
+    fullSummary:
+      'The incident resulted in high atmospheric release of volatile organic hydrocarbons, massive thermal radiative plumes reaching 450+ MW, and catastrophic fallout over the sensitive Dibru-Saikhowa National Park boundary and the Maguri-Motapung wetland. Over 11,000 residents across 5 peripheral villages were displaced to emergency relief camps. Containment required a high-capacity water deluge umbrella (4,000 gpm) to preserve wellhead casing integrity, followed by snubbing unit operations to pump heavy density kill-mud down the wellbore.',
+    keyTakeaways: [
+      'Fire burned vigorously for 166 days before being successfully capped and extinguished.',
+      'Significant air, soil, and aquatic hydrocarbon contamination across surrounding riverine ecosystems.',
+      'Over 14,000 people directly affected within 10 km, with several villages evacuated into relief shelters.',
+      'Biodiversity and endangered wildlife in nearby Dibru-Saikhowa Biosphere suffered acute thermal exposure.',
+    ],
+    airQualityPm25: '5.2x',
+    waterBodiesAffected: 3,
+    forestAreaLostKm2: 7.8,
+    soilContamination: 'Elevated Hydrocarbons',
+    demographics: {
+      childrenPct: 20,
+      adultsPct: 42,
+      elderlyPct: 38,
+    },
+    nearbyIndustries: [
+      { name: 'Oil India Limited (Baghjan Well #5)', distanceKm: 0.0, threat: 'Critical', threatColor: '#dc2626', type: 'Oil & Gas Production' },
+      { name: 'OIL Gas Gathering Station (GGS-8)', distanceKm: 2.4, threat: 'High', threatColor: '#ea580c', type: 'Hydrocarbon Processing' },
+      { name: 'Tinsukia Condensate Storage Terminal', distanceKm: 5.1, threat: 'Medium', threatColor: '#f59e0b', type: 'Petroleum Terminal' },
+      { name: 'Geological Survey Exploration Site', distanceKm: 6.8, threat: 'Low', threatColor: '#3b82f6', type: 'Geological Base' },
+      { name: 'Digboi Refinery Pipeline Feed Junction', distanceKm: 14.2, threat: 'Safe', threatColor: '#10b981', type: 'Refinery Infrastructure' },
+      { name: 'Assam Petrochemicals Distribution Line', distanceKm: 18.5, threat: 'Safe', threatColor: '#10b981', type: 'Chemical Logistics' },
+    ],
+    timeline: [
+      { date: '27 May 2020', title: 'Well blowout and gas surge commenced during workover operations', statusColor: 'bg-red-500' },
+      { date: '9 Jun 2020', title: 'Condensate plume ignited into massive blaze; emergency evacuation ordered', statusColor: 'bg-orange-500' },
+      { date: 'Jul 2020', title: 'Peak thermal radiative power observed by VIIRS (FRP > 450 MW)', statusColor: 'bg-amber-500' },
+      { date: 'Aug 2020', title: 'Severe hydrocarbon deposition reported in Maguri Motapung wetland', statusColor: 'bg-blue-500' },
+      { date: 'Oct 2020', title: 'High-pressure snubbing unit deployed for secondary blowout capping attempt', statusColor: 'bg-purple-500' },
+      { date: '9 Nov 2020', title: 'Well killed with heavy brine mud; inferno officially extinguished', statusColor: 'bg-emerald-500' },
+    ],
+    actions: [
+      {
+        title: 'High-Volume Deluge Water Umbrella',
+        priority: 'Immediate · Critical',
+        desc: 'Continuous delivery of 4,000 gallons per minute (gpm) of pressurized water directly over wellhead flanges to shield structural integrity against thermal metallurgical fatigue.',
+        status: 'Active',
+        icon: '💧',
+      },
+      {
+        title: 'Establish 2.5 km Strict Exclusion Perimeter',
+        priority: 'High Priority',
+        desc: 'Maintain mandatory evacuation buffer for Baghjan, Dighaltarrang, and Notun Gaon settlements to mitigate acute exposure to toxic H2S fumes and condensate fallout.',
+        status: 'Enforced',
+        icon: '🛡️',
+      },
+      {
+        title: 'Snubbing Unit Well-Kill Mud Injection',
+        priority: 'Tactical Intervention',
+        desc: 'Deploy international blowout engineers (Alert Disaster Control) to install high-pressure blowout preventer (BOP) stack and inject high-density barite kill-mud downhole.',
+        status: 'Active',
+        icon: '⚙️',
+      },
+      {
+        title: 'Aquatic Floating Booms on Dangori River',
+        priority: 'Ecological Containment',
+        desc: 'Anchor multi-tiered absorbent floating booms across Dangori River and Maguri Beel wetlands to intercept crude condensates before reaching the Brahmaputra tributary.',
+        status: 'Active',
+        icon: '🌊',
+      },
+      {
+        title: 'Satellite Infrared Telemetry Overwatch',
+        priority: 'Ongoing Telemetry',
+        desc: 'Calibrate daily NASA FIRMS VIIRS 375m and Sentinel-2 SWIR overpasses to monitor thermal radiative output and detect subsurface flare boundary migration.',
+        status: 'Enforced',
+        icon: '🛰️',
+      },
+    ],
+  },
+  {
+    id: 'simlipal-wildfire',
+    title: 'Simlipal Biosphere Wildfire',
+    incidentType: 'Wildfire',
+    location: 'Mayurbhanj',
+    state: 'Odisha',
+    country: 'India',
+    dateRange: '18 Feb 2021 – 15 Mar 2021',
+    durationDays: 25,
+    lat: 21.932,
+    lng: 86.345,
+    coordinates: '21.9320°N, 86.3450°E',
+    isDynamicPoint: false,
+    severity: 'High',
+    habitat: 'Simlipal Tiger Reserve & Moist Deciduous Forest Sanctuary',
+    confidenceScore: 88,
+    totalIndustrialSites: 4,
+    estimatedPopulation10km: 6850,
+    estimatedPopulation20km: 24900,
+    affectedAreaKm2: 38,
+    frpMw: 280.4,
+    summary:
+      'Widespread canopy and ground fire outbreaks engulfed multiple beats across the Simlipal Biosphere Reserve in Mayurbhanj district, Odisha. Propelled by elevated dry-season temperatures, strong gusts, and dense sal leaf litter, thermal anomalies rapidly spread across core conservation sectors.',
+    fullSummary:
+      'Satellite telemetry from VIIRS and MODIS revealed over 340 active thermal clusters over a 3-week span. Suppression efforts combined ground forest brigades with tactical counter-firing and community beat patrols to prevent the fire line from encroaching into contiguous human settlements.',
+    keyTakeaways: [
+      'Dry-season leaf litter and gusty winds rapidly fueled multiple simultaneous forest beats.',
+      'Over 38 km² of canopy and undergrowth subjected to moderate-to-severe scorching.',
+      'Core tiger and elephant migratory corridors protected through rapid tactical fire-breaks.',
+      'Zero loss of human life reported due to prompt community perimeter fire lines.',
+    ],
+    airQualityPm25: '3.8x',
+    waterBodiesAffected: 1,
+    forestAreaLostKm2: 18.2,
+    soilContamination: 'Moderate Ash Fallout',
+    demographics: {
+      childrenPct: 24,
+      adultsPct: 51,
+      elderlyPct: 25,
+    },
+    nearbyIndustries: [
+      { name: 'Mayurbhanj Timber Logistics Hub', distanceKm: 4.8, threat: 'High', threatColor: '#ea580c', type: 'Forest Industry' },
+      { name: 'Baripada Grain Storage Warehouse', distanceKm: 12.1, threat: 'Medium', threatColor: '#f59e0b', type: 'Agricultural Terminal' },
+      { name: 'Subarnarekha Pumping Station', distanceKm: 16.4, threat: 'Low', threatColor: '#3b82f6', type: 'Water Infrastructure' },
+      { name: 'Balasore Power Distribution Substation', distanceKm: 22.0, threat: 'Safe', threatColor: '#10b981', type: 'Electrical Utility' },
+    ],
+    timeline: [
+      { date: '18 Feb 2021', title: 'First thermal anomalies detected in core Southern Simlipal beat', statusColor: 'bg-red-500' },
+      { date: '25 Feb 2021', title: 'Fires expand across 8 reserve ranges fueled by 38°C dry heat', statusColor: 'bg-orange-500' },
+      { date: '3 Mar 2021', title: 'Multi-agency disaster management & ODRAF personnel mobilized', statusColor: 'bg-amber-500' },
+      { date: '10 Mar 2021', title: 'Counter-firing operations establish 120 km of defensive fire-breaks', statusColor: 'bg-blue-500' },
+      { date: '15 Mar 2021', title: 'Unseasonal showers and final mop-up successfully douse all spots', statusColor: 'bg-emerald-500' },
+    ],
+    actions: [
+      {
+        title: 'Tactical Fire-Break Clearing (Controlled Burn)',
+        priority: 'Immediate',
+        desc: 'Clear 30-meter buffer strips along ridge crests to starve advancing ground fires of dry leaf fuels.',
+        status: 'Completed',
+        icon: '🪓',
+      },
+      {
+        title: 'ODRAF High-Pressure Backpack Spray Teams',
+        priority: 'High Priority',
+        desc: 'Deploy 500+ trained disaster responders equipped with portable water mist blowers to quell ember flaring.',
+        status: 'Active',
+        icon: '🚒',
+      },
+      {
+        title: 'Wildlife Sanctuary Escape Corridor Monitoring',
+        priority: 'Ecological Guard',
+        desc: 'Keep open northern wet-drainage valleys to permit unhindered movement of large herbivores and big cats.',
+        status: 'Enforced',
+        icon: '🐅',
+      },
+      {
+        title: 'Infrared Drone Nocturnal Reconnaissance',
+        priority: 'Telemetry',
+        desc: 'Nighttime thermal aerial surveillance to spot smoldering tree stumps before daytime re-ignition.',
+        status: 'Active',
+        icon: '🛸',
+      },
+    ],
+  },
+];
+
+export default function Report({ onNavigate, selectedIncident: propIncident }: ReportProps) {
+  // 1. Resolve Active Incident from Props or Session Storage
+  const [analyzedIncident, setAnalyzedIncident] = useState<any>(() => {
+    if (propIncident) return propIncident;
+    try {
+      const saved = sessionStorage.getItem('astraflare_selected_incident');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Sync state if prop changes
+  useEffect(() => {
+    if (propIncident) {
+      setAnalyzedIncident(propIncident);
+    } else {
+      try {
+        const saved = sessionStorage.getItem('astraflare_selected_incident');
+        if (saved) setAnalyzedIncident(JSON.parse(saved));
+      } catch {}
+    }
+  }, [propIncident]);
+
+  // 2. Synthesize dynamic report if analyzedIncident exists
+  const dynamicReport = useMemo(() => {
+    if (analyzedIncident) {
+      return createDynamicReportFromIncident(analyzedIncident);
+    }
+    return null;
+  }, [analyzedIncident]);
+
+  // 3. Combined Catalog: Active Point First, then Historical Archives
+  const allIncidents = useMemo(() => {
+    if (dynamicReport) {
+      return [dynamicReport, ...INCIDENTS_CATALOG];
+    }
+    return INCIDENTS_CATALOG;
+  }, [dynamicReport]);
+
+  // Active Incident Selection (defaults to the analyzed point if available)
+  const [activeIncidentId, setActiveIncidentId] = useState<string>(() => {
+    return dynamicReport ? dynamicReport.id : INCIDENTS_CATALOG[0].id;
+  });
+
+  // Automatically select dynamic point when a new one is analyzed
+  useEffect(() => {
+    if (dynamicReport) {
+      setActiveIncidentId(dynamicReport.id);
+    }
+  }, [dynamicReport?.id]);
+
+  const [isFullSummaryExpanded, setIsFullSummaryExpanded] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Active Incident Data
+  const currentIncident =
+    allIncidents.find((inc) => inc.id === activeIncidentId) || allIncidents[0];
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleShareReport = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Report link copied to clipboard!');
+    } else {
+      showToast('Report ready to share.');
+    }
+  };
+
+  const handleDownloadPdf = () => {
+    window.print();
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
-      {/* ═══════════════════════ UNIFIED HEADER ═══════════════════════ */}
+    <div className="min-h-screen bg-[#f8fafc] text-gray-800 flex flex-col font-sans select-none pb-12">
+      {/* ─── Top Global App Header ─── */}
       <Header activePage="Report" onNavigate={onNavigate} />
 
-      {/* ═══════════════════════ MAIN CONTENT BODY ═══════════════════════ */}
-      <main className="flex-1 px-8 py-5 flex flex-col gap-5 max-w-[1700px] w-full mx-auto">
-        {selectedIncident ? (
-          /* ═══════════════════════════════════════════════════════════════════════
-             VIEW 2: REPORT PREVIEW / DETAILS PAGE (Matching Item 21 in Image 2)
-             ═══════════════════════════════════════════════════════════════════════ */
-          <div className="flex flex-col gap-5 animate-in fade-in duration-200">
-            {/* Top Back & Action Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleBackToDashboard}
-                  className="flex items-center gap-2 h-9 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-2xs hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  <ArrowLeft size={15} weight="bold" />
-                  <span>Back to Reports</span>
-                </button>
-                <div>
-                  <h1 className="text-[24px] font-black text-gray-900 tracking-tight leading-none">
-                    Report Preview
-                  </h1>
-                  <p className="text-[12.5px] text-gray-400 mt-1 font-medium">
-                    Detailed analysis report for selected incident
-                  </p>
-                </div>
-              </div>
+      {/* ─── Floating Toast Notification ─── */}
+      {toastMessage && (
+        <div className="fixed top-20 right-8 z-[999] px-4 py-2.5 bg-slate-900 text-white text-[12.5px] font-semibold rounded-xl shadow-2xl flex items-center gap-2 border border-slate-700 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle size={17} weight="fill" className="text-emerald-400" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2.5">
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 h-9 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[12.5px] font-semibold text-gray-700 shadow-2xs transition-colors cursor-pointer"
-                >
-                  {copiedLink ? (
-                    <>
-                      <Check size={14} weight="bold" className="text-emerald-600" />
-                      <span className="text-emerald-600 font-bold">Link Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShareNetwork size={15} weight="bold" />
-                      <span>Share</span>
-                    </>
-                  )}
-                </button>
+      {/* ─── Sub-header Navigation & Title Bar ─── */}
+      <div className="bg-white border-b border-gray-200/80 px-6 sm:px-10 py-3.5 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Left: Back Link & Title */}
+          <div>
+            <button
+              onClick={() => onNavigate && onNavigate(currentIncident.isDynamicPoint ? 'Predictive Analysis' : 'Live Map')}
+              className="inline-flex items-center gap-1.5 text-[12px] font-bold text-gray-500 hover:text-orange-600 transition-colors mb-1.5 cursor-pointer"
+            >
+              <ArrowLeft size={14} weight="bold" />
+              <span>{currentIncident.isDynamicPoint ? 'Back to Predictive Analysis' : 'Back to Incidents'}</span>
+            </button>
 
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-[26px] font-black text-gray-950 tracking-tight leading-none">
+                {currentIncident.title}
+              </h1>
+
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-red-50 text-red-600 border border-red-200/80 shadow-2xs">
+                <Fire size={12} weight="fill" className="text-red-500" />
+                {currentIncident.incidentType}
+              </span>
+
+              {currentIncident.isDynamicPoint && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-orange-50 text-orange-700 border border-orange-200/90 shadow-2xs">
+                  <Sparkle size={12} weight="fill" className="text-orange-500" />
+                  Targeted Point Analysis
+                </span>
+              )}
+
+              {/* Incident Switcher Dropdown */}
+              <div className="relative">
                 <button
-                  onClick={() => window.print()}
-                  className="flex items-center gap-1.5 h-9 px-4 bg-[#2563eb] hover:bg-blue-700 text-white rounded-lg text-[12.5px] font-bold shadow-sm transition-colors cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Switch between analyzed point and curated incident dossiers"
                 >
-                  <DownloadSimple size={15} weight="bold" />
-                  <span>Download PDF</span>
+                  <span>Switch Incident</span>
+                  <CaretDown size={11} weight="bold" />
                 </button>
 
-                <button
-                  onClick={handleDownloadExcel}
-                  className="flex items-center gap-1.5 h-9 px-4 bg-[#059669] hover:bg-emerald-700 text-white rounded-lg text-[12.5px] font-bold shadow-sm transition-colors cursor-pointer"
-                >
-                  <DownloadSimple size={15} weight="bold" />
-                  <span>Download Excel</span>
-                </button>
+                {isDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
+                    <div className="absolute left-0 mt-1.5 w-72 bg-white rounded-xl shadow-xl border border-gray-200 p-1.5 z-50">
+                      {dynamicReport && (
+                        <>
+                          <div className="px-2.5 py-1 text-[10px] font-extrabold text-orange-600 uppercase tracking-wider">
+                            Active Point Analysis
+                          </div>
+                          <button
+                            onClick={() => {
+                              setActiveIncidentId(dynamicReport.id);
+                              setIsDropdownOpen(false);
+                              showToast(`Loaded ${dynamicReport.title}`);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px] font-semibold flex items-center justify-between transition-colors cursor-pointer mb-1 ${
+                              activeIncidentId === dynamicReport.id
+                                ? 'bg-orange-50 text-orange-700 border border-orange-200/70'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="min-w-0 pr-2">
+                              <p className="font-bold truncate text-gray-950 flex items-center gap-1">
+                                <span>🎯</span>
+                                <span className="truncate">{dynamicReport.location}</span>
+                              </p>
+                              <p className="text-[10.5px] text-gray-400 font-normal">
+                                {dynamicReport.coordinates} · {dynamicReport.frpMw} MW
+                              </p>
+                            </div>
+                            {activeIncidentId === dynamicReport.id && (
+                              <Check size={14} weight="bold" className="text-orange-600 shrink-0" />
+                            )}
+                          </button>
+                          <div className="border-t border-gray-100 my-1" />
+                          <div className="px-2.5 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            Historical Archives
+                          </div>
+                        </>
+                      )}
+
+                      {INCIDENTS_CATALOG.map((inc) => (
+                        <button
+                          key={inc.id}
+                          onClick={() => {
+                            setActiveIncidentId(inc.id);
+                            setIsDropdownOpen(false);
+                            showToast(`Loaded ${inc.title} dossier`);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-[12px] font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                            activeIncidentId === inc.id
+                              ? 'bg-orange-50 text-orange-700'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div>
+                            <p className="font-bold">{inc.title}</p>
+                            <p className="text-[10.5px] text-gray-400 font-normal">
+                              {inc.state}, {inc.country}
+                            </p>
+                          </div>
+                          {activeIncidentId === inc.id && (
+                            <Check size={14} weight="bold" className="text-orange-600" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Document Paper Container */}
-            <div className="bg-white border border-gray-200/90 rounded-2xl p-8 shadow-xs max-w-5xl mx-auto w-full flex flex-col gap-6">
-              {/* Document Header */}
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-6 border-b border-gray-100 gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 border border-orange-100 shadow-2xs">
-                    <Fire size={26} weight="fill" />
-                  </div>
-                  <div>
-                    <h2 className="text-[22px] font-black text-gray-900 tracking-tight">
-                      {selectedIncident.title}
-                    </h2>
-                    <p className="text-[13px] text-gray-500 mt-0.5 font-medium">
-                      {selectedIncident.districts}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold ${selectedIncident.statusColor}`}>
-                        {selectedIncident.status}
-                      </span>
-                      <span className="text-[11.5px] text-gray-400 font-medium">
-                        Region: {selectedIncident.state}, India
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right AstraFlare Brand Emblem */}
-                <div className="flex items-center gap-2.5 text-right sm:text-right shrink-0">
-                  <div className="leading-none">
-                    <p className="text-[18px] font-black tracking-tight text-gray-900">
-                      Astra <span className="text-orange-500">Flare</span>
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-1">
-                      From Space to a Safer Earth
-                    </p>
-                  </div>
-                  <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-sm">
-                    <Fire size={18} weight="fill" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Metadata Info Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50/80 rounded-xl border border-gray-100 text-[12px]">
-                <div>
-                  <p className="text-gray-400 font-medium">Report ID</p>
-                  <p className="font-bold text-gray-900 mt-0.5">{selectedIncident.reportId}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 font-medium">Generated On</p>
-                  <p className="font-bold text-gray-900 mt-0.5">{selectedIncident.generatedOn}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 font-medium">Time Range</p>
-                  <p className="font-bold text-gray-900 mt-0.5">1 Sep 2025 – 9 Sep 2025</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 font-medium">Data Sources</p>
-                  <p className="font-bold text-orange-600 mt-0.5 truncate">NASA FIRMS, MODIS, OSM, WorldCover</p>
-                </div>
-              </div>
-
-              {/* 1. Executive Summary */}
-              <div>
-                <h3 className="text-[15px] font-black text-gray-900 mb-2.5 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span>1. Executive Summary</span>
-                </h3>
-                <p className="text-[13px] text-gray-600 leading-relaxed font-normal">
-                  {selectedIncident.summary} Satellite observations indicate elevated thermal radiative power and potential boundary expansion towards neighboring vegetative and rural parcels. Multi-spectral infrared telemetry has confirmed zero false alarm anomaly.
-                </p>
-
-                {/* 4 Summary Metric Badges */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                  <div className="bg-red-50/70 border border-red-200/80 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0">
-                      <Fire size={18} weight="fill" />
-                    </div>
-                    <div>
-                      <p className="text-[18px] font-black text-gray-900 leading-none">
-                        {selectedIncident.maxConfidence}%
-                      </p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-0.5">Avg. Confidence</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                      <Tree size={18} weight="fill" />
-                    </div>
-                    <div>
-                      <p className="text-[18px] font-black text-gray-900 leading-none">
-                        {selectedIncident.affectedArea}
-                      </p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-0.5">Affected Area</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50/70 border border-blue-200/80 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                      <Plant size={18} weight="fill" />
-                    </div>
-                    <div>
-                      <p className="text-[18px] font-black text-gray-900 leading-none">
-                        {selectedIncident.districtsCount}
-                      </p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-0.5">Major Districts</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-orange-50/70 border border-orange-200/80 rounded-xl p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-orange-500 text-white flex items-center justify-center shrink-0">
-                      <ChartBar size={18} weight="bold" />
-                    </div>
-                    <div>
-                      <p className="text-[18px] font-black text-gray-900 leading-none">
-                        {selectedIncident.increaseRate}
-                      </p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-0.5">Spread (7 days)</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. Detection History Table */}
-              <div>
-                <h3 className="text-[15px] font-black text-gray-900 mb-2.5 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500" />
-                  <span>2. Satellite Thermal Detections Log</span>
-                </h3>
-                <div className="overflow-x-auto border border-gray-200 rounded-xl">
-                  <table className="w-full text-[12px] text-left">
-                    <thead className="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
-                      <tr>
-                        <th className="py-2.5 px-3.5">Overpass Time</th>
-                        <th className="py-2.5 px-3.5">Satellite Sensor</th>
-                        <th className="py-2.5 px-3.5">FRP (Radiative Power)</th>
-                        <th className="py-2.5 px-3.5">Brightness Temp</th>
-                        <th className="py-2.5 px-3.5">Coordinates</th>
-                        <th className="py-2.5 px-3.5 text-right">Confidence</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {selectedIncident.detections.map((det, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50/60">
-                          <td className="py-2.5 px-3.5 font-bold text-gray-800">{det.time}</td>
-                          <td className="py-2.5 px-3.5 text-gray-600">{det.sensor}</td>
-                          <td className="py-2.5 px-3.5 font-semibold text-orange-600">{det.frp}</td>
-                          <td className="py-2.5 px-3.5 text-gray-700">{det.temp}</td>
-                          <td className="py-2.5 px-3.5 font-mono text-[11px] text-gray-500">{det.coords}</td>
-                          <td className="py-2.5 px-3.5 text-right font-bold text-gray-900">{det.confidence}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* 3. Land Cover Impact Breakdown */}
-              <div>
-                <h3 className="text-[15px] font-black text-gray-900 mb-2.5 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span>3. Geospatial &amp; Land Cover Distribution (NSA WorldCover &amp; OSM)</span>
-                </h3>
-                <div className="space-y-2.5 bg-gray-50/70 p-4 rounded-xl border border-gray-100">
-                  {selectedIncident.landCover.map((lc, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex items-center justify-between text-[12px]">
-                        <span className="font-semibold text-gray-800">{lc.type}</span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-gray-500">{lc.area}</span>
-                          <span className="font-bold text-gray-900 w-10 text-right">{lc.percentage}%</span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${lc.color}`} style={{ width: `${lc.percentage}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Action Directives & Response Status */}
-              <div>
-                <h3 className="text-[15px] font-black text-gray-900 mb-2.5 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-purple-500" />
-                  <span>4. Recommended Mitigation Actions &amp; Response Directives</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {selectedIncident.actions.map((act, idx) => (
-                    <div key={idx} className="bg-white border border-gray-200 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-orange-600">Directive #{idx + 1}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${act.status === 'Completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                            {act.status}
-                          </span>
-                        </div>
-                        <p className="text-[12.5px] font-bold text-gray-900 leading-snug">{act.title}</p>
-                        <p className="text-[11px] text-gray-500 mt-1 leading-normal">{act.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Digital Signature & Verification Footer */}
-              <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11.5px] text-gray-400">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} weight="fill" className="text-emerald-600" />
-                  <span>Authenticated by AstraFlare Autonomous Satellite Telemetry Grid</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span>Authorized Signature: <b className="text-gray-700">AstraFlare AI v2.4</b></span>
-                  <button onClick={() => window.print()} className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
-                    <Printer size={14} />
-                    <span>Print Report</span>
-                  </button>
-                </div>
-              </div>
+            {/* Subtitle Details */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-gray-500 mt-1.5 font-medium">
+              <span className="flex items-center gap-1">
+                <MapPin size={13} weight="fill" className="text-orange-500" />
+                {currentIncident.location}, {currentIncident.state}, {currentIncident.country}
+              </span>
+              <span>·</span>
+              <span className="font-mono text-gray-500">
+                {currentIncident.lat.toFixed(4)}° N, {currentIncident.lng.toFixed(4)}° E
+              </span>
+              <span>·</span>
+              <span className="flex items-center gap-1">
+                <Clock size={13} weight="bold" className="text-gray-400" />
+                {currentIncident.dateRange}
+              </span>
             </div>
           </div>
-        ) : (
-          /* ═══════════════════════════════════════════════════════════════════════
-             VIEW 1: MAIN REPORTS DASHBOARD (Matching Image 1)
-             ═══════════════════════════════════════════════════════════════════════ */
-          <div className="flex flex-col gap-5">
-            {/* ─── Page Title Header & Top Selectors ─── */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h1 className="text-[26px] font-black text-gray-900 tracking-tight leading-none">
-                  Reports
-                </h1>
-                <p className="text-[13px] text-gray-400 mt-1.5 font-medium">
-                  Insights, statistics, and downloadable reports for fire monitoring and risk analysis
-                </p>
+
+          {/* Right: Quick Action Buttons */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={handleShareReport}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-bold text-[12.5px] shadow-2xs transition-all cursor-pointer"
+            >
+              <ShareNetwork size={15} weight="bold" />
+              <span>Share Report</span>
+            </button>
+
+            <button
+              onClick={handleDownloadPdf}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-950 hover:bg-black text-white font-bold text-[12.5px] shadow-sm transition-all cursor-pointer"
+              title="Print or export complete report to PDF"
+            >
+              <DownloadSimple size={15} weight="bold" />
+              <span>Download PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Main Content Container ─── */}
+      <div className="max-w-7xl mx-auto w-full px-6 sm:px-10 mt-6 space-y-6">
+        {/* ─── ROW 1: 4 Key Metric Cards (Matches Both Sketches & AI Design) ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Confidence Score */}
+          <div className="bg-white border border-gray-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[12px] font-bold text-gray-500 flex items-center gap-1">
+                  <ShieldCheck size={16} className="text-blue-600" weight="bold" />
+                  Confidence Score ⓘ
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                  ● High
+                </span>
               </div>
-
-              <div className="flex items-center gap-2.5 flex-wrap">
-                {/* Date range picker */}
-                <div className="relative">
-                  <button
-                    onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-                    className="flex items-center gap-2 h-9 px-3.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-semibold text-gray-700 shadow-2xs transition-colors cursor-pointer"
-                  >
-                    <CalendarBlank size={15} className="text-gray-500" />
-                    <span>{dateRange}</span>
-                    <CaretDown size={12} weight="bold" className="text-gray-400" />
-                  </button>
-
-                  {isDateDropdownOpen && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setIsDateDropdownOpen(false)} />
-                      <div className="absolute right-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50 animate-in fade-in">
-                        {['1 Sep 2025 – 9 Sep 2025', 'Last 7 Days', 'Last 30 Days', 'Custom Range...'].map((range) => (
-                          <button
-                            key={range}
-                            onClick={() => setIsDateDropdownOpen(false)}
-                            className="w-full text-left px-3.5 py-2 text-[12px] font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer"
-                          >
-                            {range}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Download Report Action Button */}
-                <button
-                  onClick={() => handleOpenReport(INCIDENTS_DATA[0])}
-                  className="flex items-center gap-2 h-9 px-4 bg-[#2563eb] hover:bg-blue-700 text-white text-[13px] font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
-                >
-                  <DownloadSimple size={15} weight="bold" />
-                  <span>Download Report</span>
-                </button>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-[34px] font-black text-gray-950 tracking-tight leading-none">
+                  {currentIncident.confidenceScore}%
+                </span>
+              </div>
+              {/* Colored progress bar */}
+              <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden mb-2">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full"
+                  style={{ width: `${currentIncident.confidenceScore}%` }}
+                />
               </div>
             </div>
+            <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
+              Based on NASA satellite telemetry, ground verification & multi-agency audit.
+            </p>
+          </div>
 
-            {/* ─── Top 4 Metric KPI Cards ─── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Total Detections */}
-              <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex items-center gap-4 hover:shadow-xs transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
-                  <Fire size={26} weight="fill" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">
-                    Total Detections
-                  </p>
-                  <p className="text-[24px] font-black text-gray-900 leading-tight">
-                    8,742
-                  </p>
-                  <p className="text-[11px] font-bold text-emerald-600 leading-none mt-1">
-                    ↑ +28% <span className="text-gray-400 font-normal">vs. previous period</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 2: Total Affected Area */}
-              <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex items-center gap-4 hover:shadow-xs transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                  <Tree size={26} weight="fill" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">
-                    Total Affected Area
-                  </p>
-                  <p className="text-[24px] font-black text-gray-900 leading-tight">
-                    36,850 ha
-                  </p>
-                  <p className="text-[11px] font-bold text-red-500 leading-none mt-1">
-                    ↑ +42% <span className="text-gray-400 font-normal">vs. previous period</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 3: High Risk Incidents */}
-              <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex items-center gap-4 hover:shadow-xs transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
-                  <Warning size={26} weight="fill" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">
-                    High Risk Incidents
-                  </p>
-                  <p className="text-[24px] font-black text-gray-900 leading-tight">
-                    58
-                  </p>
-                  <p className="text-[11px] font-bold text-red-500 leading-none mt-1">
-                    ↑ +31% <span className="text-gray-400 font-normal">vs. previous period</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 4: Persistent Sources */}
-              <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex items-center gap-4 hover:shadow-xs transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Planet size={26} weight="fill" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">
-                    Persistent Sources
-                  </p>
-                  <p className="text-[24px] font-black text-gray-900 leading-tight">
-                    214
-                  </p>
-                  <p className="text-[11px] font-bold text-blue-600 leading-none mt-1">
-                    ↑ +12% <span className="text-gray-400 font-normal">vs. previous period</span>
-                  </p>
-                </div>
-              </div>
+          {/* Card 2: Total Industrial Sites */}
+          <div className="bg-white border border-gray-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute right-3 bottom-2 text-slate-100 pointer-events-none">
+              <Factory size={74} weight="fill" />
             </div>
-
-            {/* ─── Middle Charts Row: Fire Activity Trend + Area Affected by State ─── */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              {/* Left (7 Cols): Fire Activity Trend */}
-              <div className="lg:col-span-7 bg-white border border-gray-200/80 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <ChartBar size={16} weight="bold" className="text-gray-700" />
-                    <h3 className="text-[13.5px] font-bold text-gray-900">
-                      Fire Activity Trend
-                    </h3>
-                  </div>
-
-                  {/* Legend pills */}
-                  <div className="flex items-center gap-3 text-[11.5px] font-semibold">
-                    <span className="flex items-center gap-1.5 text-red-500">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]" /> VIIRS
-                    </span>
-                    <span className="flex items-center gap-1.5 text-amber-500">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" /> MODIS
-                    </span>
-                    <span className="flex items-center gap-1.5 text-blue-600">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" /> Total
-                    </span>
-                  </div>
+            <div className="relative z-10">
+              <span className="text-[12px] font-bold text-gray-500 flex items-center gap-1.5 mb-2">
+                <div className="w-5 h-5 rounded bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-[10px]">
+                  🏭
                 </div>
-
-                {/* Trend Chart (SVG) */}
-                <div className="relative pt-2 pb-1">
-                  <svg viewBox="0 0 460 190" className="w-full h-[180px] overflow-visible">
-                    <defs>
-                      <linearGradient id="blueTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.01" />
-                      </linearGradient>
-                      <linearGradient id="redTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#ef4444" stopOpacity="0.02" />
-                      </linearGradient>
-                    </defs>
-
-                    {/* Horizontal Grid lines */}
-                    {[35, 75, 115, 155].map((yVal, i) => (
-                      <line
-                        key={i}
-                        x1="25"
-                        y1={yVal}
-                        x2="450"
-                        y2={yVal}
-                        stroke="#f1f5f9"
-                        strokeWidth="1"
-                      />
-                    ))}
-
-                    {/* Y Axis Labels */}
-                    <text x="0" y="40" fontSize="9.5" fill="#94a3b8">2,000</text>
-                    <text x="0" y="80" fontSize="9.5" fill="#94a3b8">1,500</text>
-                    <text x="0" y="120" fontSize="9.5" fill="#94a3b8">1,000</text>
-                    <text x="5" y="158" fontSize="9.5" fill="#94a3b8">500</text>
-                    <text x="14" y="178" fontSize="9.5" fill="#94a3b8">0</text>
-
-                    {/* Shaded Area Fills */}
-                    <path
-                      d="M 30 148 L 80 135 L 130 120 L 180 110 L 230 102 L 280 75 L 330 55 L 380 40 L 430 58 L 430 170 L 30 170 Z"
-                      fill="url(#blueTrendGrad)"
-                    />
-                    <path
-                      d="M 30 162 L 80 152 L 130 142 L 180 135 L 230 130 L 280 105 L 330 88 L 380 75 L 430 89 L 430 170 L 30 170 Z"
-                      fill="url(#redTrendGrad)"
-                    />
-
-                    {/* MODIS line (Amber) */}
-                    <path
-                      d="M 30 166 Q 80 160 130 156 T 230 148 T 330 135 T 430 142"
-                      fill="none"
-                      stroke="#f59e0b"
-                      strokeWidth="2"
-                    />
-
-                    {/* VIIRS line (Red) */}
-                    <path
-                      d="M 30 162 L 80 152 L 130 142 L 180 135 L 230 130 L 280 105 L 330 88 L 380 75 L 430 89"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="2"
-                    />
-
-                    {/* Total line (Blue) with points */}
-                    <path
-                      d="M 30 148 L 80 135 L 130 120 L 180 110 L 230 102 L 280 75 L 330 55 L 380 40 L 430 58"
-                      fill="none"
-                      stroke="#2563eb"
-                      strokeWidth="2.5"
-                    />
-
-                    {/* Data Points */}
-                    {TREND_DATA.map((pt, idx) => (
-                      <g key={idx} className="cursor-pointer" onClick={() => setActiveTooltip(idx)}>
-                        {/* Interactive Dot on Total */}
-                        <circle
-                          cx={pt.x}
-                          cy={pt.total === 1800 ? 40 : pt.total === 1590 ? 55 : pt.total === 1550 ? 58 : 148 - (pt.total - 520) * 0.08}
-                          r={activeTooltip === idx ? 4.5 : 3}
-                          fill="#2563eb"
-                          stroke="#ffffff"
-                          strokeWidth="1.8"
-                        />
-                        <text
-                          x={pt.x}
-                          y="185"
-                          fontSize="9.5"
-                          fill="#94a3b8"
-                          textAnchor="middle"
-                        >
-                          {pt.day}
-                        </text>
-                      </g>
-                    ))}
-                  </svg>
-
-                  {/* Active Tooltip Box */}
-                  {activeTooltip !== null && (
-                    <div
-                      className="absolute bg-white rounded-lg px-2.5 py-1.5 shadow-md border border-gray-200 pointer-events-none transition-all text-center"
-                      style={{
-                        left: `${(TREND_DATA[activeTooltip].x / 460) * 100 - 8}%`,
-                        top: '10px',
-                      }}
-                    >
-                      <p className="text-[10px] font-bold text-gray-500">{TREND_DATA[activeTooltip].day} 2025</p>
-                      <p className="text-[12px] font-black text-blue-600">
-                        {TREND_DATA[activeTooltip].total.toLocaleString()} Detections
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-gray-400 mt-2 text-center">
-                  Daily thermal anomaly count aggregated from VIIRS (375m) &amp; MODIS (1km) sensors
-                </p>
+                Total Industrial Sites
+              </span>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[34px] font-black text-gray-950 tracking-tight leading-none">
+                  {currentIncident.totalIndustrialSites}
+                </span>
               </div>
-
-              {/* Right (5 Cols): Area Affected by State */}
-              <div className="lg:col-span-5 bg-white border border-gray-200/80 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <ChartBar size={16} weight="bold" className="text-gray-700" />
-                    <h3 className="text-[13.5px] font-bold text-gray-900">
-                      Area Affected by State
-                    </h3>
-                  </div>
-                  <span className="text-[11px] font-semibold text-gray-400">Area (ha)</span>
-                </div>
-
-                {/* Bar Chart Representation */}
-                <div className="space-y-3 py-1">
-                  {[
-                    { state: 'Assam', area: '8,650 ha', percent: 86, color: 'bg-red-500' },
-                    { state: 'Madhya Pradesh', area: '6,200 ha', percent: 62, color: 'bg-orange-500' },
-                    { state: 'Chhattisgarh', area: '4,100 ha', percent: 41, color: 'bg-amber-500' },
-                    { state: 'Odisha', area: '2,800 ha', percent: 28, color: 'bg-yellow-500' },
-                    { state: 'Maharashtra', area: '2,100 ha', percent: 21, color: 'bg-blue-500' },
-                    { state: 'Others (Pan-India)', area: '3,200 ha', percent: 32, color: 'bg-gray-400' },
-                  ].map((bar, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex items-center justify-between text-[11.5px]">
-                        <span className="font-semibold text-gray-700">{bar.state}</span>
-                        <span className="font-bold text-gray-900">{bar.area}</span>
-                      </div>
-                      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${bar.color} transition-all duration-500`}
-                          style={{ width: `${bar.percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-                  <span>Assam accounts for 35% of total impacted area</span>
-                  <span className="text-orange-600 font-bold">Pan-India View</span>
-                </div>
-              </div>
+              <p className="text-[12px] font-bold text-orange-600">within 20 km radius</p>
             </div>
+            <p className="relative z-10 text-[11px] text-gray-400 font-medium leading-relaxed mt-2">
+              1 at ground zero, 3 high proximity threat zones.
+            </p>
+          </div>
 
-            {/* ─── Lower Section: Top Incidents Table & Report Insights ─── */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-              {/* Left (8 Cols): Top Incidents Table */}
-              <div className="lg:col-span-8 bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Fire size={16} weight="fill" className="text-gray-700" />
-                      <h3 className="text-[13.5px] font-bold text-gray-900">
-                        Top Incidents
-                      </h3>
-                    </div>
-                    <span className="text-[11px] text-gray-400">Click any row to view full report</span>
-                  </div>
-
-                  {/* Table */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[12px] text-left">
-                      <thead>
-                        <tr className="text-gray-400 border-b border-gray-100 font-medium">
-                          <th className="pb-2 font-medium">#</th>
-                          <th className="pb-2 font-medium">Location</th>
-                          <th className="pb-2 font-medium">State</th>
-                          <th className="pb-2 font-medium">First Detected</th>
-                          <th className="pb-2 font-medium">Affected Area (ha)</th>
-                          <th className="pb-2 font-medium">Max Confidence</th>
-                          <th className="pb-2 font-medium text-right">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50">
-                        {INCIDENTS_DATA.map((row, idx) => (
-                          <tr
-                            key={row.id}
-                            onClick={() => handleOpenReport(row)}
-                            className="hover:bg-orange-50/60 transition-colors cursor-pointer group"
-                          >
-                            <td className="py-2.5 font-bold text-gray-400">{idx + 1}</td>
-                            <td className="py-2.5 font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-                              {row.location}
-                            </td>
-                            <td className="py-2.5 text-gray-600 font-medium">{row.state}</td>
-                            <td className="py-2.5 text-gray-500">{row.firstDetected}</td>
-                            <td className="py-2.5 font-bold text-gray-800">{row.affectedAreaNum.toLocaleString()}</td>
-                            <td className="py-2.5 font-semibold text-gray-700">{row.maxConfidence}%</td>
-                            <td className="py-2.5 text-right">
-                              <span className={`inline-block px-2 py-0.5 rounded text-[10.5px] font-bold ${row.statusColor}`}>
-                                {row.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-                  <span>Showing top 5 high-impact fire incidents</span>
-                  <span className="text-blue-600 font-bold">58 total incidents recorded</span>
-                </div>
-              </div>
-
-              {/* Right (4 Cols): Report Insights */}
-              <div className="lg:col-span-4 bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Sparkle size={16} weight="fill" className="text-amber-500" />
-                    <h3 className="text-[13.5px] font-bold text-gray-900">
-                      Report Insights
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-md bg-red-50 text-red-500 flex items-center justify-center shrink-0 mt-0.5">
-                        <Fire size={13} weight="fill" />
-                      </div>
-                      <p className="text-[11.5px] text-gray-700 leading-snug">
-                        <b className="text-gray-900">28% increase in fire detections</b> compared to the previous 7-day observation period.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <Tree size={13} weight="fill" />
-                      </div>
-                      <p className="text-[11.5px] text-gray-700 leading-snug">
-                        <b className="text-gray-900">Assam accounts for 35%</b> of the total national affected area across northeastern states.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <Warning size={13} weight="fill" />
-                      </div>
-                      <p className="text-[11.5px] text-gray-700 leading-snug">
-                        <b className="text-gray-900">High risk of spread</b> in Tinsukia and Dibrugarh districts due to unseasonally dry foliage.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <Planet size={13} weight="fill" />
-                      </div>
-                      <p className="text-[11.5px] text-gray-700 leading-snug">
-                        <b className="text-gray-900">214 persistent thermal sources</b> detected across industrial metallurgy and refinery clusters.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <CheckCircle size={13} weight="fill" />
-                      </div>
-                      <p className="text-[11.5px] text-gray-700 leading-snug">
-                        <b className="text-gray-900">Early warnings helped reduce</b> potential loss of life in 3 major residential-fringe incidents.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-2.5 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-                  <span>Synthesized via AI Risk Engine</span>
-                  <span className="text-emerald-600 font-bold">Live Synced</span>
-                </div>
-              </div>
+          {/* Card 3: Estimated Population */}
+          <div className="bg-white border border-gray-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute right-3 bottom-2 text-blue-50/80 pointer-events-none">
+              <Users size={74} weight="fill" />
             </div>
-
-            {/* ─── Bottom Section: Downloadable Reports ─── */}
-            <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-2xs">
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="flex items-center gap-2">
-                  <DownloadSimple size={16} weight="bold" className="text-gray-700" />
-                  <h3 className="text-[13.5px] font-bold text-gray-900">
-                    Downloadable Reports
-                  </h3>
+            <div className="relative z-10">
+              <span className="text-[12px] font-bold text-gray-500 flex items-center gap-1.5 mb-2">
+                <div className="w-5 h-5 rounded bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-[10px]">
+                  👥
                 </div>
-                <span className="text-[11px] text-gray-400">Click to preview document before export</span>
+                Estimated Population
+              </span>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[34px] font-black text-gray-950 tracking-tight leading-none">
+                  {currentIncident.estimatedPopulation10km.toLocaleString()}
+                </span>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                {DOWNLOADABLE_REPORTS.map((rep) => {
-                  const Icon = rep.icon;
-                  const targetIncident = INCIDENTS_DATA.find((i) => i.id === rep.incidentId) || INCIDENTS_DATA[0];
-                  return (
-                    <div
-                      key={rep.id}
-                      onClick={() => handleOpenReport(targetIncident)}
-                      className="border border-gray-200 hover:border-orange-400 rounded-xl p-3.5 bg-gray-50/50 hover:bg-white transition-all cursor-pointer shadow-2xs group flex flex-col justify-between"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${rep.iconColor}`}>
-                          <Icon size={20} weight="bold" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[12.5px] font-bold text-gray-900 group-hover:text-orange-600 transition-colors truncate">
-                            {rep.title}
-                          </p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">
-                            {rep.format} • {rep.size}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenReport(targetIncident);
-                        }}
-                        className="mt-3 w-full py-1.5 bg-white group-hover:bg-orange-500 border border-gray-200 group-hover:border-transparent text-gray-700 group-hover:text-white rounded-lg text-[11.5px] font-bold transition-colors text-center"
-                      >
-                        Preview &amp; Download
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+              <p className="text-[12px] font-bold text-blue-600">people within 10 km</p>
             </div>
+            <p className="relative z-10 text-[11px] text-gray-400 font-medium leading-relaxed mt-2">
+              {currentIncident.estimatedPopulation20km.toLocaleString()} residing in outer 20 km zone.
+            </p>
+          </div>
 
-            {/* ─── Bottom Banner Bar ─── */}
-            <div className="bg-[#f0fdf4] border border-emerald-200/90 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <Tree size={18} weight="fill" />
+          {/* Card 4: Affected Area & Critical Habitats */}
+          <div className="bg-white border border-gray-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute right-3 bottom-2 text-amber-50 pointer-events-none">
+              <MapPin size={74} weight="fill" />
+            </div>
+            <div className="relative z-10">
+              <span className="text-[12px] font-bold text-gray-500 flex items-center gap-1.5 mb-2">
+                <div className="w-5 h-5 rounded bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-[10px]">
+                  📍
+                </div>
+                Affected Area
+              </span>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[34px] font-black text-gray-950 tracking-tight leading-none">
+                  ~{currentIncident.affectedAreaKm2} km²
+                </span>
+              </div>
+              <p className="text-[12px] font-bold text-amber-600">potential impact zone</p>
+            </div>
+            <p className="relative z-10 text-[11px] text-gray-400 font-medium leading-relaxed mt-2">
+              Includes peripheral wetland & forest reserves.
+            </p>
+          </div>
+        </div>
+
+        {/* ─── Report Summary (Full Width) ─── */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-gray-900">
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-[14px]">
+                📋
+              </div>
+              <h3 className="text-[16px] font-black tracking-tight">Report Summary</h3>
+            </div>
+            <span className="text-[11px] font-bold text-gray-400">Incident Narrative Briefing</span>
+          </div>
+          <p className="text-[13.5px] text-gray-700 leading-relaxed font-normal">
+            {currentIncident.summary}
+          </p>
+          {isFullSummaryExpanded && (
+            <p className="text-[13.5px] text-gray-700 leading-relaxed font-normal mt-3 pt-3 border-t border-gray-100 animate-in fade-in">
+              {currentIncident.fullSummary}
+            </p>
+          )}
+          <div className="pt-3.5 mt-2 flex items-center justify-between border-t border-gray-100/80">
+            <button
+              onClick={() => setIsFullSummaryExpanded(!isFullSummaryExpanded)}
+              className="px-3.5 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-[11.5px] transition-all cursor-pointer"
+            >
+              {isFullSummaryExpanded ? 'Collapse Summary' : 'Read Full Detailed Summary'}
+            </button>
+            <span className="text-[11px] text-gray-400">Synthesized via AI Risk Engine & NASA FIRMS</span>
+          </div>
+        </div>
+
+        {/* ─── Nearby Industrial Sites with Range ─── */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-gray-900">
+                <div className="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-[14px]">
+                  🏭
                 </div>
                 <div>
-                  <p className="text-[13px] font-bold text-gray-900">
-                    Data for a Safer Tomorrow
-                  </p>
-                  <p className="text-[12px] text-gray-500 mt-0.5">
-                    Together we can monitor, predict, and prevent wildfires using the power of satellite data and AI.
-                  </p>
+                  <h3 className="text-[16px] font-black tracking-tight">Nearby Industrial Sites with Range</h3>
+                  <p className="text-[11px] text-gray-400 font-medium">{currentIncident.totalIndustrialSites} industrial facilities monitored within 20 km</p>
                 </div>
               </div>
-
               <button
-                onClick={() => handleOpenReport(INCIDENTS_DATA[0])}
-                className="flex items-center gap-2 h-9 px-4 bg-[#059669] hover:bg-[#047857] text-white rounded-lg text-[13px] font-bold shadow-sm transition-colors shrink-0 cursor-pointer"
+                onClick={() => onNavigate && onNavigate('Live Map')}
+                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer"
               >
-                <span>Generate Custom Report</span>
-                <ArrowRight size={14} weight="bold" />
+                <span>View on Map</span>
+                <ArrowRight size={10} weight="bold" />
               </button>
             </div>
+
+            {/* Ranked Facilities List */}
+            <div className="divide-y divide-gray-100 text-[12px]">
+              {currentIncident.nearbyIndustries.slice(0, 5).map((site, index) => (
+                <div key={index} className="py-2.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-mono text-gray-400 font-bold text-[11px] w-4">{index + 1}</span>
+                    <div className="truncate">
+                      <p className="font-bold text-gray-900 truncate">{site.name}</p>
+                      <p className="text-[10px] text-gray-400">{site.type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span
+                      className="px-2 py-0.5 rounded text-[9.5px] font-black text-white"
+                      style={{ backgroundColor: site.threatColor }}
+                    >
+                      {site.threat}
+                    </span>
+                    <span className="font-mono font-bold text-gray-700 text-[11.5px] w-14 text-right">
+                      {site.distanceKm === 0 ? '0 km' : `${site.distanceKm} km`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </main>
+
+          <div className="pt-2 text-[11px] text-gray-400 flex items-center justify-between border-t border-gray-100 mt-2">
+            <span>OSM Verified Industrial Geometry</span>
+            <span className="text-gray-500 font-medium">+ 7 additional perimeter facilities</span>
+          </div>
+        </div>
+
+        {/* ─── Fire Suppression Directives (From Handwritten Sketch: "What action should they take to stop that fire") ─── */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-[16px]">
+                🛡️
+              </div>
+              <div>
+                <h3 className="text-[18px] font-black text-gray-950 tracking-tight">
+                  Fire Suppression Directives & Recommended Countermeasures
+                </h3>
+                <p className="text-[12px] text-gray-500 font-medium">
+                  Tactical response instructions to isolate the blowout, protect populations, and suppress active inferno
+                </p>
+              </div>
+            </div>
+            <span className="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
+              ✓ Verified Protocols
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+            {currentIncident.actions.map((act, index) => (
+              <div
+                key={index}
+                className="p-4 rounded-xl border border-gray-200 hover:border-orange-500 bg-slate-50/50 hover:bg-orange-50/20 transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="text-[20px]">{act.icon}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-white border border-gray-200 text-gray-700 shadow-2xs">
+                      {act.priority}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-[13.5px] text-gray-900 group-hover:text-orange-600 transition-colors mb-1">
+                    {act.title}
+                  </h4>
+                  <p className="text-[12px] text-gray-600 leading-relaxed font-normal">
+                    {act.desc}
+                  </p>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-gray-200/60 flex items-center justify-between text-[11px]">
+                  <span className="text-gray-400 font-medium">Protocol Step {index + 1}</span>
+                  <span className="text-emerald-600 font-bold flex items-center gap-1">
+                    <CheckCircle size={13} weight="fill" />
+                    {act.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Downloadable Reports Section ─── */}
+        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-2xs">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <DownloadSimple size={18} weight="bold" className="text-gray-800" />
+              <h3 className="text-[15px] font-black text-gray-950">Exportable Dossier Files</h3>
+            </div>
+            <span className="text-[11.5px] text-gray-400">PDF, GeoJSON & CSV formats supported</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <button
+              onClick={handleDownloadPdf}
+              className="p-3.5 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
+            >
+              <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <FilePdf size={22} weight="fill" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-gray-900 truncate">Executive Briefing (PDF)</p>
+                <p className="text-[11px] text-gray-400">Official Government Brief · 2.4 MB</p>
+              </div>
+            </button>
+
+            <button
+              onClick={handleDownloadPdf}
+              className="p-3.5 rounded-xl border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
+            >
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Tree size={22} weight="fill" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-gray-900 truncate">Ecological Audit</p>
+                <p className="text-[11px] text-gray-400">Wetland Flora/Fauna · 1.8 MB</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => onNavigate && onNavigate('Live Map')}
+              className="p-3.5 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
+            >
+              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Globe size={22} weight="fill" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-gray-900 truncate">GIS Vector Shapefile</p>
+                <p className="text-[11px] text-gray-400">GeoJSON Impact Polygons · 840 KB</p>
+              </div>
+            </button>
+
+            <button
+              onClick={handleDownloadPdf}
+              className="p-3.5 rounded-xl border border-gray-200 hover:border-orange-400 hover:bg-orange-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
+            >
+              <div className="w-10 h-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Printer size={22} weight="bold" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-gray-900 truncate">Printable Archive</p>
+                <p className="text-[11px] text-gray-400">Formatted for A4 Export</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   Clock,
   ArrowRight,
   CaretDown,
+  CaretUp,
   Crosshair,
   Stack,
   CalendarBlank,
@@ -109,6 +110,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
 
   // Layers state
+  const [isLayersCollapsed, setIsLayersCollapsed] = useState(false);
   const [layers, setLayers] = useState([
     { id: 'osm_industries', name: 'OSM Industries (Near Hotspots)', color: '#ea580c', checked: true },
     { id: 'viirs', name: 'Fire Hotspots (VIIRS)', color: '#ef4444', checked: true },
@@ -543,9 +545,30 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     });
   }, [allIncidents, incidentSeverityFilter, incidentSearchQuery]);
 
+  // Progressive batch rendering for silky smooth 60fps scrolling through all incidents
+  const [visibleIncidentCount, setVisibleIncidentCount] = useState(60);
 
+  // Reset pagination count whenever filters, query, or country changes
+  useEffect(() => {
+    setVisibleIncidentCount(60);
+  }, [incidentSearchQuery, incidentSeverityFilter, selectedSubdivisionId, selectedCountryCode]);
 
-  // Initialize Map
+  // Incidents currently mounted in DOM for fast rendering
+  const incidentsToRender = useMemo(() => {
+    return displayedIncidents.slice(0, visibleIncidentCount);
+  }, [displayedIncidents, visibleIncidentCount]);
+
+  // Seamless auto-load more incidents as user scrolls toward bottom
+  const handleIncidentListScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 350) {
+      setVisibleIncidentCount((prev) => {
+        if (prev >= displayedIncidents.length) return prev;
+        return Math.min(prev + 60, displayedIncidents.length);
+      });
+    }
+  }, [displayedIncidents.length]);
+
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
@@ -1512,131 +1535,146 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
         </div>
 
         {/* ─── RIGHT COLUMN: Metrics + Layers + Incidents / OSM Industries ─── */}
-        <div className="w-[345px] flex flex-col gap-3 shrink-0 h-full min-h-0 overflow-y-auto pr-1 pb-2">
+        <div className="w-[345px] flex flex-col gap-2.5 shrink-0 h-full min-h-0 overflow-hidden pr-0.5 pb-2">
           {/* 4 Stat Cards */}
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2 shrink-0">
             {/* Card 1: Active Detections */}
-            <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-xs flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0">
-                <Fire size={22} weight="fill" />
+            <div className="bg-white border border-gray-200/80 rounded-xl p-3 shadow-xs flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+                <Fire size={20} weight="fill" />
               </div>
               <div className="min-w-0">
-                <p className="text-[19px] font-black text-gray-900 leading-tight">
+                <p className="text-[17px] font-black text-gray-900 leading-tight">
                   {realStats.total.toLocaleString()}
                 </p>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                <p className="text-[10.5px] text-gray-400 font-medium leading-tight">
                   Active Detections
                 </p>
               </div>
             </div>
 
             {/* Card 2: Estimated Area */}
-            <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-xs flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                <Tree size={22} weight="fill" />
+            <div className="bg-white border border-gray-200/80 rounded-xl p-3 shadow-xs flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <Tree size={20} weight="fill" />
               </div>
               <div className="min-w-0">
-                <p className="text-[14px] font-black text-gray-900 leading-tight truncate">
+                <p className="text-[13px] font-black text-gray-900 leading-tight truncate">
                   {realStats.areaStr}
                 </p>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                <p className="text-[10.5px] text-gray-400 font-medium leading-tight">
                   Estimated Area
                 </p>
               </div>
             </div>
 
             {/* Card 3: Total Radiative Power */}
-            <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-xs flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                <Broadcast size={22} weight="fill" />
+            <div className="bg-white border border-gray-200/80 rounded-xl p-3 shadow-xs flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Broadcast size={20} weight="fill" />
               </div>
               <div className="min-w-0">
-                <p className="text-[18px] font-black text-gray-900 leading-tight">
-                  {realStats.totalFrp} <span className="text-[11px] font-normal text-gray-500">MW</span>
+                <p className="text-[17px] font-black text-gray-900 leading-tight">
+                  {realStats.totalFrp} <span className="text-[10px] font-normal text-gray-500">MW</span>
                 </p>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                <p className="text-[10.5px] text-gray-400 font-medium leading-tight">
                   Total Fire Power
                 </p>
               </div>
             </div>
 
             {/* Card 4: OSM Industries in View */}
-            <div className="bg-white border border-orange-200/80 rounded-xl p-3.5 shadow-xs flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
-                <Factory size={22} weight="fill" />
+            <div className="bg-white border border-orange-200/80 rounded-xl p-3 shadow-xs flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                <Factory size={20} weight="fill" />
               </div>
               <div className="min-w-0">
-                <p className="text-[19px] font-black text-gray-900 leading-tight">
+                <p className="text-[17px] font-black text-gray-900 leading-tight">
                   {filteredOsmIndustries.length}
                 </p>
-                <p className="text-[10.5px] text-gray-400 font-medium leading-tight truncate">
+                <p className="text-[10px] text-gray-400 font-medium leading-tight truncate">
                   {atRiskOsmCount > 0 ? (
-                    <span className="text-red-500 font-bold">{atRiskOsmCount} Near Active Fire</span>
+                    <span className="text-red-500 font-bold">{atRiskOsmCount} Near Fire</span>
                   ) : (
-                    <span className="text-emerald-600 font-medium">All Perimeters Clear</span>
+                    <span className="text-emerald-600 font-medium">Perimeter Clear</span>
                   )}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Map Layers Section */}
-          <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center justify-between mb-3">
+          {/* Map Layers Section (Collapsible to save vertical space for Incidents list) */}
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3 shadow-xs shrink-0">
+            <div
+              onClick={() => setIsLayersCollapsed(!isLayersCollapsed)}
+              className="flex items-center justify-between cursor-pointer select-none"
+            >
               <div className="flex items-center gap-2 text-gray-800">
-                <Stack size={16} weight="bold" />
-                <span className="text-[13px] font-bold">Map Layers</span>
+                <Stack size={15} weight="bold" />
+                <span className="text-[12.5px] font-bold">Map Layers</span>
+                <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 text-slate-600 font-semibold rounded">
+                  {layers.filter((l) => l.checked).length}/{layers.length}
+                </span>
               </div>
-              <button
-                onClick={() =>
-                  setLayers((prev) =>
-                    prev.map((l) => ({
-                      ...l,
-                      checked: ['osm_industries', 'viirs', 'modis', 'state', 'district'].includes(l.id),
-                    }))
-                  )
-                }
-                className="text-[11.5px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-              >
-                Reset
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLayers((prev) =>
+                      prev.map((l) => ({
+                        ...l,
+                        checked: ['osm_industries', 'viirs', 'modis', 'state', 'district'].includes(l.id),
+                      }))
+                    );
+                  }}
+                  className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors mr-1 cursor-pointer"
+                >
+                  Reset
+                </button>
+                <span className="text-gray-400 hover:text-gray-600">
+                  {isLayersCollapsed ? <CaretDown size={13} weight="bold" /> : <CaretUp size={13} weight="bold" />}
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {layers.map((layer) => (
-                <label
-                  key={layer.id}
-                  onClick={() => toggleLayer(layer.id)}
-                  className="flex items-center gap-2 text-[12px] font-medium text-gray-700 hover:text-gray-900 cursor-pointer select-none truncate"
-                >
-                  <span
-                    className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all shrink-0 ${
-                      layer.checked
-                        ? 'border-transparent text-white'
-                        : 'border-gray-300 bg-white'
-                    }`}
-                    style={{
-                      backgroundColor: layer.checked ? layer.color : undefined,
-                    }}
+            {!isLayersCollapsed && (
+              <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-gray-100 animate-in fade-in duration-150">
+                {layers.map((layer) => (
+                  <label
+                    key={layer.id}
+                    onClick={() => toggleLayer(layer.id)}
+                    className="flex items-center gap-2 text-[11.5px] font-medium text-gray-700 hover:text-gray-900 cursor-pointer select-none truncate"
                   >
-                    {layer.checked && (
-                      <svg
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="w-2.5 h-2.5 text-white"
-                      >
-                        <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
-                      </svg>
-                    )}
-                  </span>
-                  <span className="truncate">{layer.name}</span>
-                </label>
-              ))}
-            </div>
+                    <span
+                      className={`w-3.5 h-3.5 rounded flex items-center justify-center border transition-all shrink-0 ${
+                        layer.checked
+                          ? 'border-transparent text-white'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: layer.checked ? layer.color : undefined,
+                      }}
+                    >
+                      {layer.checked && (
+                        <svg
+                          viewBox="0 0 16 16"
+                          fill="currentColor"
+                          className="w-2.5 h-2.5 text-white"
+                        >
+                          <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="truncate">{layer.name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Active Incidents & Industrial Vulnerability Hub */}
-          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-xs flex-1 flex flex-col min-h-0">
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3 shadow-xs flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Professional 2-Tab Segmented Control */}
             <div className="flex items-center bg-slate-100/90 p-1 rounded-xl mb-3 shrink-0 gap-1 border border-slate-200/60 shadow-xs">
               <button
@@ -1682,7 +1720,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
 
             {/* Content for OSM Industries tab */}
             {activeSideTab === 'osm_industries' && (
-              <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {/* Sub-filter pills for OSM Industries */}
                 <div className="flex items-center gap-1 mb-2.5 pb-2 border-b border-gray-100 shrink-0 overflow-x-auto">
                   <button
@@ -1717,7 +1755,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
                   </button>
                 </div>
 
-                <div className="space-y-2.5 overflow-y-auto pr-1 flex-1">
+                <div className="space-y-2.5 overflow-y-auto pr-1 flex-1 min-h-0 custom-scrollbar">
                   {isLoadingOsm ? (
                     <div className="text-center py-10 text-gray-400 text-[12px] flex flex-col items-center gap-2">
                       <Factory size={24} className="animate-bounce text-orange-500" />
@@ -1807,7 +1845,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
 
             {/* Content for Incidents side list tab */}
             {activeSideTab === 'incidents' && (
-              <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {/* Search & Header */}
                 <div className="mb-2 pb-2 border-b border-gray-100 shrink-0">
                   <div className="relative mb-2">
@@ -1822,7 +1860,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
                     {incidentSearchQuery && (
                       <button
                         onClick={() => setIncidentSearchQuery('')}
-                        className="absolute right-2.5 top-2 text-[11px] text-gray-400 hover:text-gray-600"
+                        className="absolute right-2.5 top-2 text-[11px] text-gray-400 hover:text-gray-600 cursor-pointer"
                       >
                         ✕
                       </button>
@@ -1864,8 +1902,11 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
                   </div>
                 </div>
 
-                {/* List of all incidents within boundary box */}
-                <div className="space-y-2 overflow-y-auto pr-1 flex-1">
+                {/* List of all incidents within boundary box - smoothly scrollable */}
+                <div
+                  onScroll={handleIncidentListScroll}
+                  className="space-y-2 overflow-y-auto pr-1 flex-1 min-h-0 custom-scrollbar"
+                >
                   {displayedIncidents.length === 0 ? (
                     <div className="text-center py-10 text-gray-400 text-[12px] flex flex-col items-center gap-2">
                       <div className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold">
@@ -1879,76 +1920,99 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
                       </p>
                     </div>
                   ) : (
-                    displayedIncidents.map((inc) => (
-                      <div
-                        key={inc.id}
-                        onClick={() => {
-                          try {
-                            sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(inc));
-                          } catch {}
-                          if (onSelectIncident) onSelectIncident(inc);
-                          if (onNavigate) onNavigate('Predictive Analysis', inc);
-                        }}
-                        className="p-3 rounded-xl border border-gray-200/90 hover:border-orange-500 hover:bg-orange-50/20 hover:shadow-xs transition-all cursor-pointer flex flex-col gap-1.5 group bg-white"
-                        style={{
-                          borderLeftWidth: '4px',
-                          borderLeftColor: inc.level === 'Critical' ? '#dc2626' : inc.level === 'High' ? '#ea580c' : '#f59e0b',
-                        }}
-                        title="Click to view Predictive Analysis for this anomaly"
-                      >
-                        <div className="flex items-center justify-between gap-1.5">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className={`shrink-0 ${inc.flameColor}`}>
-                              <Fire size={15} weight="fill" />
-                            </span>
-                            <span className="font-bold text-[12.5px] text-gray-900 group-hover:text-orange-600 truncate">
-                              {inc.location}
-                            </span>
-                          </div>
-                          <span
-                            className={`px-2 py-0.5 rounded text-[9.5px] font-black text-white leading-tight shrink-0 shadow-2xs ${inc.levelBg}`}
-                          >
-                            {inc.level}
-                          </span>
-                        </div>
-
-                        <div className="text-[10.5px] text-gray-600 space-y-0.5">
-                          <div className="flex items-center justify-between">
-                            <span className="font-mono text-gray-500 text-[10.5px] font-semibold">{inc.coordinates}</span>
-                            <span className="font-black text-red-600 text-[11px] flex items-center gap-0.5">
-                              <Fire size={12} weight="fill" className="text-red-500" />
-                              {inc.frp.toFixed(1)} MW
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between text-[10px] text-gray-400">
-                            <span className="font-medium text-gray-500">{inc.instrument} · {inc.satellite}</span>
-                            <span>{inc.date} {inc.time}</span>
-                          </div>
-                        </div>
-
-                        <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10.5px]">
-                          <span className="text-gray-500 text-[10px]">
-                            Confidence: <strong className="text-gray-700 font-bold">{inc.confidence}</strong> · {inc.daynight}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                focusOnIncident(inc);
-                              }}
-                              className="text-gray-400 hover:text-gray-700 font-bold flex items-center gap-0.5 transition-colors cursor-pointer"
-                              title="Preview on Live Map without leaving"
+                    <>
+                      {incidentsToRender.map((inc) => (
+                        <div
+                          key={inc.id}
+                          onClick={() => {
+                            try {
+                              sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(inc));
+                            } catch {}
+                            if (onSelectIncident) onSelectIncident(inc);
+                            if (onNavigate) onNavigate('Predictive Analysis', inc);
+                          }}
+                          className="p-3 rounded-xl border border-gray-200/90 hover:border-orange-500 hover:bg-orange-50/20 hover:shadow-xs transition-all cursor-pointer flex flex-col gap-1.5 group bg-white"
+                          style={{
+                            borderLeftWidth: '4px',
+                            borderLeftColor: inc.level === 'Critical' ? '#dc2626' : inc.level === 'High' ? '#ea580c' : '#f59e0b',
+                          }}
+                          title="Click to view Predictive Analysis for this anomaly"
+                        >
+                          <div className="flex items-center justify-between gap-1.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className={`shrink-0 ${inc.flameColor}`}>
+                                <Fire size={15} weight="fill" />
+                              </span>
+                              <span className="font-bold text-[12.5px] text-gray-900 group-hover:text-orange-600 truncate">
+                                {inc.location}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-[9.5px] font-black text-white leading-tight shrink-0 shadow-2xs ${inc.levelBg}`}
                             >
-                              Locate <ArrowRight size={10} weight="bold" />
-                            </button>
-                            <span className="px-2 py-0.5 rounded bg-orange-600 group-hover:bg-orange-700 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow-2xs">
-                              <span>Predictive Analysis</span>
-                              <ArrowRight size={10} weight="bold" />
+                              {inc.level}
                             </span>
                           </div>
+
+                          <div className="text-[10.5px] text-gray-600 space-y-0.5">
+                            <div className="flex items-center justify-between">
+                              <span className="font-mono text-gray-500 text-[10.5px] font-semibold">{inc.coordinates}</span>
+                              <span className="font-black text-red-600 text-[11px] flex items-center gap-0.5">
+                                <Fire size={12} weight="fill" className="text-red-500" />
+                                {inc.frp.toFixed(1)} MW
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] text-gray-400">
+                              <span className="font-medium text-gray-500">{inc.instrument} · {inc.satellite}</span>
+                              <span>{inc.date} {inc.time}</span>
+                            </div>
+                          </div>
+
+                          <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10.5px]">
+                            <span className="text-gray-500 text-[10px]">
+                              Confidence: <strong className="text-gray-700 font-bold">{inc.confidence}</strong> · {inc.daynight}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  focusOnIncident(inc);
+                                }}
+                                className="text-gray-400 hover:text-gray-700 font-bold flex items-center gap-0.5 transition-colors cursor-pointer"
+                                title="Preview on Live Map without leaving"
+                              >
+                                Locate <ArrowRight size={10} weight="bold" />
+                              </button>
+                              <span className="px-2 py-0.5 rounded bg-orange-600 group-hover:bg-orange-700 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow-2xs">
+                                <span>Predictive Analysis</span>
+                                <ArrowRight size={10} weight="bold" />
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+
+                      {visibleIncidentCount < displayedIncidents.length ? (
+                        <div className="py-2.5 px-3 bg-slate-50 border border-slate-200/80 rounded-xl text-center flex flex-col items-center gap-1.5 shrink-0 my-1">
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            Showing {visibleIncidentCount} of {displayedIncidents.length} incidents
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setVisibleIncidentCount((prev) => Math.min(prev + 100, displayedIncidents.length))}
+                            className="px-3 py-1 bg-white hover:bg-orange-50 border border-slate-300 hover:border-orange-300 text-orange-600 font-bold text-[11px] rounded-lg transition-all shadow-2xs cursor-pointer"
+                          >
+                            Load Next 100 ({displayedIncidents.length - visibleIncidentCount} remaining)
+                          </button>
+                        </div>
+                      ) : (
+                        displayedIncidents.length > 30 && (
+                          <div className="py-2 text-center text-[10.5px] text-slate-400 font-medium shrink-0">
+                            ✓ All {displayedIncidents.length} active incidents loaded
+                          </div>
+                        )
+                      )}
+                    </>
                   )}
                 </div>
               </div>

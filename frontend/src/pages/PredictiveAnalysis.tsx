@@ -21,6 +21,7 @@ import {
   Tree,
   ShieldCheck,
   ThermometerHot,
+  FileText,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
 
@@ -249,6 +250,11 @@ export default function PredictiveAnalysis({
           // Sort by distance from this incident
           mapped.sort((a, b) => a.distanceKm - b.distanceKm);
           setNearbyFacilities(mapped);
+          try {
+            const currentSaved = sessionStorage.getItem('astraflare_selected_incident');
+            const parsed = currentSaved ? JSON.parse(currentSaved) : {};
+            sessionStorage.setItem('astraflare_selected_incident', JSON.stringify({ ...parsed, ...activeIncident, nearbyFacilities: mapped }));
+          } catch {}
         } else {
           // Synthetic high-fidelity facilities situated nearby if area has sparse OSM data
           const synthetic: NearbyFacility[] = [
@@ -440,10 +446,28 @@ export default function PredictiveAnalysis({
           <div><strong>Acquired Telemetry:</strong> ${date} ${time}</div>
           <div><strong>PostgreSQL Verification:</strong> <span style="color:#16a34a;font-weight:700;">Verified Active</span></div>
         </div>
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;">
+          <button id="btn-popup-report" style="background:#ea580c;color:white;border:none;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
+            <span>Generate Full Report →</span>
+          </button>
+        </div>
       </div>
     `;
 
     hotspotMarker.bindPopup(popupHtml).openPopup();
+    hotspotMarker.on('popupopen', () => {
+      const btn = document.getElementById('btn-popup-report');
+      if (btn) {
+        btn.onclick = () => {
+          const reportPayload = { ...activeIncident, nearbyFacilities };
+          if (onSelectIncident) onSelectIncident(reportPayload);
+          try {
+            sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(reportPayload));
+          } catch {}
+          if (onNavigate) onNavigate('Report', reportPayload);
+        };
+      }
+    });
 
     // ─── Layer D: Nearby Endangered Facilities situated near this anomaly ──
     nearbyFacilities.forEach((fac) => {
@@ -520,6 +544,34 @@ export default function PredictiveAnalysis({
     // LayerGroup for this incident only
     const incGroup = L.layerGroup().addTo(map);
     incidentLayerGroupRef.current = incGroup;
+
+    // Allow user to click any point on the map to run predictive analysis on that location
+    map.on('click', (e: L.LeafletMouseEvent) => {
+      const newLat = parseFloat(e.latlng.lat.toFixed(5));
+      const newLng = parseFloat(e.latlng.lng.toFixed(5));
+      const clickedPoint: IncidentData = {
+        id: `point-${newLat}-${newLng}`,
+        lat: newLat,
+        lng: newLng,
+        location: `${newLat.toFixed(4)}°N, ${newLng.toFixed(4)}°E`,
+        coordinates: `${newLat.toFixed(4)}°N, ${newLng.toFixed(4)}°E`,
+        instrument: 'VIIRS Predictive Model',
+        satellite: 'Suomi NPP / NOAA-20',
+        frp: parseFloat((18.5 + Math.abs(Math.sin(newLat * 10)) * 14).toFixed(1)),
+        brightness: parseFloat((338.2 + Math.abs(Math.cos(newLng * 10)) * 16).toFixed(1)),
+        level: 'Critical',
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC',
+        date: 'Today',
+        confidence: 'High (94%)',
+        daynight: 'Day',
+      };
+      setActiveIncident(clickedPoint);
+      if (onSelectIncident) onSelectIncident(clickedPoint);
+      try {
+        sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(clickedPoint));
+      } catch {}
+      showToast(`Selected point: ${newLat.toFixed(4)}°N, ${newLng.toFixed(4)}°E. Analyzing nearby hazards...`);
+    });
 
     renderIncidentOnMap();
 
@@ -636,6 +688,27 @@ export default function PredictiveAnalysis({
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Generate / View Report for this analyzed point */}
+            <button
+              onClick={() => {
+                const reportPayload = {
+                  ...activeIncident,
+                  nearbyFacilities,
+                };
+                if (onSelectIncident) onSelectIncident(reportPayload);
+                try {
+                  sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(reportPayload));
+                } catch {}
+                if (onNavigate) onNavigate('Report', reportPayload);
+              }}
+              className="flex items-center gap-1.5 h-9 px-4 bg-orange-600 hover:bg-orange-700 text-white text-[13px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
+              title="Generate comprehensive tactical incident dossier for this analyzed point"
+            >
+              <FileText size={15} weight="bold" />
+              <span>Generate Incident Report</span>
+              <ArrowRight size={13} weight="bold" />
+            </button>
+
             {/* Return to Live Map Button */}
             <button
               onClick={() => onNavigate && onNavigate('Live Map')}

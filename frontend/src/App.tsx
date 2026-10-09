@@ -50,7 +50,7 @@ const App = () => {
 
 
   if (currentPage === 'Report') {
-    return <Report onNavigate={handleNavigate} />;
+    return <Report onNavigate={handleNavigate} selectedIncident={selectedIncident} />;
   }
 
   if (currentPage === 'Alert') {
