@@ -54,6 +54,19 @@ function findClosestSubdivision(lat: number, lng: number, subdivisions: CountryS
   return minDist < 6.5 ? closest : subdivisions[0]?.name || 'Global Region';
 }
 
+/**
+ * Format raw satellite confidence values (e.g., 'n', 'h', 'l' or numbers) into user-friendly text
+ */
+function formatConfidence(conf?: string | number): string {
+  if (conf === undefined || conf === null || conf === '') return 'Nominal (Verified)';
+  const s = String(conf).toLowerCase().trim();
+  if (s === 'n') return 'Nominal (Verified)';
+  if (s === 'h') return 'High (Confirmed)';
+  if (s === 'l') return 'Low (Preliminary)';
+  if (!isNaN(Number(s))) return `${s}%`;
+  return String(conf);
+}
+
 interface LiveMapProps {
   onNavigate?: (page: string, incident?: any) => void;
   onSelectIncident?: (incident: any) => void;
@@ -64,6 +77,10 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
   const mapInstanceRef = useRef<L.Map | null>(null);
   const baseLayerRef = useRef<L.TileLayer | null>(null);
   const labelsLayerRef = useRef<L.TileLayer | null>(null);
+  const districtLayerRef = useRef<L.TileLayer | null>(null);
+  const ndviLayerRef = useRef<L.TileLayer | null>(null);
+  const landuseLayerRef = useRef<L.TileLayer | null>(null);
+  const weatherLayerRef = useRef<L.TileLayer | null>(null);
   const markersLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const boundaryMaskGroupRef = useRef<L.LayerGroup | null>(null);
   const osmLayerGroupRef = useRef<L.LayerGroup | null>(null);
@@ -79,7 +96,6 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     totalInDb: 0,
   });
 
-  // OpenStreetMap (OSM) Industries near hotspots state
   // OpenStreetMap (OSM) Industries near hotspots state
   const [osmIndustries, setOsmIndustries] = useState<OSMIndustry[]>([]);
   const [isLoadingOsm, setIsLoadingOsm] = useState(false);
@@ -116,10 +132,10 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     { id: 'viirs', name: 'Fire Hotspots (VIIRS)', color: '#ef4444', checked: true },
     { id: 'modis', name: 'Fire Hotspots (MODIS)', color: '#f97316', checked: true },
     { id: 'state', name: 'State Boundaries & Places', color: '#2563eb', checked: true },
-    { id: 'district', name: 'District Boundaries', color: '#38bdf8', checked: true },
-    { id: 'ndvi', name: 'Forest Cover (NDVI)', color: '#9ca3af', checked: false },
-    { id: 'landuse', name: 'Land Use / Land Cover', color: '#9ca3af', checked: false },
-    { id: 'weather', name: 'Weather (Temperature)', color: '#9ca3af', checked: false },
+    { id: 'district', name: 'District & Road Networks', color: '#38bdf8', checked: true },
+    { id: 'ndvi', name: 'Forest Cover (Terrain & Relief)', color: '#10b981', checked: false },
+    { id: 'landuse', name: 'Land Cover & Physical Topo', color: '#8b5cf6', checked: false },
+    { id: 'weather', name: 'Weather Radar & Rain', color: '#06b6d4', checked: false },
   ]);
 
   const toggleLayer = (id: string) => {
@@ -320,9 +336,60 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     return () => clearInterval(interval);
   }, [currentBbox, dayRange, sourceFilter, loadThermalData]);
 
-  // Filtered features according to selected state / subdivision & active boundary box
+  // Latest anomaly timestamp across all loaded features for accurate relative time filtering
+  const latestAnomalyTime = useMemo(() => {
+    let maxTime = 0;
+    for (const f of anomalies) {
+      const p = f.properties;
+      if (p && p.acq_date) {
+        const tClean = (p.acq_time || '0000').padStart(4, '0');
+        const h = parseInt(tClean.slice(0, 2), 10) || 0;
+        const m = parseInt(tClean.slice(2, 4), 10) || 0;
+        const t = new Date(`${p.acq_date}T00:00:00Z`).getTime() + (h * 3600 + m * 60) * 1000;
+        if (t > maxTime) maxTime = t;
+      }
+    }
+    return maxTime || Date.now();
+  }, [anomalies]);
+
+  // Filtered features according to satellite source, time window, and boundary bounds
   const filteredAnomalies = useMemo(() => {
+    const viirsChecked = layers.find((l) => l.id === 'viirs')?.checked ?? true;
+    const modisChecked = layers.find((l) => l.id === 'modis')?.checked ?? true;
+
+    // If both satellite fire hotspot layers are unchecked, hide all fire points
+    if (!viirsChecked && !modisChecked) return [];
+
     let list = anomalies.filter((f) => {
+      const p = f.properties || ({} as any);
+      const inst = (p.instrument || '').toUpperCase();
+      const src = (p.source || '').toUpperCase();
+      const sat = (p.satellite || '').toUpperCase();
+
+      const isViirs = inst.includes('VIIRS') || src.includes('VIIRS') || ['SUOMI', 'NOAA', 'SNPP'].some((s) => sat.includes(s));
+      const isModis = inst.includes('MODIS') || src.includes('MODIS') || ['TERRA', 'AQUA'].some((s) => sat.includes(s));
+
+      if (!viirsChecked && isViirs) return false;
+      if (!modisChecked && isModis) return false;
+
+      // Time Window recency filtering
+      if (p.acq_date) {
+        const tClean = (p.acq_time || '0000').padStart(4, '0');
+        const h = parseInt(tClean.slice(0, 2), 10) || 0;
+        const m = parseInt(tClean.slice(2, 4), 10) || 0;
+        const ptTime = new Date(`${p.acq_date}T00:00:00Z`).getTime() + (h * 3600 + m * 60) * 1000;
+
+        if (timeWindow === 'Last 6 Hours' && ptTime < latestAnomalyTime - 6 * 3600 * 1000) {
+          return false;
+        }
+        if (timeWindow === 'Last 24 Hours' && ptTime < latestAnomalyTime - 24 * 3600 * 1000) {
+          return false;
+        }
+        if (timeWindow === 'Last 48 Hours' && ptTime < latestAnomalyTime - 48 * 3600 * 1000) {
+          return false;
+        }
+      }
+
       const [lng, lat] = f.geometry.coordinates;
       return (
         lat >= activeBbox.s &&
@@ -340,7 +407,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
       const [lng, lat] = f.geometry.coordinates;
       return lat >= s && lat <= n && lng >= w && lng <= e;
     });
-  }, [anomalies, currentSubdivision, activeBbox]);
+  }, [anomalies, currentSubdivision, activeBbox, layers, timeWindow, latestAnomalyTime]);
 
   // Real-time anomaly count per subdivision for the side list badges
   const anomalyCountBySubdivision = useMemo(() => {
@@ -513,7 +580,8 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
         brightness: p.brightness || 0,
         time: p.acq_time ? `${p.acq_time.padStart(4, '0').slice(0, 2)}:${p.acq_time.padStart(4, '0').slice(2)} UTC` : 'NRT',
         date: p.acq_date || 'Today',
-        confidence: p.confidence || 'Nominal',
+        confidence: formatConfidence(p.confidence),
+        rawConfidence: p.confidence,
         daynight: p.daynight === 'D' ? 'Day' : 'Night',
         level: isCritical ? 'Critical' : isHigh ? 'High' : 'Moderate',
         levelBg: isCritical ? 'bg-[#dc2626]' : isHigh ? 'bg-[#ea580c]' : 'bg-[#eab308]',
@@ -598,15 +666,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     satLayer.addTo(map);
     baseLayerRef.current = satLayer;
 
-    // 2. Reference Boundaries & Places
-    const labelsLayer = L.tileLayer(
-      'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-      { maxZoom: 18, opacity: 0.9, crossOrigin: true }
-    );
-    labelsLayer.addTo(map);
-    labelsLayerRef.current = labelsLayer;
-
-    // 3. Layer group for real thermal anomaly points (placed in fireHotspotPane)
+    // 2. Layer group for real thermal anomaly points (placed in fireHotspotPane)
     const markersGroup = L.layerGroup().addTo(map);
     markersLayerGroupRef.current = markersGroup;
 
@@ -635,48 +695,127 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
-    if (labelsLayerRef.current) map.removeLayer(labelsLayerRef.current);
+    if (baseLayerRef.current && map.hasLayer(baseLayerRef.current)) {
+      map.removeLayer(baseLayerRef.current);
+    }
 
     if (activeTab === 'Map') {
       const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
+        zIndex: 10,
       });
       osm.addTo(map);
       baseLayerRef.current = osm;
     } else {
       const sat = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 18 }
+        { maxZoom: 18, zIndex: 10 }
       );
       sat.addTo(map);
       baseLayerRef.current = sat;
-
-      const labels = L.tileLayer(
-        'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 18, opacity: 0.85 }
-      );
-      labels.addTo(map);
-      labelsLayerRef.current = labels;
     }
   }, [activeTab]);
 
-  // Render Real NASA FIRMS Thermal Anomaly Markers
+  // Manage Overlay Map Layers (State, District, Forest Cover / NDVI, Land Cover, Weather)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // 1. State Boundaries & Places
+    const stateChecked = layers.find((l) => l.id === 'state')?.checked ?? true;
+    if (stateChecked) {
+      if (!labelsLayerRef.current) {
+        labelsLayerRef.current = L.tileLayer(
+          'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 18, opacity: 0.85, zIndex: 300 }
+        );
+      }
+      if (!map.hasLayer(labelsLayerRef.current)) {
+        labelsLayerRef.current.addTo(map);
+      }
+    } else if (labelsLayerRef.current && map.hasLayer(labelsLayerRef.current)) {
+      map.removeLayer(labelsLayerRef.current);
+    }
+
+    // 2. District & Transportation Networks
+    const districtChecked = layers.find((l) => l.id === 'district')?.checked ?? false;
+    if (districtChecked) {
+      if (!districtLayerRef.current) {
+        districtLayerRef.current = L.tileLayer(
+          'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 18, opacity: 0.75, zIndex: 310 }
+        );
+      }
+      if (!map.hasLayer(districtLayerRef.current)) {
+        districtLayerRef.current.addTo(map);
+      }
+    } else if (districtLayerRef.current && map.hasLayer(districtLayerRef.current)) {
+      map.removeLayer(districtLayerRef.current);
+    }
+
+    // 3. Forest Cover (Shaded Relief / Topo)
+    const ndviChecked = layers.find((l) => l.id === 'ndvi')?.checked ?? false;
+    if (ndviChecked) {
+      if (!ndviLayerRef.current) {
+        ndviLayerRef.current = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 14, opacity: 0.65, zIndex: 250 }
+        );
+      }
+      if (!map.hasLayer(ndviLayerRef.current)) {
+        ndviLayerRef.current.addTo(map);
+      }
+    } else if (ndviLayerRef.current && map.hasLayer(ndviLayerRef.current)) {
+      map.removeLayer(ndviLayerRef.current);
+    }
+
+    // 4. Land Cover & Physical Topography
+    const landuseChecked = layers.find((l) => l.id === 'landuse')?.checked ?? false;
+    if (landuseChecked) {
+      if (!landuseLayerRef.current) {
+        landuseLayerRef.current = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 12, opacity: 0.6, zIndex: 260 }
+        );
+      }
+      if (!map.hasLayer(landuseLayerRef.current)) {
+        landuseLayerRef.current.addTo(map);
+      }
+    } else if (landuseLayerRef.current && map.hasLayer(landuseLayerRef.current)) {
+      map.removeLayer(landuseLayerRef.current);
+    }
+
+    // 5. Weather Radar & Rain Precipitation
+    const weatherChecked = layers.find((l) => l.id === 'weather')?.checked ?? false;
+    if (weatherChecked) {
+      if (!weatherLayerRef.current) {
+        weatherLayerRef.current = L.tileLayer(
+          'https://tilecache.rainviewer.com/v2/radar/nowcast_10/256/{z}/{x}/{y}/2/1_1.png',
+          { maxZoom: 18, opacity: 0.75, zIndex: 350 }
+        );
+      }
+      if (!map.hasLayer(weatherLayerRef.current)) {
+        weatherLayerRef.current.addTo(map);
+      }
+    } else if (weatherLayerRef.current && map.hasLayer(weatherLayerRef.current)) {
+      map.removeLayer(weatherLayerRef.current);
+    }
+  }, [layers]);
+
+  // Render Real NASA FIRMS Thermal Anomaly Markers (reacts to active filters & search)
   useEffect(() => {
     const markersGroup = markersLayerGroupRef.current;
     if (!markersGroup) return;
 
     markersGroup.clearLayers();
 
-    filteredAnomalies.forEach((feature) => {
-      const [lng, lat] = feature.geometry.coordinates;
-      const p = feature.properties;
-
-      const isHigh = p.intensity === 'high';
-      const isMed = p.intensity === 'medium';
-      const color = isHigh ? '#ef4444' : isMed ? '#f97316' : '#eab308';
-      const outerRadius = isHigh ? 13 : isMed ? 9.5 : 7;
-      const coreRadius = isHigh ? 6 : isMed ? 4.5 : 3.5;
+    displayedIncidents.forEach((inc) => {
+      const { lat, lng } = inc;
+      const isCritical = inc.level === 'Critical';
+      const isHigh = inc.level === 'High';
+      const color = isCritical ? '#ef4444' : isHigh ? '#f97316' : '#eab308';
+      const outerRadius = isCritical ? 13 : isHigh ? 9.5 : 7;
+      const coreRadius = isCritical ? 6 : isHigh ? 4.5 : 3.5;
 
       // 1. Concentric glowing outer halo on fireHotspotPane (elevated above industry markers)
       L.circleMarker([lat, lng], {
@@ -686,7 +825,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
         weight: 1.5,
         opacity: 0.8,
         fillColor: color,
-        fillOpacity: isHigh ? 0.45 : 0.35,
+        fillOpacity: isCritical ? 0.45 : 0.35,
       }).addTo(markersGroup);
 
       // 2. High-contrast core center marker on fireHotspotPane
@@ -699,23 +838,6 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
         fillOpacity: 1.0,
       }).addTo(markersGroup);
 
-      const incObj = {
-        id: `inc-${lat.toFixed(4)}-${lng.toFixed(4)}`,
-        lat,
-        lng,
-        location: findClosestSubdivision(lat, lng, availableSubdivisions),
-        coordinates: `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
-        instrument: p.instrument || 'VIIRS',
-        satellite: p.satellite || 'Suomi NPP',
-        frp: p.frp || 0,
-        brightness: p.brightness || 0,
-        level: p.intensity === 'high' ? 'Critical' : p.intensity === 'medium' ? 'High' : 'Moderate',
-        time: p.acq_time ? `${p.acq_time} UTC` : 'NRT',
-        date: p.acq_date || 'Today',
-        confidence: p.confidence || 'Nominal',
-        daynight: p.daynight === 'D' ? 'Day' : 'Night',
-      };
-
       const btnId = `btn-map-analyze-${lat.toFixed(3)}-${lng.toFixed(3)}`;
       const popupHtml = `
         <div style="font-family:sans-serif;min-width:215px;padding:4px;">
@@ -724,17 +846,17 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
               <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};"></span>
               <strong style="font-size:13px;color:#0f172a;">NASA FIRMS Detection</strong>
             </div>
-            <span style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;">${p.intensity}</span>
+            <span style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;">${inc.level}</span>
           </div>
           <div style="font-size:11.5px;color:#334155;line-height:1.5;">
-            <div><strong>Location:</strong> ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E</div>
-            <div><strong>Region:</strong> ${findClosestSubdivision(lat, lng, availableSubdivisions)}</div>
-            <div><strong>Satellite:</strong> ${p.satellite} (${p.instrument})</div>
-            <div><strong>FRP (Power):</strong> <span style="color:#dc2626;font-weight:700;">${p.frp.toFixed(1)} MW</span></div>
-            <div><strong>Brightness:</strong> ${p.brightness.toFixed(1)} K</div>
-            <div><strong>Confidence:</strong> ${p.confidence}</div>
-            <div><strong>Acquisition:</strong> ${p.acq_date} ${p.acq_time ? p.acq_time + ' UTC' : ''}</div>
-            <div><strong>Day/Night:</strong> ${p.daynight === 'D' ? '☀️ Daytime' : '🌙 Nighttime'}</div>
+            <div><strong>Location:</strong> ${inc.location}</div>
+            <div><strong>Coordinates:</strong> ${inc.coordinates}</div>
+            <div><strong>Satellite:</strong> ${inc.satellite} (${inc.instrument})</div>
+            <div><strong>FRP (Power):</strong> <span style="color:#dc2626;font-weight:700;">${inc.frp.toFixed(1)} MW</span></div>
+            <div><strong>Brightness:</strong> ${inc.brightness.toFixed(1)} K</div>
+            <div><strong>Confidence:</strong> ${inc.confidence}</div>
+            <div><strong>Acquisition:</strong> ${inc.date} ${inc.time}</div>
+            <div><strong>Day/Night:</strong> ${inc.daynight === 'Day' ? '☀️ Daytime' : '🌙 Nighttime'}</div>
           </div>
           <div style="margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;">
             <button id="${btnId}" style="background:#ea580c;color:white;border:none;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
@@ -750,20 +872,20 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
         if (btn) {
           btn.onclick = () => {
             try {
-              sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(incObj));
+              sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(inc));
             } catch {}
-            if (onSelectIncident) onSelectIncident(incObj);
-            if (onNavigate) onNavigate('Predictive Analysis', incObj);
+            if (onSelectIncident) onSelectIncident(inc);
+            if (onNavigate) onNavigate('Predictive Analysis', inc);
           };
         }
       });
 
       core.bindTooltip(
-        `<div style="font-size:11px;font-weight:700;">FRP: ${p.frp.toFixed(1)} MW · ${p.instrument}</div><div style="font-size:9.5px;color:#9ca3af;">${p.acq_date} (${p.intensity.toUpperCase()})</div>`,
+        `<div style="font-size:11px;font-weight:700;">FRP: ${inc.frp.toFixed(1)} MW · ${inc.instrument}</div><div style="font-size:9.5px;color:#9ca3af;">${inc.date} (${inc.level.toUpperCase()})</div>`,
         { direction: 'top', className: 'bg-gray-900 text-white p-1 rounded border-0' }
       );
     });
-  }, [filteredAnomalies]);
+  }, [displayedIncidents, onNavigate, onSelectIncident]);
 
   // ─── BOUNDARY BOX ISOLATION & MASKING EFFECT ─────────────────────────────
   // Makes ONLY the area within the boundary box visible on the map, masking out the exterior
@@ -842,7 +964,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
     const isOsmLayerActive = layers.find((l) => l.id === 'osm_industries')?.checked;
     if (!isOsmLayerActive) return;
 
-    filteredOsmIndustries.forEach((ind) => {
+    displayedOsmIndustries.forEach((ind) => {
       // 1. Proximity dashed connector line from industry to closest fire hotspot (only if <= 50 km)
       if (ind.nearestHotspot && ind.distanceKm > 0 && ind.distanceKm <= 50.0) {
         const polyline = L.polyline(
@@ -993,7 +1115,7 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
 
       marker.bindPopup(popupHtml, { className: 'custom-osm-popup', maxWidth: 340 });
     });
-  }, [filteredOsmIndustries, layers]);
+  }, [displayedOsmIndustries, layers]);
 
   // Handle Country selection (switches country, flies map, and dynamically updates side list with states/cities)
   const handleCountrySelect = (c: CountryOption) => {
@@ -1512,6 +1634,33 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
               </div>
             </div>
 
+            {/* Active Environmental Overlays Indicator */}
+            {layers.some((l) => ['ndvi', 'landuse', 'weather'].includes(l.id) && l.checked) && (
+              <div className="absolute top-[225px] right-4 z-[20] bg-[#090e17]/85 backdrop-blur-md border border-white/10 rounded-xl p-2.5 text-white shadow-xl min-w-[185px] animate-in fade-in slide-in-from-right-1">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Active Overlays</p>
+                <div className="space-y-1 text-[11px]">
+                  {layers.find((l) => l.id === 'ndvi')?.checked && (
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>Forest Cover & Relief</span>
+                    </div>
+                  )}
+                  {layers.find((l) => l.id === 'landuse')?.checked && (
+                    <div className="flex items-center gap-1.5 text-purple-400 font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                      <span>Physical Land Cover</span>
+                    </div>
+                  )}
+                  {layers.find((l) => l.id === 'weather')?.checked && (
+                    <div className="flex items-center gap-1.5 text-cyan-400 font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                      <span>Weather Radar & Rain</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Bottom Left Status indicator */}
             <div className="absolute bottom-4 left-4 z-[400] text-[11px] font-semibold text-white/90 drop-shadow flex items-center gap-2 pointer-events-none">
               <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-sm" />
@@ -1898,6 +2047,16 @@ export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) 
                       }`}
                     >
                       High ({allIncidents.filter((i) => i.level === 'High').length})
+                    </button>
+                    <button
+                      onClick={() => setIncidentSeverityFilter('MODERATE')}
+                      className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        incidentSeverityFilter === 'MODERATE'
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                      }`}
+                    >
+                      Moderate ({allIncidents.filter((i) => i.level === 'Moderate').length})
                     </button>
                   </div>
                 </div>
