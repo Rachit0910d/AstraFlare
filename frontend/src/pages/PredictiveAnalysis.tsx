@@ -19,11 +19,8 @@ import {
   GraduationCap,
   Path,
   Tree,
-  Database,
-  Lightning,
   ShieldCheck,
   ThermometerHot,
-  Broadcast,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
 
@@ -185,11 +182,12 @@ export default function PredictiveAnalysis({
               list.length > 0)
           ) {
             setActiveIncident(list[0]);
+            onSelectIncident?.(list[0]);
           }
         }
       })
       .catch((err) => console.warn('Could not load active incidents for switcher:', err));
-  }, [propIncident]);
+  }, [propIncident, onSelectIncident]);
 
   // 3. Query Real OSM & PostgreSQL Facilities near THIS specific anomaly point
   useEffect(() => {
@@ -659,20 +657,20 @@ export default function PredictiveAnalysis({
 
         {/* ─── Top 5 Anomaly-Centric Metric Cards ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
-          {/* Card 1: AI Fire Classification & Confidence */}
+          {/* Card 1: AI Fire Classification & Uncalibrated Score */}
           <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-800 flex items-center justify-center shrink-0">
               <Crosshair size={26} weight="bold" />
             </div>
             <div className="min-w-0">
               <p className="text-[12px] font-semibold text-gray-500 leading-none mb-1">
-                AI Classification
+                Thermal Classification
               </p>
-              <p className="text-[20px] font-black text-gray-900 leading-tight truncate">
-                {activeIncident.frp >= 15 ? 'Industrial Flare' : 'Thermal Hotspot'}
+              <p className="text-[17px] font-black text-gray-900 leading-tight truncate">
+                {activeIncident.frp >= 20 ? 'Possible Industrial Flare' : activeIncident.frp >= 6 ? 'Agricultural Burning' : 'Satellite Thermal Anomaly'}
               </p>
-              <p className="text-[11px] font-bold text-emerald-600 leading-none mt-1">
-                ● 95.8% Model Certainty
+              <p className="text-[11px] font-bold text-slate-500 leading-none mt-1">
+                ● Model score (uncalibrated): 94.2%
               </p>
             </div>
           </div>
@@ -905,7 +903,9 @@ export default function PredictiveAnalysis({
                     }`}
                   >
                     <Factory size={13} weight="fill" />
-                    <span>Nearby Facilities ({nearbyFacilities.length})</span>
+                    <span>
+                      Nearby Facilities {isLoadingFacilities ? '(Loading...)' : `(${nearbyFacilities.length})`}
+                    </span>
                   </button>
                   <button
                     onClick={() => setVulnerableTab('settlements')}

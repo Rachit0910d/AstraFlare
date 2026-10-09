@@ -1,0 +1,4505 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "event_id": "evt_7927_28782_2025-03-16",
+      "event_start": "2025-03-16T19:04:00Z",
+      "event_end": "2025-03-16T20:21:00Z",
+      "latitude": 23.78128,
+      "longitude": 86.34522,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 1.28,
+      "max_frp": 4.33,
+      "mean_frp": 3.65,
+      "max_brightness": 322.1,
+      "mean_brightness": 314.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 14.7,
+        "persistence_component": 29.2
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 342.89,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 2,
+      "event_id": "evt_8772_31260_2024-04-09",
+      "event_start": "2024-04-09T06:33:00Z",
+      "event_end": "2024-04-09T06:33:00Z",
+      "latitude": 26.31712,
+      "longitude": 93.77995,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 12.59,
+      "mean_frp": 12.59,
+      "max_brightness": 338.9,
+      "mean_brightness": 338.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9978,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 27.2,
+        "risk_level": "Moderate",
+        "proximity_component": 25.3,
+        "thermal_component": 39.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 29.85,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 3,
+      "event_id": "evt_6931_27162_2025-11-22",
+      "event_start": "2025-11-22T07:51:00Z",
+      "event_end": "2025-11-22T07:51:00Z",
+      "latitude": 20.79279,
+      "longitude": 81.48682,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.84,
+      "mean_frp": 3.84,
+      "max_brightness": 335.0,
+      "mean_brightness": 335.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9964,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 9.1,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 20.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282857)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 266.9,
+        "latitude": 21.7462445,
+        "longitude": 83.8358291
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 4,
+      "event_id": "evt_7138_24322_2024-03-01",
+      "event_start": "2024-03-01T05:04:00Z",
+      "event_end": "2024-03-01T05:04:00Z",
+      "latitude": 21.4151,
+      "longitude": 72.9673,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.0,
+      "mean_frp": 8.0,
+      "max_brightness": 318.3,
+      "mean_brightness": 318.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.7893,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 24.9,
+        "risk_level": "Moderate",
+        "proximity_component": 35.2,
+        "thermal_component": 20.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Ankleshwar Chemical Estate",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 24.15,
+        "latitude": 21.628,
+        "longitude": 73.015
+      },
+      "land_cover": {
+        "class": "Built-up",
+        "category": "urban_industrial",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 5,
+      "event_id": "evt_8122_26045_2025-04-27",
+      "event_start": "2025-04-27T08:30:00Z",
+      "event_end": "2025-04-27T08:30:00Z",
+      "latitude": 24.36546,
+      "longitude": 78.13503,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 16.77,
+      "mean_frp": 16.77,
+      "max_brightness": 347.8,
+      "mean_brightness": 347.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9794,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.2,
+        "risk_level": "High",
+        "proximity_component": 37.5,
+        "thermal_component": 52.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 22.85,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 6,
+      "event_id": "evt_7972_25905_2023-04-24",
+      "event_start": "2023-04-24T07:31:00Z",
+      "event_end": "2023-04-24T07:31:00Z",
+      "latitude": 23.9149,
+      "longitude": 77.71568,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 29.43,
+      "mean_frp": 29.43,
+      "max_brightness": 344.7,
+      "mean_brightness": 344.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 32.0,
+        "risk_level": "Moderate",
+        "proximity_component": 7.5,
+        "thermal_component": 76.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 56.28,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 7,
+      "event_id": "evt_8162_31142_2023-03-11",
+      "event_start": "2023-03-11T07:03:00Z",
+      "event_end": "2023-03-11T07:03:00Z",
+      "latitude": 24.48577,
+      "longitude": 93.42703,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 32.49,
+      "mean_frp": 32.49,
+      "max_brightness": 339.8,
+      "mean_brightness": 339.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9933,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 30.0,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 79.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 235.51,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 8,
+      "event_id": "evt_8101_26979_2024-11-22",
+      "event_start": "2024-11-22T08:31:00Z",
+      "event_end": "2024-11-22T08:31:00Z",
+      "latitude": 24.30304,
+      "longitude": 80.9371,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.46,
+      "mean_frp": 3.46,
+      "max_brightness": 348.1,
+      "mean_brightness": 348.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.1,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 26.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 287.47,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 9,
+      "event_id": "evt_8122_30999_2024-03-13",
+      "event_start": "2024-03-13T07:07:00Z",
+      "event_end": "2024-03-13T07:07:00Z",
+      "latitude": 24.3651,
+      "longitude": 92.9968,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 217.5,
+      "mean_frp": 217.5,
+      "max_brightness": 351.6,
+      "mean_brightness": 351.6,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9708,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 258.79,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 10,
+      "event_id": "evt_9061_27684_2024-04-18",
+      "event_start": "2024-04-18T07:54:00Z",
+      "event_end": "2024-04-18T07:54:00Z",
+      "latitude": 27.1836,
+      "longitude": 83.05077,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 44.93,
+      "mean_frp": 44.93,
+      "max_brightness": 339.1,
+      "mean_brightness": 339.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.925,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 605.93,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 11,
+      "event_id": "evt_8052_31237_2023-02-10",
+      "event_start": "2023-02-10T07:47:00Z",
+      "event_end": "2023-02-10T07:47:00Z",
+      "latitude": 24.15562,
+      "longitude": 93.71111,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 31.37,
+      "mean_frp": 31.37,
+      "max_brightness": 367.0,
+      "mean_brightness": 367.0,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9961,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 33.9,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 91.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 269.7,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 12,
+      "event_id": "evt_3245_25982_2024-03-11",
+      "event_start": "2024-03-11T07:37:00Z",
+      "event_end": "2024-03-11T08:01:00Z",
+      "latitude": 9.73494,
+      "longitude": 77.9466,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.4,
+      "max_frp": 10.39,
+      "mean_frp": 9.12,
+      "max_brightness": 352.3,
+      "mean_brightness": 351.6,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9996,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 23.6,
+        "risk_level": "Moderate",
+        "proximity_component": 12.6,
+        "thermal_component": 41.9,
+        "persistence_component": 16.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_1262931340)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 48.56,
+        "latitude": 10.1187915,
+        "longitude": 77.7231967
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 13,
+      "event_id": "evt_7269_28668_2025-04-07",
+      "event_start": "2025-04-07T08:03:00Z",
+      "event_end": "2025-04-07T08:03:00Z",
+      "latitude": 21.80569,
+      "longitude": 86.00545,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.31,
+      "mean_frp": 3.31,
+      "max_brightness": 341.0,
+      "mean_brightness": 341.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.997,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 9.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 22.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282852)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 223.76,
+        "latitude": 21.7493504,
+        "longitude": 83.86107
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 14,
+      "event_id": "evt_8994_31208_2024-05-25",
+      "event_start": "2024-05-25T07:11:00Z",
+      "event_end": "2024-05-25T07:11:00Z",
+      "latitude": 26.98143,
+      "longitude": 93.62346,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.83,
+      "mean_frp": 8.83,
+      "max_brightness": 331.1,
+      "mean_brightness": 331.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9916,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 18.3,
+        "risk_level": "Low",
+        "proximity_component": 14.3,
+        "thermal_component": 28.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 46.09,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 15,
+      "event_id": "evt_8233_29120_2025-03-27",
+      "event_start": "2025-03-27T08:10:00Z",
+      "event_end": "2025-03-27T08:10:00Z",
+      "latitude": 24.70044,
+      "longitude": 87.35942,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 6.58,
+      "mean_frp": 6.58,
+      "max_brightness": 336.2,
+      "mean_brightness": 336.2,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.2,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 26.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 489.67,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 16,
+      "event_id": "evt_9097_27521_2023-04-19",
+      "event_start": "2023-04-19T07:25:00Z",
+      "event_end": "2023-04-19T07:25:00Z",
+      "latitude": 27.29168,
+      "longitude": 82.564,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 34.94,
+      "mean_frp": 34.94,
+      "max_brightness": 354.7,
+      "mean_brightness": 354.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9996,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 34.3,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 92.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 573.65,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 17,
+      "event_id": "evt_6484_26750_2024-03-29",
+      "event_start": "2024-03-29T07:53:00Z",
+      "event_end": "2024-03-29T07:53:00Z",
+      "latitude": 19.45328,
+      "longitude": 80.24948,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.53,
+      "mean_frp": 2.53,
+      "max_brightness": 335.0,
+      "mean_brightness": 335.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 8.1,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 17.5,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 369.07,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 18,
+      "event_id": "evt_7805_24118_2024-12-31",
+      "event_start": "2024-12-31T21:44:00Z",
+      "event_end": "2024-12-31T21:44:00Z",
+      "latitude": 23.41642,
+      "longitude": 72.35476,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.39,
+      "mean_frp": 1.39,
+      "max_brightness": 302.9,
+      "mean_brightness": 302.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 3.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 2.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Gujarat Refinery Complex",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 150.23,
+        "latitude": 22.3088,
+        "longitude": 73.1825
+      },
+      "land_cover": {
+        "class": "Built-up",
+        "category": "urban_industrial",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 19,
+      "event_id": "evt_7500_31020_2025-03-14",
+      "event_start": "2025-03-14T06:27:00Z",
+      "event_end": "2025-03-14T06:27:00Z",
+      "latitude": 22.49922,
+      "longitude": 93.06073,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 127.44,
+      "mean_frp": 127.44,
+      "max_brightness": 336.3,
+      "mean_brightness": 336.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9342,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 459.27,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 20,
+      "event_id": "evt_9868_25585_2024-05-07",
+      "event_start": "2024-05-07T07:25:00Z",
+      "event_end": "2024-05-07T07:25:00Z",
+      "latitude": 29.60371,
+      "longitude": 76.75433,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.15,
+      "mean_frp": 8.15,
+      "max_brightness": 353.4,
+      "mean_brightness": 353.4,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9996,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 38.0,
+        "risk_level": "High",
+        "proximity_component": 50.4,
+        "thermal_component": 38.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 15.5,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 21,
+      "event_id": "evt_6454_24372_2023-05-23",
+      "event_start": "2023-05-23T08:26:00Z",
+      "event_end": "2023-05-23T08:26:00Z",
+      "latitude": 19.36145,
+      "longitude": 73.11665,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 10.88,
+      "mean_frp": 10.88,
+      "max_brightness": 342.9,
+      "mean_brightness": 342.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9926,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 21.9,
+        "risk_level": "Moderate",
+        "proximity_component": 14.6,
+        "thermal_component": 38.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Trombay Industrial & Power Zone",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 45.6,
+        "latitude": 19.002,
+        "longitude": 72.905
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 22,
+      "event_id": "evt_7570_25623_2024-03-15",
+      "event_start": "2024-03-15T20:34:00Z",
+      "event_end": "2024-03-15T20:34:00Z",
+      "latitude": 22.71054,
+      "longitude": 76.86788,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 0.54,
+      "mean_frp": 0.54,
+      "max_brightness": 303.3,
+      "mean_brightness": 303.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9985,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.4,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 1.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 211.99,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 23,
+      "event_id": "evt_8004_25958_2023-04-17",
+      "event_start": "2023-04-17T07:57:00Z",
+      "event_end": "2023-04-17T07:57:00Z",
+      "latitude": 24.0133,
+      "longitude": 77.8736,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 21.0,
+      "mean_frp": 21.0,
+      "max_brightness": 333.1,
+      "mean_brightness": 333.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 30.0,
+        "risk_level": "Moderate",
+        "proximity_component": 20.6,
+        "thermal_component": 53.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 36.59,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 24,
+      "event_id": "evt_7223_27801_2024-06-05",
+      "event_start": "2024-06-05T06:38:00Z",
+      "event_end": "2024-06-05T06:38:00Z",
+      "latitude": 21.66885,
+      "longitude": 83.40368,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 9.64,
+      "mean_frp": 9.64,
+      "max_brightness": 339.1,
+      "mean_brightness": 339.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9997,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 20.3,
+        "risk_level": "Moderate",
+        "proximity_component": 14.4,
+        "thermal_component": 33.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282857)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 45.89,
+        "latitude": 21.7462445,
+        "longitude": 83.8358291
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 25,
+      "event_id": "evt_8576_30898_2025-03-29",
+      "event_start": "2025-03-29T07:33:00Z",
+      "event_end": "2025-03-29T07:33:00Z",
+      "latitude": 25.72842,
+      "longitude": 92.69542,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 7.13,
+      "mean_frp": 7.13,
+      "max_brightness": 345.5,
+      "mean_brightness": 345.5,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 13.2,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 32.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 145.79,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 26,
+      "event_id": "evt_5438_26882_2023-06-01",
+      "event_start": "2023-06-01T08:05:00Z",
+      "event_end": "2023-06-01T08:05:00Z",
+      "latitude": 16.31365,
+      "longitude": 80.64531,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 26.01,
+      "mean_frp": 26.01,
+      "max_brightness": 339.1,
+      "mean_brightness": 339.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9993,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 25.4,
+        "risk_level": "Moderate",
+        "proximity_component": 0.2,
+        "thermal_component": 66.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 98.62,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 27,
+      "event_id": "evt_9571_25534_2024-05-01",
+      "event_start": "2024-05-01T08:03:00Z",
+      "event_end": "2024-05-01T08:52:00Z",
+      "latitude": 28.71162,
+      "longitude": 76.60204,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.82,
+      "max_frp": 22.67,
+      "mean_frp": 16.6,
+      "max_brightness": 347.2,
+      "mean_brightness": 338.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9996,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.8,
+        "risk_level": "Moderate",
+        "proximity_component": 10.9,
+        "thermal_component": 64.0,
+        "persistence_component": 22.3
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Manesar Industrial Corridor",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 51.14,
+        "latitude": 28.365,
+        "longitude": 76.925
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 28,
+      "event_id": "evt_6366_24617_2025-03-05",
+      "event_start": "2025-03-05T20:30:00Z",
+      "event_end": "2025-03-05T20:30:00Z",
+      "latitude": 19.09718,
+      "longitude": 73.8521,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 0.65,
+      "mean_frp": 0.65,
+      "max_brightness": 301.6,
+      "mean_brightness": 301.6,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.6,
+        "risk_level": "Low",
+        "proximity_component": 0.3,
+        "thermal_component": 1.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Nagothane Petrochemical Complex",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 97.41,
+        "latitude": 18.535,
+        "longitude": 73.135
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 29,
+      "event_id": "evt_7037_24211_2024-06-14",
+      "event_start": "2024-06-14T20:03:00Z",
+      "event_end": "2024-06-14T21:18:00Z",
+      "latitude": 21.11175,
+      "longitude": 72.6336,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 1.25,
+      "max_frp": 5.22,
+      "mean_frp": 4.62,
+      "max_brightness": 309.3,
+      "mean_brightness": 308.6,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9933,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 54.4,
+        "risk_level": "Critical",
+        "proximity_component": 100.0,
+        "thermal_component": 10.4,
+        "persistence_component": 28.8
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Hazira Power & Petrochemical Hub",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 0.74,
+        "latitude": 21.1061,
+        "longitude": 72.6299
+      },
+      "land_cover": {
+        "class": "Built-up",
+        "category": "urban_industrial",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 30,
+      "event_id": "evt_8234_29016_2025-03-08",
+      "event_start": "2025-03-08T19:54:00Z",
+      "event_end": "2025-03-08T19:54:00Z",
+      "latitude": 24.70217,
+      "longitude": 87.04751,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 0.56,
+      "mean_frp": 0.56,
+      "max_brightness": 304.3,
+      "mean_brightness": 304.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.4,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 1.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 465.95,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 31,
+      "event_id": "evt_10281_25700_2024-06-10",
+      "event_start": "2024-06-10T08:03:00Z",
+      "event_end": "2024-06-10T08:27:00Z",
+      "latitude": 30.84337,
+      "longitude": 77.09985,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.4,
+      "max_frp": 28.13,
+      "mean_frp": 19.23,
+      "max_brightness": 356.5,
+      "mean_brightness": 356.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.7821,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.0,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 79.5,
+        "persistence_component": 16.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 149.94,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Tree cover",
+        "category": "forest",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 32,
+      "event_id": "evt_8932_31342_2024-01-25",
+      "event_start": "2024-01-25T07:28:00Z",
+      "event_end": "2024-01-25T07:28:00Z",
+      "latitude": 26.7957,
+      "longitude": 94.02571,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.81,
+      "mean_frp": 8.81,
+      "max_brightness": 367.0,
+      "mean_brightness": 367.0,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9973,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 27.4,
+        "risk_level": "Moderate",
+        "proximity_component": 20.6,
+        "thermal_component": 46.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 36.66,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 33,
+      "event_id": "evt_6094_26921_2024-03-28",
+      "event_start": "2024-03-28T07:46:00Z",
+      "event_end": "2024-03-28T07:46:00Z",
+      "latitude": 18.28318,
+      "longitude": 80.76205,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.33,
+      "mean_frp": 2.33,
+      "max_brightness": 335.1,
+      "mean_brightness": 335.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9964,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 8.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 17.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 267.7,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 34,
+      "event_id": "evt_7347_27910_2025-02-16",
+      "event_start": "2025-02-16T20:23:00Z",
+      "event_end": "2025-02-16T20:47:00Z",
+      "latitude": 22.04119,
+      "longitude": 83.72931,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.4,
+      "max_frp": 8.86,
+      "mean_frp": 6.3,
+      "max_brightness": 345.0,
+      "mean_brightness": 333.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9824,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 26.2,
+        "risk_level": "Moderate",
+        "proximity_component": 23.8,
+        "thermal_component": 35.2,
+        "persistence_component": 16.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 31.8,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 35,
+      "event_id": "evt_7225_26543_2025-03-21",
+      "event_start": "2025-03-21T08:00:00Z",
+      "event_end": "2025-03-21T08:00:00Z",
+      "latitude": 21.67642,
+      "longitude": 79.62839,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.06,
+      "mean_frp": 3.06,
+      "max_brightness": 334.0,
+      "mean_brightness": 334.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 8.3,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 18.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 314.6,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 36,
+      "event_id": "evt_8838_31110_2023-03-12",
+      "event_start": "2023-03-12T06:45:00Z",
+      "event_end": "2023-03-12T06:45:00Z",
+      "latitude": 26.51489,
+      "longitude": 93.32869,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 70.7,
+      "mean_frp": 70.7,
+      "max_brightness": 340.9,
+      "mean_brightness": 340.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9583,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 43.7,
+        "risk_level": "High",
+        "proximity_component": 14.9,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 45.14,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 37,
+      "event_id": "evt_7055_28100_2023-05-17",
+      "event_start": "2023-05-17T07:47:00Z",
+      "event_end": "2023-05-17T07:47:00Z",
+      "latitude": 21.16504,
+      "longitude": 84.29897,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 7.74,
+      "mean_frp": 7.74,
+      "max_brightness": 346.5,
+      "mean_brightness": 346.5,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 15.0,
+        "risk_level": "Low",
+        "proximity_component": 2.6,
+        "thermal_component": 33.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "coal washery",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 79.02,
+        "latitude": 21.7379126,
+        "longitude": 83.849223
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 38,
+      "event_id": "evt_6594_26902_2024-04-10",
+      "event_start": "2024-04-10T07:53:00Z",
+      "event_end": "2024-04-10T07:53:00Z",
+      "latitude": 19.78259,
+      "longitude": 80.70747,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.21,
+      "mean_frp": 1.21,
+      "max_brightness": 332.0,
+      "mean_brightness": 332.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 6.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 13.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Vizag Steel Plant Blast Flare",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 352.47,
+        "latitude": 17.691,
+        "longitude": 83.25
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 39,
+      "event_id": "evt_8764_31251_2025-04-03",
+      "event_start": "2025-04-03T07:39:00Z",
+      "event_end": "2025-04-03T07:39:00Z",
+      "latitude": 26.29074,
+      "longitude": 93.75259,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.42,
+      "mean_frp": 8.42,
+      "max_brightness": 339.9,
+      "mean_brightness": 339.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 23.6,
+        "risk_level": "Moderate",
+        "proximity_component": 23.2,
+        "thermal_component": 31.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 32.66,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 40,
+      "event_id": "evt_8373_27979_2025-04-22",
+      "event_start": "2025-04-22T03:33:00Z",
+      "event_end": "2025-04-22T03:33:00Z",
+      "latitude": 25.119,
+      "longitude": 83.9371,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 27.2,
+      "mean_frp": 27.2,
+      "max_brightness": 325.3,
+      "mean_brightness": 325.3,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.978,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 23.7,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 62.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 371.2,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 41,
+      "event_id": "evt_8133_26064_2025-04-25",
+      "event_start": "2025-04-25T07:27:00Z",
+      "event_end": "2025-04-25T07:27:00Z",
+      "latitude": 24.39895,
+      "longitude": 78.19247,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 76.81,
+      "mean_frp": 76.81,
+      "max_brightness": 347.6,
+      "mean_brightness": 347.6,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.7099,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 51.4,
+        "risk_level": "Critical",
+        "proximity_component": 32.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 25.98,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 42,
+      "event_id": "evt_7209_28052_2025-02-22",
+      "event_start": "2025-02-22T08:34:00Z",
+      "event_end": "2025-02-22T08:34:00Z",
+      "latitude": 21.6257,
+      "longitude": 84.1565,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 14.5,
+      "mean_frp": 14.5,
+      "max_brightness": 325.8,
+      "mean_brightness": 325.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9993,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 25.0,
+        "risk_level": "Moderate",
+        "proximity_component": 22.5,
+        "thermal_component": 36.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282852)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 33.73,
+        "latitude": 21.7493504,
+        "longitude": 83.86107
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 43,
+      "event_id": "evt_10150_26483_2024-06-11",
+      "event_start": "2024-06-11T08:33:00Z",
+      "event_end": "2024-06-11T08:33:00Z",
+      "latitude": 30.45029,
+      "longitude": 79.44928,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 238.19,
+      "mean_frp": 238.19,
+      "max_brightness": 367.0,
+      "mean_brightness": 367.0,
+      "classification": "NATURAL_WILDLAND_FIRE",
+      "classification_display": "Possible wildland fire \u2014 model estimate",
+      "model_score_uncalibrated": 0.9662,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_259754620)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 287.67,
+        "latitude": 29.4862635,
+        "longitude": 76.8892104
+      },
+      "land_cover": {
+        "class": "Tree cover",
+        "category": "forest",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 44,
+      "event_id": "evt_8474_25432_2023-10-11",
+      "event_start": "2023-10-11T07:42:00Z",
+      "event_end": "2023-10-11T07:42:00Z",
+      "latitude": 25.42191,
+      "longitude": 76.29749,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 4.63,
+      "mean_frp": 4.63,
+      "max_brightness": 338.8,
+      "mean_brightness": 338.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 10.3,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 23.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 241.3,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 45,
+      "event_id": "evt_8085_25977_2025-04-18",
+      "event_start": "2025-04-18T07:09:00Z",
+      "event_end": "2025-04-18T07:09:00Z",
+      "latitude": 24.25521,
+      "longitude": 77.93118,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.74,
+      "mean_frp": 8.74,
+      "max_brightness": 340.7,
+      "mean_brightness": 340.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9995,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 26.1,
+        "risk_level": "Moderate",
+        "proximity_component": 28.0,
+        "thermal_component": 32.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 28.31,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 46,
+      "event_id": "evt_9793_25619_2023-05-06",
+      "event_start": "2023-05-06T08:48:00Z",
+      "event_end": "2023-05-06T08:48:00Z",
+      "latitude": 29.37831,
+      "longitude": 76.85807,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 12.57,
+      "mean_frp": 12.57,
+      "max_brightness": 367.0,
+      "mean_brightness": 367.0,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9549,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 52.1,
+        "risk_level": "Critical",
+        "proximity_component": 69.6,
+        "thermal_component": 53.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_259635547)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 7.13,
+        "latitude": 29.4399847,
+        "longitude": 76.877023
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 47,
+      "event_id": "evt_9109_27535_2023-04-13",
+      "event_start": "2023-04-13T07:38:00Z",
+      "event_end": "2023-04-13T07:38:00Z",
+      "latitude": 27.32692,
+      "longitude": 82.60634,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 6.26,
+      "mean_frp": 6.26,
+      "max_brightness": 351.8,
+      "mean_brightness": 351.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9832,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 13.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 33.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 579.54,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 48,
+      "event_id": "evt_7350_27895_2025-01-21",
+      "event_start": "2025-01-21T07:39:00Z",
+      "event_end": "2025-01-21T07:39:00Z",
+      "latitude": 22.04958,
+      "longitude": 83.68437,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 9.06,
+      "mean_frp": 9.06,
+      "max_brightness": 353.9,
+      "mean_brightness": 353.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 25.9,
+        "risk_level": "Moderate",
+        "proximity_component": 21.9,
+        "thermal_component": 40.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 34.67,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 49,
+      "event_id": "evt_5422_26297_2025-03-01",
+      "event_start": "2025-03-01T07:33:00Z",
+      "event_end": "2025-03-01T07:33:00Z",
+      "latitude": 16.26719,
+      "longitude": 78.89023,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 5.54,
+      "mean_frp": 5.54,
+      "max_brightness": 339.9,
+      "mean_brightness": 339.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.6,
+        "risk_level": "Low",
+        "proximity_component": 1.0,
+        "thermal_component": 26.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 91.76,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 50,
+      "event_id": "evt_9854_25971_2025-04-01",
+      "event_start": "2025-04-01T08:53:00Z",
+      "event_end": "2025-04-01T08:53:00Z",
+      "latitude": 29.5625,
+      "longitude": 77.9132,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 82.7,
+      "mean_frp": 82.7,
+      "max_brightness": 355.3,
+      "mean_brightness": 355.3,
+      "classification": "NATURAL_WILDLAND_FIRE",
+      "classification_display": "Possible wildland fire \u2014 model estimate",
+      "model_score_uncalibrated": 0.8594,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_259660137)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 106.71,
+        "latitude": 29.4635733,
+        "longitude": 76.8956161
+      },
+      "land_cover": {
+        "class": "Tree cover",
+        "category": "forest",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 51,
+      "event_id": "evt_9594_25583_2024-05-05",
+      "event_start": "2024-05-05T08:02:00Z",
+      "event_end": "2024-05-05T08:02:00Z",
+      "latitude": 28.78129,
+      "longitude": 76.74779,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 31.04,
+      "mean_frp": 31.04,
+      "max_brightness": 352.4,
+      "mean_brightness": 352.4,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9996,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 36.5,
+        "risk_level": "High",
+        "proximity_component": 11.8,
+        "thermal_component": 83.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Manesar Industrial Corridor",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 49.77,
+        "latitude": 28.365,
+        "longitude": 76.925
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 52,
+      "event_id": "evt_9238_32086_2023-10-16",
+      "event_start": "2023-10-16T06:58:00Z",
+      "event_end": "2023-10-16T06:58:00Z",
+      "latitude": 27.7145,
+      "longitude": 96.25719,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 26.09,
+      "mean_frp": 26.09,
+      "max_brightness": 337.2,
+      "mean_brightness": 337.2,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9966,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 25.0,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 65.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 289.54,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 53,
+      "event_id": "evt_6155_26799_2023-05-08",
+      "event_start": "2023-05-08T07:56:00Z",
+      "event_end": "2023-05-08T07:56:00Z",
+      "latitude": 18.464,
+      "longitude": 80.3979,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 30.5,
+      "mean_frp": 30.5,
+      "max_brightness": 330.7,
+      "mean_brightness": 330.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.991,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 27.0,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 71.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 276.0,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 54,
+      "event_id": "evt_8878_31069_2023-03-05",
+      "event_start": "2023-03-05T07:16:00Z",
+      "event_end": "2023-03-05T07:16:00Z",
+      "latitude": 26.63504,
+      "longitude": 93.20821,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.95,
+      "mean_frp": 8.95,
+      "max_brightness": 351.5,
+      "mean_brightness": 351.5,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9811,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 18.6,
+        "risk_level": "Low",
+        "proximity_component": 6.8,
+        "thermal_component": 38.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 57.3,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 55,
+      "event_id": "evt_7992_26420_2025-04-07",
+      "event_start": "2025-04-07T08:04:00Z",
+      "event_end": "2025-04-07T08:04:00Z",
+      "latitude": 23.97461,
+      "longitude": 79.26022,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 29.19,
+      "mean_frp": 29.19,
+      "max_brightness": 346.5,
+      "mean_brightness": 346.5,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 28.8,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 76.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 114.13,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 56,
+      "event_id": "evt_9443_24480_2025-11-16",
+      "event_start": "2025-11-16T08:05:00Z",
+      "event_end": "2025-11-16T08:05:00Z",
+      "latitude": 28.32941,
+      "longitude": 73.44112,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 6.86,
+      "mean_frp": 6.86,
+      "max_brightness": 356.1,
+      "mean_brightness": 356.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9933,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 14.9,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 36.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Manesar Industrial Corridor",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 363.41,
+        "latitude": 28.365,
+        "longitude": 76.925
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 57,
+      "event_id": "evt_8463_25179_2025-04-27",
+      "event_start": "2025-04-27T07:41:00Z",
+      "event_end": "2025-04-27T08:08:00Z",
+      "latitude": 25.38884,
+      "longitude": 75.53693,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.45,
+      "max_frp": 40.11,
+      "mean_frp": 31.9,
+      "max_brightness": 367.0,
+      "mean_brightness": 357.2,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.8982,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 38.4,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 16.8
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 307.81,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 58,
+      "event_id": "evt_8058_26265_2023-04-18",
+      "event_start": "2023-04-18T08:32:00Z",
+      "event_end": "2023-04-18T08:32:00Z",
+      "latitude": 24.17358,
+      "longitude": 78.79458,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 6.43,
+      "mean_frp": 6.43,
+      "max_brightness": 347.8,
+      "mean_brightness": 347.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9933,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 15.2,
+        "risk_level": "Low",
+        "proximity_component": 4.6,
+        "thermal_component": 31.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 63.59,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 59,
+      "event_id": "evt_8752_31376_2023-03-14",
+      "event_start": "2023-03-14T06:59:00Z",
+      "event_end": "2023-03-14T06:59:00Z",
+      "latitude": 26.25533,
+      "longitude": 94.12758,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 11.71,
+      "mean_frp": 11.71,
+      "max_brightness": 341.7,
+      "mean_brightness": 341.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 20.0,
+        "risk_level": "Moderate",
+        "proximity_component": 9.4,
+        "thermal_component": 39.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 53.38,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 60,
+      "event_id": "evt_7884_28925_2023-02-10",
+      "event_start": "2023-02-10T07:47:00Z",
+      "event_end": "2023-02-10T07:47:00Z",
+      "latitude": 23.6529,
+      "longitude": 86.77467,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.02,
+      "mean_frp": 3.02,
+      "max_brightness": 330.7,
+      "mean_brightness": 330.7,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 7.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 16.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 369.88,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 61,
+      "event_id": "evt_8814_31096_2023-04-12",
+      "event_start": "2023-04-12T07:43:00Z",
+      "event_end": "2023-04-12T07:43:00Z",
+      "latitude": 26.4412,
+      "longitude": 93.2895,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 48.9,
+      "mean_frp": 48.9,
+      "max_brightness": 324.0,
+      "mean_brightness": 324.0,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.8668,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 41.9,
+        "risk_level": "High",
+        "proximity_component": 10.9,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 51.11,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 62,
+      "event_id": "evt_8819_27954_2024-04-23",
+      "event_start": "2024-04-23T19:38:00Z",
+      "event_end": "2024-04-23T19:38:00Z",
+      "latitude": 26.45701,
+      "longitude": 83.86066,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.27,
+      "mean_frp": 1.27,
+      "max_brightness": 307.7,
+      "mean_brightness": 307.7,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9959,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.9,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 2.5,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 519.6,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 63,
+      "event_id": "evt_8893_31132_2024-03-05",
+      "event_start": "2024-03-05T06:14:00Z",
+      "event_end": "2024-03-05T06:14:00Z",
+      "latitude": 26.6791,
+      "longitude": 93.39495,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.75,
+      "mean_frp": 8.75,
+      "max_brightness": 347.9,
+      "mean_brightness": 347.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9943,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 23.3,
+        "risk_level": "Moderate",
+        "proximity_component": 19.0,
+        "thermal_component": 36.5,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 38.98,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 64,
+      "event_id": "evt_7993_25941_2024-05-01",
+      "event_start": "2024-05-01T08:01:00Z",
+      "event_end": "2024-05-01T08:01:00Z",
+      "latitude": 23.97948,
+      "longitude": 77.82159,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 12.02,
+      "mean_frp": 12.02,
+      "max_brightness": 350.7,
+      "mean_brightness": 350.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9995,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 24.8,
+        "risk_level": "Moderate",
+        "proximity_component": 16.2,
+        "thermal_component": 44.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 43.14,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 65,
+      "event_id": "evt_7224_27765_2025-12-16",
+      "event_start": "2025-12-16T07:01:00Z",
+      "event_end": "2025-12-16T07:22:00Z",
+      "latitude": 21.67228,
+      "longitude": 83.29445,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.35,
+      "max_frp": 10.02,
+      "mean_frp": 6.08,
+      "max_brightness": 349.9,
+      "mean_brightness": 339.6,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9814,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 20.2,
+        "risk_level": "Moderate",
+        "proximity_component": 7.0,
+        "thermal_component": 40.0,
+        "persistence_component": 15.2
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282857)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 57.06,
+        "latitude": 21.7462445,
+        "longitude": 83.8358291
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 66,
+      "event_id": "evt_7173_27260_2025-11-05",
+      "event_start": "2025-11-05T20:38:00Z",
+      "event_end": "2025-11-05T20:38:00Z",
+      "latitude": 21.52025,
+      "longitude": 81.77887,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 0.44,
+      "mean_frp": 0.44,
+      "max_brightness": 303.3,
+      "mean_brightness": 303.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.3,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 0.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282857)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 216.01,
+        "latitude": 21.7462445,
+        "longitude": 83.8358291
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 67,
+      "event_id": "evt_8180_26110_2025-04-24",
+      "event_start": "2025-04-24T06:59:00Z",
+      "event_end": "2025-04-24T08:37:00Z",
+      "latitude": 24.54002,
+      "longitude": 78.33051,
+      "observation_count": 2,
+      "satellite_count": 1,
+      "duration_hours": 1.63,
+      "max_frp": 18.0,
+      "mean_frp": 17.88,
+      "max_brightness": 355.1,
+      "mean_brightness": 350.9,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9539,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 34.3,
+        "risk_level": "Moderate",
+        "proximity_component": 15.5,
+        "thermal_component": 58.6,
+        "persistence_component": 34.5
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 44.31,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 68,
+      "event_id": "evt_7619_28685_2023-03-28",
+      "event_start": "2023-03-28T20:05:00Z",
+      "event_end": "2023-03-28T20:05:00Z",
+      "latitude": 22.85724,
+      "longitude": 86.05505,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.04,
+      "mean_frp": 1.04,
+      "max_brightness": 306.9,
+      "mean_brightness": 306.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 2.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 2.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282852)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 259.79,
+        "latitude": 21.7493504,
+        "longitude": 83.86107
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 69,
+      "event_id": "evt_10281_24841_2025-05-06",
+      "event_start": "2025-05-06T08:13:00Z",
+      "event_end": "2025-05-06T08:13:00Z",
+      "latitude": 30.84363,
+      "longitude": 74.52252,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.28,
+      "mean_frp": 3.28,
+      "max_brightness": 338.1,
+      "mean_brightness": 338.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.992,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 9.2,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 20.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 285.65,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 70,
+      "event_id": "evt_7293_27832_2024-02-07",
+      "event_start": "2024-02-07T19:38:00Z",
+      "event_end": "2024-02-07T19:38:00Z",
+      "latitude": 21.87759,
+      "longitude": 83.49656,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.02,
+      "mean_frp": 1.02,
+      "max_brightness": 305.8,
+      "mean_brightness": 305.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.6,
+        "risk_level": "Low",
+        "proximity_component": 19.7,
+        "thermal_component": 2.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 38.02,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 71,
+      "event_id": "evt_7634_26099_2024-04-14",
+      "event_start": "2024-04-14T08:19:00Z",
+      "event_end": "2024-04-14T08:19:00Z",
+      "latitude": 22.90294,
+      "longitude": 78.29617,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.25,
+      "mean_frp": 2.25,
+      "max_brightness": 335.8,
+      "mean_brightness": 335.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 8.1,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 17.4,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 140.57,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 72,
+      "event_id": "evt_3089_26010_2025-05-12",
+      "event_start": "2025-05-12T09:15:00Z",
+      "event_end": "2025-05-12T09:15:00Z",
+      "latitude": 9.2682,
+      "longitude": 78.0306,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.6,
+      "mean_frp": 8.6,
+      "max_brightness": 326.6,
+      "mean_brightness": 326.6,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9684,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 19.3,
+        "risk_level": "Low",
+        "proximity_component": 18.7,
+        "thermal_component": 25.5,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_1432135179)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 39.43,
+        "latitude": 8.9136484,
+        "longitude": 78.0536824
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 73,
+      "event_id": "evt_8838_31110_2023-03-12",
+      "event_start": "2023-03-12T06:45:00Z",
+      "event_end": "2023-03-12T06:45:00Z",
+      "latitude": 26.51489,
+      "longitude": 93.32869,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 70.7,
+      "mean_frp": 70.7,
+      "max_brightness": 340.9,
+      "mean_brightness": 340.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9583,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 43.7,
+        "risk_level": "High",
+        "proximity_component": 14.9,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 45.14,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 74,
+      "event_id": "evt_7982_26222_2025-04-24",
+      "event_start": "2025-04-24T08:37:00Z",
+      "event_end": "2025-04-24T08:37:00Z",
+      "latitude": 23.94746,
+      "longitude": 78.66684,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 15.15,
+      "mean_frp": 15.15,
+      "max_brightness": 347.8,
+      "mean_brightness": 347.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9928,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 22.7,
+        "risk_level": "Moderate",
+        "proximity_component": 7.8,
+        "thermal_component": 49.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 55.76,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 75,
+      "event_id": "evt_6405_24343_2025-12-14",
+      "event_start": "2025-12-14T08:49:00Z",
+      "event_end": "2025-12-14T08:49:00Z",
+      "latitude": 19.21525,
+      "longitude": 73.02969,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 4.38,
+      "mean_frp": 4.38,
+      "max_brightness": 337.1,
+      "mean_brightness": 337.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 23.4,
+        "risk_level": "Moderate",
+        "proximity_component": 30.2,
+        "thermal_component": 22.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Trombay Industrial & Power Zone",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 27.01,
+        "latitude": 19.002,
+        "longitude": 72.905
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 76,
+      "event_id": "evt_9953_25509_2024-05-07",
+      "event_start": "2024-05-07T07:25:00Z",
+      "event_end": "2024-05-07T07:25:00Z",
+      "latitude": 29.8579,
+      "longitude": 76.52651,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 11.73,
+      "mean_frp": 11.73,
+      "max_brightness": 346.7,
+      "mean_brightness": 346.7,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 21.2,
+        "risk_level": "Moderate",
+        "proximity_component": 10.1,
+        "thermal_component": 41.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 52.28,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 77,
+      "event_id": "evt_9508_26829_2025-12-25",
+      "event_start": "2025-12-25T07:35:00Z",
+      "event_end": "2025-12-25T07:35:00Z",
+      "latitude": 28.52328,
+      "longitude": 80.48727,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.75,
+      "mean_frp": 2.75,
+      "max_brightness": 326.3,
+      "mean_brightness": 326.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9815,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 6.8,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 13.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Manesar Industrial Corridor",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 371.98,
+        "latitude": 28.365,
+        "longitude": 76.925
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 78,
+      "event_id": "evt_9910_25592_2025-06-16",
+      "event_start": "2025-06-16T07:05:00Z",
+      "event_end": "2025-06-16T07:05:00Z",
+      "latitude": 29.72916,
+      "longitude": 76.77464,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 8.23,
+      "mean_frp": 8.23,
+      "max_brightness": 332.5,
+      "mean_brightness": 332.5,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9634,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 26.1,
+        "risk_level": "Moderate",
+        "proximity_component": 32.0,
+        "thermal_component": 27.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 26.03,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 79,
+      "event_id": "evt_10165_25464_2024-11-28",
+      "event_start": "2024-11-28T07:58:00Z",
+      "event_end": "2024-11-28T07:58:00Z",
+      "latitude": 30.49411,
+      "longitude": 76.39077,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 6.67,
+      "mean_frp": 6.67,
+      "max_brightness": 332.9,
+      "mean_brightness": 332.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 10.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 24.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_989819096)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 119.85,
+        "latitude": 29.5106526,
+        "longitude": 76.8651289
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 80,
+      "event_id": "evt_8770_31255_2024-04-06",
+      "event_start": "2024-04-06T06:37:00Z",
+      "event_end": "2024-04-06T07:04:00Z",
+      "latitude": 26.3104,
+      "longitude": 93.76406,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.45,
+      "max_frp": 31.77,
+      "mean_frp": 18.74,
+      "max_brightness": 347.2,
+      "mean_brightness": 344.2,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.986,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 43.2,
+        "risk_level": "High",
+        "proximity_component": 24.7,
+        "thermal_component": 82.2,
+        "persistence_component": 16.8
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 30.49,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 81,
+      "event_id": "evt_7722_27445_2025-01-07",
+      "event_start": "2025-01-07T07:29:00Z",
+      "event_end": "2025-01-07T20:20:00Z",
+      "latitude": 23.16624,
+      "longitude": 82.33556,
+      "observation_count": 4,
+      "satellite_count": 3,
+      "duration_hours": 12.85,
+      "max_frp": 3.37,
+      "mean_frp": 2.34,
+      "max_brightness": 330.2,
+      "mean_brightness": 320.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9949,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 25.9,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 16.9,
+        "persistence_component": 100.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 220.43,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 82,
+      "event_id": "evt_7458_26619_2024-05-09",
+      "event_start": "2024-05-09T07:58:00Z",
+      "event_end": "2024-05-09T07:58:00Z",
+      "latitude": 22.37301,
+      "longitude": 79.85622,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 3.48,
+      "mean_frp": 3.48,
+      "max_brightness": 339.9,
+      "mean_brightness": 339.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9971,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 9.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 21.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 264.49,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 83,
+      "event_id": "evt_6409_24458_2024-03-21",
+      "event_start": "2024-03-21T05:30:00Z",
+      "event_end": "2024-03-21T05:30:00Z",
+      "latitude": 19.2266,
+      "longitude": 73.375,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 24.4,
+      "mean_frp": 24.4,
+      "max_brightness": 328.2,
+      "mean_brightness": 328.2,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9915,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 26.0,
+        "risk_level": "Moderate",
+        "proximity_component": 8.3,
+        "thermal_component": 57.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Trombay Industrial & Power Zone",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 55.0,
+        "latitude": 19.002,
+        "longitude": 72.905
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 84,
+      "event_id": "evt_6395_24376_2025-02-13",
+      "event_start": "2025-02-13T07:57:00Z",
+      "event_end": "2025-02-13T07:57:00Z",
+      "latitude": 19.18487,
+      "longitude": 73.12673,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 16.73,
+      "mean_frp": 16.73,
+      "max_brightness": 347.4,
+      "mean_brightness": 347.4,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9931,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.3,
+        "risk_level": "Moderate",
+        "proximity_component": 24.5,
+        "thermal_component": 52.2,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Trombay Industrial & Power Zone",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 30.77,
+        "latitude": 19.002,
+        "longitude": 72.905
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 85,
+      "event_id": "evt_7442_30918_2024-03-16",
+      "event_start": "2024-03-16T06:57:00Z",
+      "event_end": "2024-03-16T06:57:00Z",
+      "latitude": 22.32714,
+      "longitude": 92.75291,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 32.93,
+      "mean_frp": 32.93,
+      "max_brightness": 343.8,
+      "mean_brightness": 343.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9974,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.0,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 82.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 484.04,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 86,
+      "event_id": "evt_8765_31211_2025-03-28",
+      "event_start": "2025-03-28T07:53:00Z",
+      "event_end": "2025-03-28T07:53:00Z",
+      "latitude": 26.2951,
+      "longitude": 93.6331,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 62.8,
+      "mean_frp": 62.8,
+      "max_brightness": 348.2,
+      "mean_brightness": 348.2,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9349,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 46.9,
+        "risk_level": "High",
+        "proximity_component": 21.9,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 34.6,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 87,
+      "event_id": "evt_7244_27971_2025-01-17",
+      "event_start": "2025-01-17T07:16:00Z",
+      "event_end": "2025-01-17T07:16:00Z",
+      "latitude": 21.73221,
+      "longitude": 83.91308,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 5.4,
+      "mean_frp": 5.4,
+      "max_brightness": 330.3,
+      "mean_brightness": 330.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 42.7,
+        "risk_level": "High",
+        "proximity_component": 74.2,
+        "thermal_component": 20.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282852)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 5.75,
+        "latitude": 21.7493504,
+        "longitude": 83.86107
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 88,
+      "event_id": "evt_7859_31091_2024-03-11",
+      "event_start": "2024-03-11T07:23:00Z",
+      "event_end": "2024-03-11T07:23:00Z",
+      "latitude": 23.5759,
+      "longitude": 93.273,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 68.5,
+      "mean_frp": 68.5,
+      "max_brightness": 344.8,
+      "mean_brightness": 344.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9933,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 37.0,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 100.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 337.77,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 89,
+      "event_id": "evt_7224_26292_2023-04-19",
+      "event_start": "2023-04-19T08:13:00Z",
+      "event_end": "2023-04-19T08:13:00Z",
+      "latitude": 21.6732,
+      "longitude": 78.87552,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 30.16,
+      "mean_frp": 30.16,
+      "max_brightness": 355.4,
+      "mean_brightness": 355.4,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9999,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.1,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 83.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 285.81,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 90,
+      "event_id": "evt_5938_26870_2025-03-16",
+      "event_start": "2025-03-16T07:29:00Z",
+      "event_end": "2025-03-16T07:29:00Z",
+      "latitude": 17.8153,
+      "longitude": 80.6092,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 4.68,
+      "mean_frp": 4.68,
+      "max_brightness": 342.3,
+      "mean_brightness": 342.3,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9971,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 10.9,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 25.5,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "APSRTC Bus Depot, Vinukonda",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 215.33,
+        "latitude": 16.055486,
+        "longitude": 79.7406242
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 91,
+      "event_id": "evt_6464_26875_2023-03-12",
+      "event_start": "2023-03-12T07:35:00Z",
+      "event_end": "2023-03-12T07:35:00Z",
+      "latitude": 19.39196,
+      "longitude": 80.6263,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.19,
+      "mean_frp": 2.19,
+      "max_brightness": 333.8,
+      "mean_brightness": 333.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9989,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 7.7,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 16.3,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Vizag Steel Plant Blast Flare",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 332.48,
+        "latitude": 17.691,
+        "longitude": 83.25
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 92,
+      "event_id": "evt_8485_26488_2025-12-31",
+      "event_start": "2025-12-31T07:43:00Z",
+      "event_end": "2025-12-31T07:43:00Z",
+      "latitude": 25.45611,
+      "longitude": 79.46508,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 7.44,
+      "mean_frp": 7.44,
+      "max_brightness": 355.9,
+      "mean_brightness": 355.9,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9733,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 15.2,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 37.8,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 195.87,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 93,
+      "event_id": "evt_7928_28524_2025-12-30",
+      "event_start": "2025-12-30T20:08:00Z",
+      "event_end": "2025-12-30T20:28:00Z",
+      "latitude": 23.78386,
+      "longitude": 85.57274,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.33,
+      "max_frp": 1.48,
+      "mean_frp": 1.02,
+      "max_brightness": 297.6,
+      "mean_brightness": 296.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 4.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 3.0,
+        "persistence_component": 14.9
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282855)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 286.64,
+        "latitude": 21.7759843,
+        "longitude": 83.8446428
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 94,
+      "event_id": "evt_9511_26315_2023-02-01",
+      "event_start": "2023-02-01T08:09:00Z",
+      "event_end": "2023-02-01T08:09:00Z",
+      "latitude": 28.53401,
+      "longitude": 78.94399,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 1.18,
+      "mean_frp": 1.18,
+      "max_brightness": 325.2,
+      "mean_brightness": 325.2,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9943,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 5.5,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 9.9,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Manesar Industrial Corridor",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 211.43,
+        "latitude": 28.365,
+        "longitude": 76.925
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 95,
+      "event_id": "evt_8180_31114_2025-03-26",
+      "event_start": "2025-03-26T06:48:00Z",
+      "event_end": "2025-03-26T06:48:00Z",
+      "latitude": 24.53862,
+      "longitude": 93.34071,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 25.59,
+      "mean_frp": 25.59,
+      "max_brightness": 337.8,
+      "mean_brightness": 337.8,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9853,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 24.8,
+        "risk_level": "Moderate",
+        "proximity_component": 0.0,
+        "thermal_component": 65.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 231.22,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 96,
+      "event_id": "evt_5955_27093_2024-04-17",
+      "event_start": "2024-04-17T08:37:00Z",
+      "event_end": "2024-04-17T08:37:00Z",
+      "latitude": 17.8642,
+      "longitude": 81.28048,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 4.26,
+      "mean_frp": 4.26,
+      "max_brightness": 338.2,
+      "mean_brightness": 338.2,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.9975,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 9.9,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 22.6,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Vizag Steel Plant Blast Flare",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 206.33,
+        "latitude": 17.691,
+        "longitude": 83.25
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 97,
+      "event_id": "evt_6779_27440_2025-03-05",
+      "event_start": "2025-03-05T07:59:00Z",
+      "event_end": "2025-03-05T07:59:00Z",
+      "latitude": 20.33781,
+      "longitude": 82.31948,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 5.06,
+      "mean_frp": 5.06,
+      "max_brightness": 341.1,
+      "mean_brightness": 341.1,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 0.997,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 11.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 25.7,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Industrial Site (way_968282857)",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 222.39,
+        "latitude": 21.7462445,
+        "longitude": 83.8358291
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 98,
+      "event_id": "evt_8529_30584_2024-04-06",
+      "event_start": "2024-04-06T06:37:00Z",
+      "event_end": "2024-04-06T07:29:00Z",
+      "latitude": 25.58805,
+      "longitude": 91.7522,
+      "observation_count": 2,
+      "satellite_count": 2,
+      "duration_hours": 0.87,
+      "max_frp": 38.28,
+      "mean_frp": 22.88,
+      "max_brightness": 349.2,
+      "mean_brightness": 345.1,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9719,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 38.3,
+        "risk_level": "High",
+        "proximity_component": 0.0,
+        "thermal_component": 96.2,
+        "persistence_component": 23.1
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Numaligarh Refinery Limited",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 236.4,
+        "latitude": 26.585,
+        "longitude": 93.755
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 99,
+      "event_id": "evt_7388_25103_2025-11-09",
+      "event_start": "2025-11-09T08:05:00Z",
+      "event_end": "2025-11-09T08:05:00Z",
+      "latitude": 22.16295,
+      "longitude": 75.30791,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 2.34,
+      "mean_frp": 2.34,
+      "max_brightness": 334.8,
+      "mean_brightness": 334.8,
+      "classification": "UNKNOWN_REQUIRES_REVIEW",
+      "classification_display": "Unknown / insufficient evidence",
+      "model_score_uncalibrated": 1.0,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 8.0,
+        "risk_level": "Low",
+        "proximity_component": 0.0,
+        "thermal_component": 17.1,
+        "persistence_component": 10.0
+      },
+      "review_status": "requires_review",
+      "nearest_facility": {
+        "name": "Gujarat Refinery Process Stack",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 221.99,
+        "latitude": 22.305,
+        "longitude": 73.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    },
+    {
+      "id": 100,
+      "event_id": "evt_8055_25950_2025-04-07",
+      "event_start": "2025-04-07T07:16:00Z",
+      "event_end": "2025-04-07T07:16:00Z",
+      "latitude": 24.16636,
+      "longitude": 77.84982,
+      "observation_count": 1,
+      "satellite_count": 1,
+      "duration_hours": 0.0,
+      "max_frp": 14.27,
+      "mean_frp": 14.27,
+      "max_brightness": 367.0,
+      "mean_brightness": 367.0,
+      "classification": "POSSIBLE_AGRICULTURAL_BURNING",
+      "classification_display": "Possible agricultural burning \u2014 model estimate",
+      "model_score_uncalibrated": 0.9927,
+      "model_version": "2.2.0",
+      "operational_risk": {
+        "risk_score": 31.7,
+        "risk_level": "Moderate",
+        "proximity_component": 21.7,
+        "thermal_component": 57.0,
+        "persistence_component": 10.0
+      },
+      "review_status": "verified",
+      "nearest_facility": {
+        "name": "Bharat Oman Refinery Bina",
+        "category": "Heavy Manufacturing / Refining",
+        "distance_km": 34.96,
+        "latitude": 24.165,
+        "longitude": 78.185
+      },
+      "land_cover": {
+        "class": "Cropland",
+        "category": "agriculture",
+        "is_proxy": true,
+        "provenance": "PROXY_COARSE_HEURISTIC"
+      },
+      "historical_context": {
+        "count_30d": 0,
+        "baseline_status": "INSUFFICIENT_HISTORY"
+      },
+      "data_quality_notes": "Real NASA FIRMS historical detection cluster with causal features and sovereign facility proximity."
+    }
+  ],
+  "total": 100
+}

@@ -1,143 +1,170 @@
 """
 AstraFlare Machine Learning Engine (Python)
 -------------------------------------------
-Analyzes NASA FIRMS thermal anomaly telemetry, ESA WorldCover land use,
-and industrial facility spatial data to predict:
-1. Fire Classification (Industrial Fire, Persistent Thermal Source, Wildfire/Other)
-2. Danger Level and Spread Probability
-3. Confidence Score (Ensemble multi-sensor calibration)
-4. Endangered Industrial Infrastructure & Facilities
+Loads versioned scikit-learn model artifacts trained on physical event features.
+Separates:
+1. Classification (Estimated Source Category)
+2. Model Score (Uncalibrated Probability)
+3. Operational Risk Score (Independent multi-criteria priority)
+4. Endangered Sovereign Industrial Facilities (Proximity Engine)
+5. Review Status & Abstention
 """
 
+import os
+import json
 import math
+import joblib
+import pandas as pd
+import numpy as np
 from typing import Dict, List, Any, Optional
 
-# Reference catalogue of major critical industrial hubs, refineries, and manufacturing clusters
-KNOWN_INDUSTRIAL_HUBS = [
-    {
-        "name": "Jamnagar Petroleum & Refining Complex",
-        "type": "Petrochemical Refinery & Polymer Plant",
-        "lat": 22.4707,
-        "lng": 70.0577,
-        "critical_materials": ["Crude Oil", "Naphtha", "Hydrogen Gas", "High-Octane Gasoline"],
-        "estimated_workers": 24000,
-    },
-    {
-        "name": "Hazira LNG Terminal & Chemical Hub",
-        "type": "Liquefied Natural Gas & Fertilizer Complex",
-        "lat": 21.1026,
-        "lng": 72.6373,
-        "critical_materials": ["Cryogenic Methane", "Ammonia", "Sulfur"],
-        "estimated_workers": 16000,
-    },
-    {
-        "name": "Manali Petrochemical & Industrial Corridor",
-        "type": "Chemical & Petroleum Refining Industrial Estate",
-        "lat": 13.1673,
-        "lng": 80.2605,
-        "critical_materials": ["Benzene", "Polyols", "Petroleum Distillates"],
-        "estimated_workers": 12500,
-    },
-    {
-        "name": "Visakhapatnam Steel & Petroleum Cluster",
-        "type": "Heavy Steel Mill & Oil Storage Terminal",
-        "lat": 17.6322,
-        "lng": 83.1818,
-        "critical_materials": ["Coking Coal", "Blast Furnace Gas", "Ammonia Liquor"],
-        "estimated_workers": 19000,
-    },
-    {
-        "name": "Dahej Petroleum, Chemicals and Petrochemicals Region (PCPIR)",
-        "type": "Chemical Synthesis & Bulk Liquid Port Terminal",
-        "lat": 21.7118,
-        "lng": 72.5855,
-        "critical_materials": ["Ethylene Dichloride", "Chlorine", "Methanol"],
-        "estimated_workers": 14000,
-    },
-    {
-        "name": "Rourkela Heavy Steel & Metallurgy Works",
-        "type": "Integrated Steel Plant & Heavy Foundry",
-        "lat": 22.2227,
-        "lng": 84.8724,
-        "critical_materials": ["Molten Pig Iron", "Coal Tar", "Nitrogen/Oxygen Plants"],
-        "estimated_workers": 21000,
-    },
-    {
-        "name": "Bhilai Steel & Foundry Complex",
-        "type": "Steel Rolling & Rail Manufacturing Mill",
-        "lat": 21.1894,
-        "lng": 81.3837,
-        "critical_materials": ["Carbon Monoxide Byproduct", "Blast Furnace Slag"],
-        "estimated_workers": 17500,
-    },
-    {
-        "name": "Trombay Fertilizer & Thermal Energy Facility",
-        "type": "Chemical Fertilizer & Thermal Generation",
-        "lat": 19.0144,
-        "lng": 72.9056,
-        "critical_materials": ["Urea", "Ammonia Storage", "Heavy Fuel Oil"],
-        "estimated_workers": 9800,
-    },
-    {
-        "name": "Nagothane Petrochemical Complex (IPCL)",
-        "type": "Gas Cracker & Polymer Production",
-        "lat": 18.5204,
-        "lng": 73.1369,
-        "critical_materials": ["Ethylene", "Propylene", "High-Pressure Gas Pipelines"],
-        "estimated_workers": 8200,
-    },
-    {
-        "name": "Barauni Industrial & Refining Complex",
-        "type": "Inland Oil Refinery & Petrochemicals",
-        "lat": 25.4344,
-        "lng": 86.0028,
-        "critical_materials": ["Aviation Turbine Fuel", "LPG", "Petroleum Coke"],
-        "estimated_workers": 7400,
-    },
-    {
-        "name": "Panipat Petrochemical & Thermal Power Hub",
-        "type": "Naphtha Cracker & Energy Generation",
-        "lat": 29.3909,
-        "lng": 76.9635,
-        "critical_materials": ["Polypropylene", "PX/PTA", "Thermal Coal"],
-        "estimated_workers": 15000,
-    },
-    {
-        "name": "Kochi Petrochemical & Maritime Refineries",
-        "type": "Coastal Refinery & Polypropylene Complex",
-        "lat": 9.9912,
-        "lng": 76.3568,
-        "critical_materials": ["Bitumen", "Motor Spirit", "Liquefied Hydrocarbons"],
-        "estimated_workers": 11000,
-    },
-]
-
+ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), "artifacts")
+MODEL_PATH = os.path.join(ARTIFACTS_DIR, "model.joblib")
+PREPROC_PATH = os.path.join(ARTIFACTS_DIR, "preprocessor.joblib")
+META_PATH = os.path.join(ARTIFACTS_DIR, "model_metadata.json")
+FACILITIES_PATH = os.path.join(os.path.dirname(__file__), "data/processed/phase1_clean_dataset/cleaned_industrial_sites_india.csv")
 
 def haversine_distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Calculate great-circle distance between two points in meters."""
-    R = 6378137.0  # Earth radius in meters
+    """Calculate great-circle distance between two geographic coordinates in meters."""
+    R = 6378137.0
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
     delta_phi = math.radians(lat2 - lat1)
     delta_lambda = math.radians(lon2 - lon1)
-
-    a = (
-        math.sin(delta_phi / 2.0) ** 2
-        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2.0) ** 2
-    )
+    a = (math.sin(delta_phi / 2.0) ** 2
+         + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2.0) ** 2)
     c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
     return R * c
 
 
 class FirePredictor:
     """
-    Predictive Model for Fire Classification, Danger Level,
-    Endangered Industries, and Model Confidence.
+    Production-grade inference engine integrating:
+    - Trained scikit-learn RandomForest model
+    - Causal spatial/temporal feature preprocessor
+    - Sovereign Indian industrial infrastructure proximity
+    - Independent operational risk calculation
     """
 
-    def __init__(self, model_version: str = "2.1.0"):
-        self.model_version = model_version
-        self.model_name = "AstraFlare-Ensemble-V2"
+    def __init__(self):
+        self.model = None
+        self.preprocessor = None
+        self.metadata = {}
+        self.facilities: List[Dict[str, Any]] = []
+        self._load_artifacts()
+        self._load_facilities()
+
+    def _load_artifacts(self):
+        if os.path.exists(MODEL_PATH) and os.path.exists(PREPROC_PATH) and os.path.exists(META_PATH):
+            try:
+                self.model = joblib.load(MODEL_PATH)
+                self.preprocessor = joblib.load(PREPROC_PATH)
+                with open(META_PATH, "r") as f:
+                    self.metadata = json.load(f)
+                self.model_version = self.metadata.get("model_version", "2.2.0")
+                self.model_name = self.metadata.get("model_name", "AstraFlare-ThermalEventClassifier")
+                self.feature_columns = self.metadata.get("feature_columns", [])
+                self.classes = self.metadata.get("classes", [])
+                self.model_loaded = True
+            except Exception as e:
+                print(f"⚠️ Error loading ML artifacts: {e}. Falling back to deterministic risk engine.")
+                self.model_loaded = False
+        else:
+            print("⚠️ ML artifacts not found. Operating in fallback mode.")
+            self.model_loaded = False
+            self.model_version = "2.2.0-fallback"
+            self.model_name = "AstraFlare-Deterministic-RiskEngine"
+            self.feature_columns = []
+            self.classes = []
+
+    def _load_facilities(self):
+        if os.path.exists(FACILITIES_PATH):
+            try:
+                df = pd.read_csv(FACILITIES_PATH)
+                for _, r in df.iterrows():
+                    self.facilities.append({
+                        "name": str(r.get("name", "Industrial Facility")),
+                        "category": str(r.get("facility_type", "industrial")),
+                        "lat": float(r["latitude"]),
+                        "lng": float(r["longitude"]),
+                    })
+            except Exception as e:
+                print(f"⚠️ Error loading sovereign facilities: {e}")
+
+    def compute_proximity(self, lat: float, lng: float) -> tuple[float, int, int, List[Dict[str, Any]], str]:
+        """
+        Calculates distance to all sovereign Indian industrial sites.
+        Returns: min_distance_m, count_1km, count_5km, endangered_facilities_list, nearest_category
+        """
+        min_dist = float("inf")
+        count_1km = 0
+        count_5km = 0
+        nearby_list = []
+        nearest_cat = "general_industrial"
+
+        for fac in self.facilities:
+            dist = haversine_distance_meters(lat, lng, fac["lat"], fac["lng"])
+            if dist < min_dist:
+                min_dist = dist
+                nearest_cat = fac["category"]
+
+            if dist <= 1000:
+                count_1km += 1
+            if dist <= 5000:
+                count_5km += 1
+
+            if dist <= 12000:
+                threat = "critical" if dist <= 2500 else "high" if dist <= 6000 else "moderate"
+                zone = "direct_danger" if dist <= 2500 else "buffer_zone" if dist <= 6000 else "monitoring_zone"
+                nearby_list.append({
+                    "name": fac["name"],
+                    "type": fac["category"],
+                    "distance_meters": round(dist),
+                    "threat_level": threat,
+                    "zone": zone,
+                    "lat": fac["lat"],
+                    "lng": fac["lng"],
+                })
+
+        nearby_list.sort(key=lambda x: x["distance_meters"])
+        return min_dist, count_1km, count_5km, nearby_list, nearest_cat
+
+    def compute_operational_risk(self, frp: float, brightness: float, min_dist_m: float, duration_hrs: float) -> Dict[str, Any]:
+        """
+        Independent Operational Risk:
+        Weighted score (0-100) combining proximity, thermal radiative power, and persistence.
+        """
+        if min_dist_m <= 2500:
+            prox_score = 100.0
+        elif min_dist_m <= 10000:
+            prox_score = 85.0 - (min_dist_m - 2500) / 7500.0 * 25.0
+        elif min_dist_m <= 30000:
+            prox_score = 60.0 - (min_dist_m - 10000) / 20000.0 * 35.0
+        elif min_dist_m <= 60000:
+            prox_score = 25.0 - (min_dist_m - 30000) / 30000.0 * 20.0
+        else:
+            prox_score = max(0.0, 5.0 - (min_dist_m - 60000) / 40000.0 * 5.0)
+
+        frp_score = min(100.0, (frp / 40.0) * 80.0 + max(0.0, (brightness - 310.0) / 40.0) * 20.0)
+        persist_score = min(100.0, duration_hrs * 15.0 + 10.0)
+        total_risk = round(0.45 * prox_score + 0.35 * frp_score + 0.20 * persist_score, 1)
+
+        if total_risk >= 50.0 or (min_dist_m <= 5000 and frp >= 15.0):
+            level = "critical"
+        elif total_risk >= 35.0:
+            level = "high"
+        elif total_risk >= 20.0:
+            level = "moderate"
+        else:
+            level = "low"
+
+        return {
+            "score": total_risk,
+            "level": level,
+            "proximity_threat": round(prox_score, 1),
+            "thermal_intensity": round(frp_score, 1),
+            "persistence": round(persist_score, 1),
+        }
 
     def predict(
         self,
@@ -149,145 +176,115 @@ class FirePredictor:
         instrument: str = "VIIRS",
         confidence_raw: str = "nominal",
         daynight: str = "D",
-        prior_detection_count: int = 1,
+        duration_hours: float = 0.0,
+        observation_count: int = 1,
+        satellite_count: int = 1,
+        spatial_extent_m: float = 0.0,
+        land_cover_code: int = 40,
+        historical_count_30d: int = 0,
+        anomaly_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        Run inference on a thermal anomaly observation.
+        Runs ML inference and operational risk evaluation.
         """
-        # 1. Spatial proximity to industrial infrastructure
-        nearby_facilities: List[Dict[str, Any]] = []
-        min_distance = float("inf")
+        # 1. Proximity Engine
+        min_dist_m, count_1km, count_5km, endangered, _ = self.compute_proximity(lat, lng)
 
-        for hub in KNOWN_INDUSTRIAL_HUBS:
-            dist = haversine_distance_meters(lat, lng, hub["lat"], hub["lng"])
-            if dist < min_distance:
-                min_distance = dist
+        # 2. Operational Risk (Separated from model score)
+        op_risk = self.compute_operational_risk(frp, brightness, min_dist_m, duration_hours)
 
-            # Threat zones:
-            # direct_danger: < 2.5 km
-            # buffer_zone: 2.5 km - 6 km
-            # monitoring_zone: 6 km - 12 km
-            if dist <= 12000:
-                threat_level = (
-                    "critical"
-                    if dist <= 2500
-                    else "high"
-                    if dist <= 6000
-                    else "moderate"
-                )
-                zone = (
-                    "direct_danger"
-                    if dist <= 2500
-                    else "buffer_zone"
-                    if dist <= 6000
-                    else "monitoring_zone"
-                )
-                nearby_facilities.append(
-                    {
-                        "name": hub["name"],
-                        "type": hub["type"],
-                        "distance_meters": round(dist),
-                        "threat_level": threat_level,
-                        "zone": zone,
-                        "estimated_workers": hub["estimated_workers"],
-                        "critical_materials": hub["critical_materials"],
-                        "lat": hub["lat"],
-                        "lng": hub["lng"],
-                    }
-                )
+        # 3. Model Inference if artifact is available
+        classification = "UNKNOWN_REQUIRES_REVIEW"
+        model_score = 0.5
+        model_status = "active"
 
-        # Sort nearest first
-        nearby_facilities.sort(key=lambda x: x["distance_meters"])
+        if self.model_loaded and self.feature_columns:
+            feat_dict = {
+                "duration_hours": duration_hours,
+                "observation_count": observation_count,
+                "satellite_count": satellite_count,
+                "spatial_extent_m": spatial_extent_m,
+                "max_frp": frp,
+                "mean_frp": frp,
+                "std_frp": 0.0,
+                "max_brightness": brightness,
+                "mean_brightness": brightness,
+                "confidence_high_ratio": 1.0 if str(confidence_raw).lower() in ("high", "h", "100") else 0.0,
+                "centroid_lat": lat,
+                "centroid_lon": lng,
+                "industrial_distance_m": min_dist_m,
+                "industrial_site_count_1km": count_1km,
+                "industrial_site_count_5km": count_5km,
+                "land_cover_code": land_cover_code,
+                "historical_count_30d": historical_count_30d,
+                "historical_mean_frp": 0.0,
+                "frp_anomaly_zscore": 0.0,
+            }
+            # Maintain exact feature ordering
+            feat_df = pd.DataFrame([feat_dict])[self.feature_columns].fillna(0.0)
+            try:
+                proc_X = self.preprocessor.transform(feat_df)
+                pred_label = self.model.predict(proc_X)[0]
+                proba_arr = self.model.predict_proba(proc_X)[0]
+                classification = pred_label
+                model_score = round(float(np.max(proba_arr)), 4)
+            except Exception as e:
+                print(f"⚠️ Inference failure: {e}")
+                model_status = "inference_error_fallback"
 
-        # 2. Fire Classification (Industrial Fire vs Persistent Thermal vs Wildfire)
-        is_near_industry = min_distance <= 8000
-        is_direct_site = min_distance <= 2000
-
-        if is_direct_site and prior_detection_count >= 3 and frp >= 5.0:
-            fire_type = "persistent_thermal_source"
-            risk_level = "high"
-        elif is_near_industry and (frp >= 15.0 or brightness >= 340.0):
-            fire_type = "industrial_fire"
-            risk_level = "critical"
-        elif is_near_industry:
-            fire_type = "industrial_fire"
-            risk_level = "high" if frp >= 5.0 else "moderate"
-        else:
+        # 4. Map classification to backend schema
+        if classification == "NATURAL_WILDLAND_FIRE":
             fire_type = "wildfire_or_other"
-            risk_level = "critical" if frp >= 35.0 else "high" if frp >= 12.0 else "moderate" if frp >= 3.0 else "low"
+            fire_type_display = "Possible wildland fire — model estimate"
+        elif classification == "POSSIBLE_AGRICULTURAL_BURNING":
+            fire_type = "wildfire_or_other"
+            fire_type_display = "Possible agricultural burning — model estimate"
+        else:
+            if min_dist_m <= 2500 and op_risk["level"] in ("critical", "high"):
+                fire_type = "industrial_fire"
+                fire_type_display = "Possible industrial-related thermal event — requires verification"
+            else:
+                fire_type = "wildfire_or_other"
+                fire_type_display = "Unknown / insufficient evidence"
 
-        # 3. Confidence Score Calculation
-        # Ensemble baseline
-        base_confidence = 78.0
+        # Determine review status
+        is_review_needed = (classification == "UNKNOWN_REQUIRES_REVIEW") or (op_risk["level"] == "critical")
+        review_status = "requires_review" if is_review_needed else "verified"
 
-        # Sensor calibration boost
-        if "VIIRS" in instrument or "VIIRS" in satellite:
-            base_confidence += 7.0  # High 375m spatial resolution
-        elif "MODIS" in instrument:
-            base_confidence += 4.0
-
-        # FRP & Brightness signal-to-noise ratio
-        if frp >= 20.0:
-            base_confidence += 8.0
-        elif frp >= 5.0:
-            base_confidence += 4.0
-
-        if brightness >= 340.0:
-            base_confidence += 5.0
-
-        # Satellite native flag
-        conf_str = str(confidence_raw).lower()
-        if conf_str in ["h", "high"]:
-            base_confidence += 5.0
-        elif conf_str in ["l", "low"]:
-            base_confidence -= 10.0
-
-        # Night detection contrast (higher SNR against dark background)
-        if daynight.upper() == "N":
-            base_confidence += 3.0
-
-        confidence_score = round(min(max(base_confidence, 45.0), 98.5), 1)
-
-        # 4. Spread & Threat Dynamics
-        rate_of_spread = round(
-            min(max(0.5 + (frp / 10.0) * (0.8 if fire_type == "wildfire_or_other" else 0.4), 0.2), 12.0),
-            1,
-        )
-        containment_prob = round(
-            min(max(95.0 - (frp * 1.5) - (15.0 if risk_level == "critical" else 5.0), 15.0), 98.0),
-            1,
-        )
-
-        spread_prediction = {
-            "rate_of_spread_kmh": rate_of_spread,
-            "predicted_direction_deg": round((lat * 31.0 + lng * 17.0) % 360, 0),
-            "threat_radius_meters": round(min(max(frp * 75.0 + 350.0, 300.0), 5000.0)),
-            "containment_probability": containment_prob,
-            "next_6h_risk": "critical" if risk_level == "critical" or rate_of_spread > 4.0 else risk_level,
-        }
-
-        features_used = {
-            "frp": frp,
-            "brightness_k": brightness,
-            "closest_industrial_dist_m": round(min_distance) if min_distance != float("inf") else None,
-            "sensor": f"{satellite} ({instrument})",
-            "daynight": daynight,
-            "temporal_prior_passes": prior_detection_count,
-        }
+        # Rate of spread estimation
+        rate_of_spread = round(max(0.2, min(5.0, (frp / 20.0) * 1.5 + (spatial_extent_m / 1000.0) * 0.5)), 2)
 
         return {
+            "anomaly_id": anomaly_id,
             "latitude": lat,
             "longitude": lng,
             "fire_type": fire_type,
-            "risk_level": risk_level,
-            "confidence_score": confidence_score,
-            "endangered_industries": nearby_facilities,
-            "spread_prediction": spread_prediction,
-            "features_used": features_used,
+            "fire_type_display": fire_type_display,
+            "risk_level": op_risk["level"],
+            "confidence_score": round(model_score * 100.0, 2),  # uncalibrated score as percentage
+            "model_score_uncalibrated": model_score,
+            "operational_risk": op_risk,
+            "review_status": review_status,
             "model_name": self.model_name,
             "model_version": self.model_version,
+            "model_status": model_status,
+            "endangered_industries": endangered,
+            "spread_prediction": {
+                "rate_of_spread_kmh": rate_of_spread,
+                "predicted_direction_deg": 45,
+                "threat_radius_meters": round(min(5000.0, 500.0 + frp * 40.0)),
+                "containment_probability": round(max(20.0, 95.0 - op_risk["score"] * 0.7), 1),
+                "next_6h_risk": op_risk["level"],
+            },
+            "features_used": {
+                "max_frp": frp,
+                "max_brightness": brightness,
+                "industrial_distance_m": round(min_dist_m, 1),
+                "land_cover_code": land_cover_code,
+                "historical_count_30d": historical_count_30d,
+            },
+            "scientific_note": "Model score is uncalibrated probability. Operational risk is calculated independently from multi-criteria physical and spatial indicators.",
         }
 
 
-# Global singleton instance
 predictor = FirePredictor()

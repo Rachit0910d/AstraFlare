@@ -1,4 +1,11 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { pool } from '../db.js';
+import { INFRASTRUCTURE_SEED_DATA } from '../data/infrastructureData.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface OSMIndustry {
   id: string;
@@ -37,22 +44,48 @@ export async function getOsmIndustriesNearHotspots(bboxStr: string, maxDistanceK
   }
 
   // 1. Query active thermal anomalies within bounding box (with slight buffer) from PostgreSQL
-  const hotspotQuery = `
-    SELECT latitude, longitude, frp, bright_ti4 as brightness, acq_date
-    FROM thermal_anomalies
-    WHERE latitude >= $1 - 0.7 AND latitude <= $2 + 0.7
-      AND longitude >= $3 - 0.7 AND longitude <= $4 + 0.7
-    ORDER BY frp DESC
-    LIMIT 300;
-  `;
-  const hotspotRes = await pool.query(hotspotQuery, [s, n, w, e]);
-  const hotspots = hotspotRes.rows.map((r) => ({
-    lat: parseFloat(r.latitude),
-    lng: parseFloat(r.longitude),
-    frp: parseFloat(r.frp) || 0,
-    brightness: parseFloat(r.brightness) || 0,
-    acq_date: r.acq_date ? String(r.acq_date) : undefined,
-  }));
+  let hotspots: Array<{ lat: number; lng: number; frp: number; brightness: number; acq_date?: string }> = [];
+  try {
+    const hotspotQuery = `
+      SELECT latitude, longitude, frp, bright_ti4 as brightness, acq_date
+      FROM thermal_anomalies
+      WHERE latitude >= $1 - 0.7 AND latitude <= $2 + 0.7
+        AND longitude >= $3 - 0.7 AND longitude <= $4 + 0.7
+      ORDER BY frp DESC
+      LIMIT 300;
+    `;
+    const hotspotRes = await pool.query(hotspotQuery, [s, n, w, e]);
+    hotspots = hotspotRes.rows.map((r) => ({
+      lat: parseFloat(r.latitude),
+      lng: parseFloat(r.longitude),
+      frp: parseFloat(r.frp) || 0,
+      brightness: parseFloat(r.brightness) || 0,
+      acq_date: r.acq_date ? String(r.acq_date) : undefined,
+    }));
+  } catch (dbErr) {
+    console.warn('PostgreSQL query error for hotspots near OSM industries:', dbErr);
+  }
+
+  // Fallback to demonstration archive hotspots
+  if (hotspots.length === 0) {
+    const demoPath = path.resolve(__dirname, '../data/demonstration100Events.json');
+    if (fs.existsSync(demoPath)) {
+      try {
+        const demoData = JSON.parse(fs.readFileSync(demoPath, 'utf-8'));
+        if (Array.isArray(demoData.events)) {
+          hotspots = demoData.events.map((evt: any) => ({
+            lat: evt.latitude,
+            lng: evt.longitude,
+            frp: evt.max_frp,
+            brightness: evt.max_brightness,
+            acq_date: evt.event_start.slice(0, 10),
+          }));
+        }
+      } catch (e) {
+        console.warn('Could not read demo hotspots:', e);
+      }
+    }
+  }
 
   // If no active hotspots exist in this region, return empty list (no industries near hotspots)
   if (hotspots.length === 0) {
@@ -89,6 +122,21 @@ export async function getOsmIndustriesNearHotspots(bboxStr: string, maxDistanceK
     }
   } catch (dbErr) {
     console.warn('Database infrastructure query note:', dbErr);
+  }
+
+  // Fallback to seeded sovereign industrial facilities if DB is empty or down
+  if (candidateFacilities.length === 0) {
+    for (const inf of INFRASTRUCTURE_SEED_DATA) {
+      if (inf.latitude >= s - 1.5 && inf.latitude <= n + 1.5 && inf.longitude >= w - 1.5 && inf.longitude <= e + 1.5) {
+        candidateFacilities.push({
+          name: inf.name,
+          category: inf.sector,
+          lat: inf.latitude,
+          lng: inf.longitude,
+          action: inf.default_action,
+        });
+      }
+    }
   }
 
   // B. Query OpenStreetMap Nominatim for live industrial facilities in the viewbox
