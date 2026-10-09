@@ -21,6 +21,7 @@ import {
   Crosshair,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
+import { classifyAnomaly } from '../utils/classification';
 
 interface ReportProps {
   onNavigate?: (page: string, incident?: any) => void;
@@ -135,34 +136,6 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
   const country = locationParts[2] || 'India';
 
   const title = `Predictive Hazard Dossier: ${siteName}`;
-  const incidentType =
-    frp >= 20
-      ? 'Industrial Thermal Flare'
-      : frp >= 8
-      ? 'High-Intensity Thermal Hotspot'
-      : 'Vegetation / Surface Hotspot';
-
-  let confidenceScore: number;
-  if (typeof raw.confidence === 'number') {
-    confidenceScore = Math.round(raw.confidence);
-  } else if (typeof raw.model_score_uncalibrated === 'number') {
-    const rawVal = raw.model_score_uncalibrated;
-    confidenceScore = Math.round(rawVal <= 1.0 ? rawVal * 100 : rawVal);
-  } else if (typeof raw.confidence === 'string' && raw.confidence.match(/\d+/)) {
-    confidenceScore = parseInt(raw.confidence.match(/\d+/)![0], 10);
-  } else {
-    // Dynamic physical signal-to-noise calculation based on sensor thermal radiative power
-    const tempBoost = Math.min(15, Math.max(0, (brightness - 300) * 0.35));
-    const frpBoost = Math.min(18, Math.log10(Math.max(1, frp)) * 11);
-    const coordSeed = Math.abs(Math.sin(lat * 12.9898 + lng * 78.233) * 43758.5453);
-    const variance = (coordSeed % 6) - 3;
-    confidenceScore = Math.min(99, Math.max(68, Math.round(70 + tempBoost + frpBoost + variance)));
-  }
-
-  // Model-driven estimations grounded in FRP
-  const affectedAreaKm2 = parseFloat((frp * 0.42 + 1.5).toFixed(1));
-  const estimatedPopulation10km = Math.round(frp * 260 + 3800);
-  const estimatedPopulation20km = Math.round(estimatedPopulation10km * 3.6);
 
   // Map real facilities from PredictiveAnalysis if present, otherwise realistic proximal assets
   let nearbyIndustries: IncidentData['nearbyIndustries'] = [];
@@ -218,53 +191,117 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
     ];
   }
 
-  const summary = `On ${date} at ${time}, spaceborne thermal infrared radiometers (${satellite} ${instrument}) acquired an active surface thermal anomaly at coordinates ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E with Fire Radiative Power (FRP) of ${frp.toFixed(1)} MW and brightness temperature of ${brightness.toFixed(0)} K (~${(brightness - 273.15).toFixed(0)}°C). Automated predictive risk modeling projects direct thermal propagation across ~${affectedAreaKm2} km², with ${nearbyIndustries.length} monitored critical infrastructure assets situated in the proximal impact perimeter.`;
+  // Unified single source of truth classification
+  const classificationResult = classifyAnomaly(raw, nearbyIndustries);
 
-  const fullSummary = `Cross-referencing OpenStreetMap infrastructure telemetry and NASA FIRMS middle-infrared bands indicates active thermal combustion requiring emergency perimeter containment. Downwind dispersion projections model airborne PM2.5 levels exceeding ${(frp > 15 ? 4.8 : 2.5).toFixed(1)}x baseline standards, potentially impacting an estimated ${estimatedPopulation10km.toLocaleString()} citizens residing within the 10 km radial sector. Priority suppression directives recommend immediate foam deluge deployment around high-risk facilities and automated alerts to civil disaster authorities.`;
+  const incidentType = raw.incidentType || raw.classification_display || classificationResult.incidentType;
+  const isPersistent = classificationResult.code === 'PERSISTENT_INDUSTRIAL_HEAT' || incidentType.includes('Persistent');
 
-  const keyTakeaways = [
-    `Radiative emission of ${frp.toFixed(1)} MW detected via ${instrument} sensor aboard ${satellite}.`,
-    `Direct heat and smoke plume perimeter covers approximately ~${affectedAreaKm2} km² of terrain.`,
-    `${nearbyIndustries.length} critical infrastructure facilities in threat perimeter (${nearbyIndustries[0]?.name || 'Primary Asset'} at ${nearbyIndustries[0]?.distanceKm || 0} km).`,
-    `Over ${estimatedPopulation10km.toLocaleString()} residents situated in the 10 km inner containment buffer.`,
-  ];
+  let confidenceScore: number;
+  if (typeof raw.confidenceScore === 'number' && raw.confidenceScore > 0) {
+    confidenceScore = Math.round(raw.confidenceScore);
+  } else if (typeof raw.confidence === 'number' && raw.confidence > 0) {
+    confidenceScore = Math.round(raw.confidence);
+  } else if (typeof raw.confidence === 'string' && raw.confidence.match(/\d+/)) {
+    confidenceScore = parseInt(raw.confidence.match(/\d+/)![0], 10);
+  } else {
+    confidenceScore = Math.round(classificationResult.confidenceScore);
+  }
 
-  const actions: IncidentData['actions'] = [
-    {
-      title: 'Deploy High-Capacity Deluge & Foam Umbrella',
-      priority: 'Immediate · Critical',
-      desc: `Mobilize rapid response tender units to establish cooling perimeters around high-risk assets within 2.5 km of coordinates (${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E).`,
-      status: 'Active',
-      icon: '💧',
-    },
-    {
-      title: 'Establish 2.5 km Exclusion & Containment Buffer',
-      priority: 'High Priority',
-      desc: 'Enforce perimeter isolation and alert emergency services to prevent downwind toxic plume inhalation across proximal human settlements.',
-      status: 'Enforced',
-      icon: '🛡️',
-    },
-    {
-      title: 'Isolate High-Voltage Infrastructure Feeds',
-      priority: 'Tactical Intervention',
-      desc: 'De-energize high-tension transformers and volatile storage pipelines within primary threat corridor to avert secondary arc ignition.',
-      status: 'Active',
-      icon: '⚡',
-    },
-    {
-      title: 'Satellite Sensor & UAV Nocturnal Overwatch',
-      priority: 'Telemetry',
-      desc: 'Continue automated ingest of NASA FIRMS VIIRS 375m passes and thermal UAV sweeps to monitor fire line containment and ember migration.',
-      status: 'Enforced',
-      icon: '🛰️',
-    },
-  ];
+  // Model-driven estimations grounded in FRP
+  const affectedAreaKm2 = parseFloat((frp * 0.42 + 1.5).toFixed(1));
+  const estimatedPopulation10km = Math.round(frp * 260 + 3800);
+  const estimatedPopulation20km = Math.round(estimatedPopulation10km * 3.6);
+
+  const summary = isPersistent
+    ? `On ${date} at ${time}, spaceborne thermal infrared radiometers (${satellite} ${instrument}) acquired an active thermal footprint at coordinates ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E. Automated predictive risk modeling classified this hotspot as Persistent Industrial Heat (FRP: ${frp.toFixed(1)} MW, Brightness: ${brightness.toFixed(0)} K) co-located with monitored industrial facilities (${nearbyIndustries[0]?.name || 'Industrial Compound'} at ${(nearbyIndustries[0]?.distanceKm || 1.8).toFixed(1)} km). Continuous thermal output corresponds to heavy smelters, processing kilns, or refractory operations requiring facility-level emissions monitoring.`
+    : `On ${date} at ${time}, spaceborne thermal infrared radiometers (${satellite} ${instrument}) acquired an active surface thermal anomaly at coordinates ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E with Fire Radiative Power (FRP) of ${frp.toFixed(1)} MW and brightness temperature of ${brightness.toFixed(0)} K (~${(brightness - 273.15).toFixed(0)}°C). Automated predictive risk modeling classifies this hotspot as ${classificationResult.label}, projecting direct thermal propagation across ~${affectedAreaKm2} km², with ${nearbyIndustries.length} monitored critical infrastructure assets situated in the proximal impact perimeter.`;
+
+  const fullSummary = isPersistent
+    ? `Cross-referencing OpenStreetMap industrial spatial telemetry and NASA FIRMS middle-infrared bands confirms sustained, stationary thermal emissions rather than sudden wildfire flare-ups. Downwind dispersion projections model steady airborne particulate and sulfur flux across proximal human settlements (${estimatedPopulation10km.toLocaleString()} residents within 10 km). Environmental compliance directives recommend verifying kiln stack scrubbers and continuous thermal overwatch.`
+    : `Cross-referencing OpenStreetMap infrastructure telemetry and NASA FIRMS middle-infrared bands indicates active thermal combustion requiring emergency perimeter containment. Downwind dispersion projections model airborne PM2.5 levels exceeding ${(frp > 15 ? 4.8 : 2.5).toFixed(1)}x baseline standards, potentially impacting an estimated ${estimatedPopulation10km.toLocaleString()} citizens residing within the 10 km radial sector. Priority suppression directives recommend immediate foam deluge deployment around high-risk facilities and automated alerts to civil disaster authorities.`;
+
+  const keyTakeaways = isPersistent
+    ? [
+        `Sustained radiative flux of ${frp.toFixed(1)} MW detected via ${instrument} sensor aboard ${satellite}.`,
+        `Thermal signature localized to stationary industrial footprint with ~${affectedAreaKm2} km² perimeter.`,
+        `${nearbyIndustries.length} critical infrastructure facilities in threat perimeter (${nearbyIndustries[0]?.name || 'Primary Asset'} at ${nearbyIndustries[0]?.distanceKm || 0} km).`,
+        `Over ${estimatedPopulation10km.toLocaleString()} residents situated in the 10 km inner environmental buffer.`,
+      ]
+    : [
+        `Radiative emission of ${frp.toFixed(1)} MW detected via ${instrument} sensor aboard ${satellite}.`,
+        `Direct heat and smoke plume perimeter covers approximately ~${affectedAreaKm2} km² of terrain.`,
+        `${nearbyIndustries.length} critical infrastructure facilities in threat perimeter (${nearbyIndustries[0]?.name || 'Primary Asset'} at ${nearbyIndustries[0]?.distanceKm || 0} km).`,
+        `Over ${estimatedPopulation10km.toLocaleString()} residents situated in the 10 km inner containment buffer.`,
+      ];
+
+  const actions: IncidentData['actions'] = isPersistent
+    ? [
+        {
+          title: 'Facility Thermal Emission Verification',
+          priority: 'Routine · Industrial Protocol',
+          desc: `Cross-examine facility operations log at ${nearbyIndustries[0]?.name || 'Primary Plant'} (${(nearbyIndustries[0]?.distanceKm || 1.8).toFixed(1)} km) to verify furnace/smelter flue gas temperatures against permit thresholds.`,
+          status: 'Active',
+          icon: '🏭',
+        },
+        {
+          title: 'Perimeter Heat Radiance & Stack Monitoring',
+          priority: 'Environmental Oversight',
+          desc: 'Verify that thermal insulation and refractory containment meet industrial safety standards to prevent secondary structural heat propagation.',
+          status: 'Enforced',
+          icon: '🛡️',
+        },
+        {
+          title: 'Continuous Infrared Satellite Tracking',
+          priority: 'Sensor Overwatch',
+          desc: 'Track multi-temporal VIIRS overpasses to confirm heat constancy versus sudden flare excursions or abnormal power spikes.',
+          status: 'Active',
+          icon: '🛰️',
+        },
+        {
+          title: 'Air Quality & Fugitive Emission Audit',
+          priority: 'Telemetry',
+          desc: 'Monitor downwind PM2.5 and SO2 sensors near proximal settlements to ensure scrubbing systems remain fully operational.',
+          status: 'Enforced',
+          icon: '💨',
+        },
+      ]
+    : [
+        {
+          title: 'Deploy High-Capacity Deluge & Foam Umbrella',
+          priority: 'Immediate · Critical',
+          desc: `Mobilize rapid response tender units to establish cooling perimeters around high-risk assets within 2.5 km of coordinates (${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E).`,
+          status: 'Active',
+          icon: '💧',
+        },
+        {
+          title: 'Establish 2.5 km Exclusion & Containment Buffer',
+          priority: 'High Priority',
+          desc: 'Enforce perimeter isolation and alert emergency services to prevent downwind toxic plume inhalation across proximal human settlements.',
+          status: 'Enforced',
+          icon: '🛡️',
+        },
+        {
+          title: 'Isolate High-Voltage Infrastructure Feeds',
+          priority: 'Tactical Intervention',
+          desc: 'De-energize high-tension transformers and volatile storage pipelines within primary threat corridor to avert secondary arc ignition.',
+          status: 'Active',
+          icon: '⚡',
+        },
+        {
+          title: 'Satellite Sensor & UAV Nocturnal Overwatch',
+          priority: 'Telemetry',
+          desc: 'Continue automated ingest of NASA FIRMS VIIRS 375m passes and thermal UAV sweeps to monitor fire line containment and ember migration.',
+          status: 'Enforced',
+          icon: '🛰️',
+        },
+      ];
 
   const timeline = [
     {
       date: `${date} ${time}`,
       title: `NASA FIRMS ${satellite} (${instrument}) acquired thermal infrared hotspot at ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
-      statusColor: 'bg-red-500',
+      statusColor: isPersistent ? 'bg-amber-500' : 'bg-red-500',
     },
     {
       date: `${date} +5 min`,
@@ -278,7 +315,7 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
     },
     {
       date: `${date} +20 min`,
-      title: `Automated predictive dossier compiled; containment protocols and tactical alerts dispatched`,
+      title: `Automated predictive dossier compiled; classification confirmed as ${classificationResult.label}`,
       statusColor: 'bg-emerald-500',
     },
   ];
@@ -287,72 +324,20 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
   const closestFacDist = nearbyIndustries[0]?.distanceKm ?? 12.0;
   const closestFacName = nearbyIndustries[0]?.name || 'Industrial Facility';
 
-  let primaryClass = 'Likely Industrial Incident';
-  let classificationCode = 'LIKELY_INDUSTRIAL_INCIDENT';
-  let category: ModelClassificationData['category'] = 'Industrial Fire';
+  const primaryClass = raw.classification_display || classificationResult.label;
+  const classificationCode = raw.classification || classificationResult.code;
+  const category = (raw.category || classificationResult.category) as ModelClassificationData['category'];
 
-  if (raw.classification) {
-    if (raw.classification === 'LIKELY_INDUSTRIAL_INCIDENT') {
-      primaryClass = 'Likely Industrial Incident (Facility Flare / Combustor)';
-      classificationCode = 'LIKELY_INDUSTRIAL_INCIDENT';
-      category = 'Industrial Fire';
-    } else if (raw.classification === 'PERSISTENT_INDUSTRIAL_HEAT') {
-      primaryClass = 'Persistent Industrial Heat (Processing / Smelter)';
-      classificationCode = 'PERSISTENT_INDUSTRIAL_HEAT';
-      category = 'Persistent Heat';
-    } else if (raw.classification === 'NATURAL_WILDLAND_FIRE') {
-      primaryClass = 'Natural Wildland Fire (Forest / Brush Canopy)';
-      classificationCode = 'NATURAL_WILDLAND_FIRE';
-      category = 'Wildfire';
-    } else if (raw.classification === 'POSSIBLE_AGRICULTURAL_BURNING') {
-      primaryClass = 'Possible Agricultural Burning (Stubble / Biomass)';
-      classificationCode = 'POSSIBLE_AGRICULTURAL_BURNING';
-      category = 'Agricultural Burn';
-    } else {
-      primaryClass = raw.classification_display || raw.classification;
-      classificationCode = raw.classification;
-      category = 'Thermal Anomaly';
-    }
-  } else {
-    if (closestFacDist <= 3.5 && frp >= 18) {
-      primaryClass = 'Likely Industrial Incident (High-Enthalpy Flare / Storage)';
-      classificationCode = 'LIKELY_INDUSTRIAL_INCIDENT';
-      category = 'Industrial Fire';
-    } else if (closestFacDist <= 2.5 && frp < 18) {
-      primaryClass = 'Persistent Industrial Heat (Smelter / Continuous Processing)';
-      classificationCode = 'PERSISTENT_INDUSTRIAL_HEAT';
-      category = 'Persistent Heat';
-    } else if (closestFacDist > 8.0 && frp >= 25) {
-      primaryClass = 'Natural Wildland Fire (Vegetative Canopy Flame)';
-      classificationCode = 'NATURAL_WILDLAND_FIRE';
-      category = 'Wildfire';
-    } else if (closestFacDist > 5.0 && frp >= 5 && frp < 25) {
-      primaryClass = 'Possible Agricultural Burning (Seasonal Crop Residue)';
-      classificationCode = 'POSSIBLE_AGRICULTURAL_BURNING';
-      category = 'Agricultural Burn';
-    } else {
-      primaryClass = 'Satellite Thermal Anomaly (Ground Verification Required)';
-      classificationCode = 'UNKNOWN_REQUIRES_REVIEW';
-      category = 'Thermal Anomaly';
-    }
-  }
-
-  let opRiskScore = 68.0;
-  let opRiskTier: ModelClassificationData['operationalRiskTier'] = 'High Risk';
+  let opRiskScore = classificationResult.operationalRiskScore;
+  let opRiskTier: ModelClassificationData['operationalRiskTier'] = classificationResult.operationalRiskTier;
   if (raw.operational_risk && typeof raw.operational_risk.risk_score === 'number') {
     opRiskScore = raw.operational_risk.risk_score;
     opRiskTier = (raw.operational_risk.risk_level + ' Risk') as any;
-  } else {
-    const proxWeight = closestFacDist <= 2.5 ? 45 : closestFacDist <= 6 ? 28 : 10;
-    const frpWeight = Math.min(35, (frp / 30) * 35);
-    const persistWeight = 15;
-    opRiskScore = Math.min(99, Math.round(proxWeight + frpWeight + persistWeight));
-    opRiskTier = opRiskScore >= 75 ? 'Critical Risk' : opRiskScore >= 50 ? 'High Risk' : opRiskScore >= 25 ? 'Moderate Risk' : 'Low Risk';
   }
 
   const uncalibratedScore = typeof raw.model_score_uncalibrated === 'number'
     ? Math.round(raw.model_score_uncalibrated <= 1.0 ? raw.model_score_uncalibrated * 100 : raw.model_score_uncalibrated)
-    : Math.min(99, Math.max(70, Math.round(confidenceScore + 1.8)));
+    : Math.round(classificationResult.uncalibratedScore);
 
   const evidences: ModelEvidenceItem[] = [
     {
@@ -360,31 +345,45 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
       factor: 'Radiative Energy Flux (FRP)',
       category: 'Radiative Radiance',
       observedValue: `${frp.toFixed(1)} MW`,
-      benchmarkRule: '> 15.0 MW indicates concentrated hydrocarbon or pressurized industrial combustion; < 5.0 MW typical for biomass residue',
+      benchmarkRule: isPersistent
+        ? 'Steady radiative flux (< 22.0 MW) proximal to industrial assets is confirmatory of continuous process furnaces/smelters'
+        : '> 15.0 MW indicates concentrated hydrocarbon or pressurized industrial combustion; < 5.0 MW typical for biomass residue',
       weightPct: 35,
-      verdict: frp >= 18 ? 'Confirmatory' : frp >= 6 ? 'Elevating' : 'Mitigating',
-      verdictBadgeClass: frp >= 18
+      verdict: isPersistent
+        ? 'Confirmatory'
+        : frp >= 18
+        ? 'Confirmatory'
+        : frp >= 6
+        ? 'Elevating'
+        : 'Mitigating',
+      verdictBadgeClass: isPersistent
+        ? 'bg-amber-50 text-amber-700 border-amber-200'
+        : frp >= 18
         ? 'bg-red-50 text-red-700 border-red-200'
         : frp >= 6
         ? 'bg-orange-50 text-orange-700 border-orange-200'
         : 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      detail: `Spaceborne middle-infrared radiometers measured instantaneous radiative dissipation of ${frp.toFixed(1)} MW. Emission magnitude is consistent with high-temperature point flare stacks or severe surface inferno.`,
-      icon: '🔥',
+      detail: isPersistent
+        ? `Spaceborne middle-infrared radiometers measured instantaneous radiative flux of ${frp.toFixed(1)} MW. Sub-blowout sustained radiance is consistent with continuous metallurgy, smelting kilns, or refractory ovens.`
+        : `Spaceborne middle-infrared radiometers measured instantaneous radiative dissipation of ${frp.toFixed(1)} MW. Emission magnitude is consistent with high-temperature point flare stacks or severe surface inferno.`,
+      icon: isPersistent ? '🏭' : '🔥',
     },
     {
       id: 'ev-prox',
       factor: 'Industrial Geometry Co-Location',
       category: 'Spatial Proximity',
       observedValue: `${closestFacDist.toFixed(1)} km to ${closestFacName}`,
-      benchmarkRule: '≤ 2.5 km classified as direct asset impact danger zone; ≤ 6.0 km buffer zone',
+      benchmarkRule: isPersistent
+        ? '≤ 4.0 km proximity to registered industrial plants provides causal Bayesian confirmation of facility process heat'
+        : '≤ 2.5 km classified as direct asset impact danger zone; ≤ 6.0 km buffer zone',
       weightPct: 30,
-      verdict: closestFacDist <= 2.5 ? 'Confirmatory' : closestFacDist <= 6.0 ? 'Elevating' : 'Mitigating',
-      verdictBadgeClass: closestFacDist <= 2.5
-        ? 'bg-red-50 text-red-700 border-red-200'
+      verdict: closestFacDist <= (isPersistent ? 4.0 : 2.5) ? 'Confirmatory' : closestFacDist <= 6.0 ? 'Elevating' : 'Mitigating',
+      verdictBadgeClass: closestFacDist <= (isPersistent ? 4.0 : 2.5)
+        ? (isPersistent ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200')
         : closestFacDist <= 6.0
         ? 'bg-orange-50 text-orange-700 border-orange-200'
         : 'bg-blue-50 text-blue-700 border-blue-200',
-      detail: `Geospatial cross-referencing with OpenStreetMap vectors situates the thermal centroid ${closestFacDist.toFixed(1)} km from ${closestFacName}. Spatial prior provides overwhelming causal evidence of proximity risk.`,
+      detail: `Geospatial cross-referencing with OpenStreetMap vectors situates the thermal centroid ${closestFacDist.toFixed(1)} km from ${closestFacName}. Spatial prior provides decisive evidence linking this heat signature to the registered plant footprint.`,
       icon: '🏭',
     },
     {
@@ -396,7 +395,7 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
       weightPct: 20,
       verdict: brightness >= 335 ? 'Confirmatory' : 'Elevating',
       verdictBadgeClass: brightness >= 335
-        ? 'bg-red-50 text-red-700 border-red-200'
+        ? (isPersistent ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200')
         : 'bg-orange-50 text-orange-700 border-orange-200',
       detail: `Sensor Channel 4 (3.74–3.93 µm) registered a thermal contrast of +${(brightness - 300).toFixed(1)} K above ambient background. Sharp gradient distinguishes true combustion from solar reflection.`,
       icon: '🌡️',
@@ -415,6 +414,8 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
     },
   ];
 
+  const decisionRationale = raw.decisionRationale || classificationResult.decisionRationale;
+
   const modelClassification: ModelClassificationData = {
     primaryClass,
     classificationCode,
@@ -425,7 +426,7 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
     uncalibratedScore,
     operationalRiskTier: opRiskTier,
     operationalRiskScore: opRiskScore,
-    decisionRationale: `Classification synthesized by combining high-resolution NASA FIRMS satellite radiometry with OpenStreetMap industrial asset proximities. The high FRP (${frp.toFixed(1)} MW) combined with proximity to ${closestFacName} (${closestFacDist.toFixed(1)} km) yields a ${confidenceScore}% calibrated confidence in ${primaryClass}.`,
+    decisionRationale,
     evidences,
     modelAuditNotes: [
       'Independent Operational Risk: Risk scoring operates independently from model confidence to prevent dangerous false-negative suppression near critical facilities.',
@@ -898,8 +899,22 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
                 {currentIncident.title}
               </h1>
 
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-red-50 text-red-600 border border-red-200/80 shadow-2xs">
-                <Fire size={12} weight="fill" className="text-red-500" />
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black border shadow-2xs ${
+                currentIncident.incidentType.includes('Persistent') || currentIncident.modelClassification?.category === 'Persistent Heat'
+                  ? 'bg-amber-50 text-amber-800 border-amber-200/90'
+                  : currentIncident.incidentType.includes('Agricultural') || currentIncident.modelClassification?.category === 'Agricultural Burn'
+                  ? 'bg-orange-50 text-orange-700 border-orange-200/90'
+                  : currentIncident.incidentType.includes('Wild') || currentIncident.modelClassification?.category === 'Wildfire'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200/90'
+                  : 'bg-red-50 text-red-600 border-red-200/80'
+              }`}>
+                {currentIncident.incidentType.includes('Persistent') || currentIncident.modelClassification?.category === 'Persistent Heat' ? (
+                  <Factory size={12} weight="fill" className="text-amber-600" />
+                ) : currentIncident.incidentType.includes('Agricultural') ? (
+                  <Tree size={12} weight="fill" className="text-orange-500" />
+                ) : (
+                  <Fire size={12} weight="fill" className="text-red-500" />
+                )}
                 {currentIncident.incidentType}
               </span>
 
@@ -1211,10 +1226,26 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
                   <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
                     Model Classification:
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-md text-[13px] font-black bg-orange-600 text-white shadow-2xs">
+                  <span className={`px-2.5 py-0.5 rounded-md text-[13px] font-black text-white shadow-2xs ${
+                    currentIncident.modelClassification.category === 'Persistent Heat'
+                      ? 'bg-amber-600'
+                      : currentIncident.modelClassification.category === 'Wildfire'
+                      ? 'bg-emerald-600'
+                      : currentIncident.modelClassification.category === 'Agricultural Burn'
+                      ? 'bg-orange-600'
+                      : 'bg-red-600'
+                  }`}>
                     {currentIncident.modelClassification.primaryClass}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-white text-gray-700 border border-gray-200">
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+                    currentIncident.modelClassification.category === 'Persistent Heat'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : currentIncident.modelClassification.category === 'Wildfire'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : currentIncident.modelClassification.category === 'Agricultural Burn'
+                      ? 'bg-orange-50 text-orange-800 border-orange-200'
+                      : 'bg-white text-gray-700 border-gray-200'
+                  }`}>
                     Category: {currentIncident.modelClassification.category}
                   </span>
                 </div>

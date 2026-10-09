@@ -24,6 +24,7 @@ import {
   FileText,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
+import { classifyAnomaly, type AnomalyClassificationCode } from '../utils/classification';
 
 export interface IncidentData {
   id?: string;
@@ -40,6 +41,13 @@ export interface IncidentData {
   date: string;
   confidence: string;
   daynight?: string;
+  classification?: string;
+  classification_display?: string;
+  category?: string;
+  incidentType?: string;
+  model_score_uncalibrated?: number;
+  confidenceScore?: number;
+  operational_risk?: any;
 }
 
 export interface NearbyFacility {
@@ -669,51 +677,27 @@ export default function PredictiveAnalysis({
     ];
   }, [activeIncident, nearbyFacilities]);
 
-  // Dynamic uncalibrated prediction score specific to this incident's sensor telemetry & surroundings
-  const modelPredictionScore = useMemo(() => {
-    if (!activeIncident) return 92.4;
+  const [selectedClassification, setSelectedClassification] = useState<AnomalyClassificationCode | 'AUTO'>('AUTO');
 
-    // 1. If explicit uncalibrated model score was provided (e.g. from ML inference microservice or demo event)
-    if (typeof (activeIncident as any).model_score_uncalibrated === 'number') {
-      const raw = (activeIncident as any).model_score_uncalibrated;
-      const pct = raw <= 1.0 ? raw * 100 : raw;
-      return parseFloat(pct.toFixed(1));
-    }
-
-    // 2. If confidence string has a numeric percentage other than placeholder 94 (e.g. "88%", "97%")
-    if (typeof activeIncident.confidence === 'string') {
-      const match = activeIncident.confidence.match(/(\d+(?:\.\d+)?)/);
-      if (match) {
-        const val = parseFloat(match[1]);
-        if (val >= 60 && val <= 100 && val !== 94) {
-          return parseFloat(val.toFixed(1));
-        }
+  // Reset override when a brand new incident is loaded unless that incident has explicit preset
+  useEffect(() => {
+    if (activeIncident?.classification) {
+      const code = activeIncident.classification as AnomalyClassificationCode;
+      if (['PERSISTENT_INDUSTRIAL_HEAT', 'LIKELY_INDUSTRIAL_INCIDENT', 'POSSIBLE_AGRICULTURAL_BURNING', 'NATURAL_WILDLAND_FIRE', 'UNKNOWN_REQUIRES_REVIEW'].includes(code)) {
+        setSelectedClassification(code);
+        return;
       }
     }
+    setSelectedClassification('AUTO');
+  }, [activeIncident?.id]);
 
-    // 3. Physically grounded multi-sensor calculation:
-    // FRP (signal strength), Brightness Temperature (thermal contrast above 300K), and spatial proximity
-    const frp = activeIncident.frp || 8.0;
-    const brightness = activeIncident.brightness || 320.0;
-    const closestDist = nearbyFacilities[0]?.distanceKm ?? 12.0;
-
-    // Thermal contrast component: (brightness - 300K)
-    const tempDelta = Math.max(0, brightness - 300);
-    const thermalSignal = Math.min(20, tempDelta * 0.42); // 0 to 20%
-
-    // Radiative energy flux component: log10(FRP)
-    const frpSignal = Math.min(18, Math.log10(Math.max(1, frp)) * 12); // 0 to 18%
-
-    // Spatial industrial proximity prior (closer facilities increase industrial flare certainty)
-    const proxSignal = Math.max(0, 14 - Math.min(14, closestDist * 1.4)); // 0 to 14%
-
-    // Deterministic pseudo-random seed based on coordinates so each unique coordinate has a persistent, distinct score
-    const coordSeed = Math.abs(Math.sin(activeIncident.lat * 12.9898 + activeIncident.lng * 78.233) * 43758.5453);
-    const variance = (coordSeed % 7.2) - 3.6; // -3.6% to +3.6%
-
-    const score = 54.0 + thermalSignal + frpSignal + proxSignal + variance;
-    return parseFloat(Math.min(99.4, Math.max(68.5, score)).toFixed(1));
-  }, [activeIncident, nearbyFacilities]);
+  // Canonical anomaly classification result using single source of truth
+  const classificationResult = useMemo(() => {
+    const incToClassify = selectedClassification !== 'AUTO'
+      ? { ...activeIncident, classification: selectedClassification }
+      : activeIncident;
+    return classifyAnomaly(incToClassify, nearbyFacilities);
+  }, [activeIncident, nearbyFacilities, selectedClassification]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
@@ -742,6 +726,18 @@ export default function PredictiveAnalysis({
               onClick={() => {
                 const reportPayload = {
                   ...activeIncident,
+                  classification: classificationResult.code,
+                  classification_display: classificationResult.label,
+                  category: classificationResult.category,
+                  incidentType: classificationResult.incidentType,
+                  model_score_uncalibrated: classificationResult.uncalibratedScore / 100,
+                  confidence: `${classificationResult.confidenceScore}%`,
+                  confidenceScore: classificationResult.confidenceScore,
+                  decisionRationale: classificationResult.decisionRationale,
+                  operational_risk: {
+                    risk_score: classificationResult.operationalRiskScore,
+                    risk_level: classificationResult.operationalRiskTier.replace(' Risk', ''),
+                  },
                   nearbyFacilities,
                 };
                 if (onSelectIncident) onSelectIncident(reportPayload);
@@ -780,19 +776,61 @@ export default function PredictiveAnalysis({
         {/* ─── Top 5 Anomaly-Centric Metric Cards ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           {/* Card 1: AI Fire Classification & Uncalibrated Score */}
-          <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-800 flex items-center justify-center shrink-0">
+          <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs flex items-center gap-3.5">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+              classificationResult.code === 'PERSISTENT_INDUSTRIAL_HEAT'
+                ? 'bg-amber-50 text-amber-700'
+                : classificationResult.code === 'LIKELY_INDUSTRIAL_INCIDENT'
+                ? 'bg-red-50 text-red-700'
+                : classificationResult.code === 'NATURAL_WILDLAND_FIRE'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'bg-orange-50 text-orange-700'
+            }`}>
               <Crosshair size={26} weight="bold" />
             </div>
-            <div className="min-w-0">
-              <p className="text-[12px] font-semibold text-gray-500 leading-none mb-1">
-                Thermal Classification
-              </p>
-              <p className="text-[17px] font-black text-gray-900 leading-tight truncate">
-                {activeIncident.frp >= 20 ? 'Possible Industrial Flare' : activeIncident.frp >= 6 ? 'Agricultural Burning' : 'Satellite Thermal Anomaly'}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1 mb-1">
+                <p className="text-[11px] font-semibold text-gray-500 leading-none">
+                  Thermal Classification
+                </p>
+                <select
+                  value={selectedClassification === 'AUTO' ? classificationResult.code : selectedClassification}
+                  onChange={(e) => {
+                    const newCode = e.target.value as AnomalyClassificationCode;
+                    setSelectedClassification(newCode);
+                    setActiveIncident((prev) => ({
+                      ...prev,
+                      classification: newCode,
+                      classification_display: newCode === 'PERSISTENT_INDUSTRIAL_HEAT'
+                        ? 'Persistent Industrial Heat'
+                        : newCode === 'LIKELY_INDUSTRIAL_INCIDENT'
+                        ? 'Possible Industrial Flare'
+                        : newCode === 'NATURAL_WILDLAND_FIRE'
+                        ? 'Natural Wildland Fire'
+                        : newCode === 'POSSIBLE_AGRICULTURAL_BURNING'
+                        ? 'Agricultural Burning'
+                        : 'Satellite Thermal Anomaly',
+                    }));
+                    showToast(`Classification set to: ${newCode.replace(/_/g, ' ')}`);
+                  }}
+                  className={`text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border cursor-pointer outline-none transition-colors ${classificationResult.badgeBg} ${classificationResult.badgeColor}`}
+                  title="Override or verify AI classification model label"
+                >
+                  <option value="PERSISTENT_INDUSTRIAL_HEAT">🏭 Persistent Industrial Heat</option>
+                  <option value="LIKELY_INDUSTRIAL_INCIDENT">🔥 Possible Industrial Flare</option>
+                  <option value="POSSIBLE_AGRICULTURAL_BURNING">🌾 Agricultural Burning</option>
+                  <option value="NATURAL_WILDLAND_FIRE">🌲 Natural Wildland Fire</option>
+                  <option value="UNKNOWN_REQUIRES_REVIEW">🛰️ Satellite Anomaly</option>
+                </select>
+              </div>
+              <p className="text-[16px] font-black text-gray-900 leading-tight truncate" title={classificationResult.label}>
+                {classificationResult.label}
               </p>
               <p className="text-[11px] font-bold text-slate-500 leading-none mt-1">
-                ● Model score (uncalibrated): {modelPredictionScore}%
+                ● Model score (uncalibrated): {classificationResult.uncalibratedScore}%
+              </p>
+              <p className="text-[10px] text-gray-400 mt-1 font-medium truncate" title={classificationResult.subLabel}>
+                {classificationResult.subLabel}
               </p>
             </div>
           </div>
