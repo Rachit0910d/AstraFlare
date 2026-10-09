@@ -1,14 +1,13 @@
 """
 AstraFlare Python ML Microservice
 ---------------------------------
-Accepts thermal anomaly observations, runs machine learning models
-for fire classification, danger level, confidence score, and endangered
-industrial infrastructure, and submits predictions to the AstraFlare
-Backend Verification Engine for database storage.
+FastAPI microservice executing machine learning inference,
+operational risk calculations, and pipeline synchronization.
 """
 
 import os
 import sys
+import json
 import requests
 from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, HTTPException
@@ -19,11 +18,12 @@ from model import predictor
 
 app = FastAPI(
     title="AstraFlare ML Prediction Service",
-    description="Machine learning inference service for industrial fire hazard classification",
-    version="2.1.0",
+    description="Machine learning inference service with causal spatial features and independent operational risk prioritization",
+    version=predictor.model_version,
 )
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5000")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5001")
+DEMO_PATH = os.path.join(os.path.dirname(__file__), "data/processed/demonstration_100_events.json")
 
 
 class AnomalyInput(BaseModel):
@@ -36,25 +36,52 @@ class AnomalyInput(BaseModel):
     instrument: Optional[str] = "VIIRS"
     confidence_raw: Optional[str] = "nominal"
     daynight: Optional[str] = "D"
-    prior_detection_count: Optional[int] = 1
-
-
-class BatchAnomaliesInput(BaseModel):
-    anomalies: List[AnomalyInput]
+    duration_hours: Optional[float] = 0.0
+    observation_count: Optional[int] = 1
+    satellite_count: Optional[int] = 1
+    spatial_extent_m: Optional[float] = 0.0
+    land_cover_code: Optional[int] = 40
+    historical_count_30d: Optional[int] = 0
 
 
 @app.get("/health")
-def health():
+def health_check():
+    """
+    Returns microservice health, loaded model metadata, and feature schema.
+    """
     return {
         "status": "healthy",
         "service": "AstraFlare-ML-Service",
-        "model_version": predictor.model_version,
+        "version": predictor.model_version,
+        "model_name": predictor.model_name,
+        "model_loaded": predictor.model_loaded,
+        "classes": predictor.classes,
+        "feature_count": len(predictor.feature_columns),
+        "sovereign_facilities_loaded": len(predictor.facilities),
+        "scientific_integrity": {
+            "confidence_calibrated": False,
+            "confidence_label": "Model score — uncalibrated",
+            "ground_truth_limitation": "Industrial ground truth is scarce (N=6 in archive). Operational risk prioritizes hazards independently.",
+        },
     }
 
 
+@app.get("/demonstration-events")
+def get_demonstration_events():
+    """
+    Serves the curated 100-event real historical demonstration dataset.
+    """
+    if os.path.exists(DEMO_PATH):
+        with open(DEMO_PATH, "r") as f:
+            return json.load(f)
+    raise HTTPException(status_code=404, detail="Demonstration dataset not found")
+
+
 @app.post("/predict")
-def predict_single(data: AnomalyInput):
-    """Run ML prediction on an anomaly without submitting to database."""
+def run_predict(data: AnomalyInput):
+    """
+    Direct ML inference without submitting to backend.
+    """
     pred = predictor.predict(
         lat=data.latitude,
         lng=data.longitude,
@@ -64,18 +91,21 @@ def predict_single(data: AnomalyInput):
         instrument=data.instrument or "VIIRS",
         confidence_raw=data.confidence_raw or "nominal",
         daynight=data.daynight or "D",
-        prior_detection_count=data.prior_detection_count or 1,
+        duration_hours=data.duration_hours or 0.0,
+        observation_count=data.observation_count or 1,
+        satellite_count=data.satellite_count or 1,
+        spatial_extent_m=data.spatial_extent_m or 0.0,
+        land_cover_code=data.land_cover_code or 40,
+        historical_count_30d=data.historical_count_30d or 0,
+        anomaly_id=data.anomaly_id,
     )
-    if data.anomaly_id:
-        pred["anomaly_id"] = data.anomaly_id
     return {"success": True, "prediction": pred}
 
 
 @app.post("/predict-and-submit")
 def predict_and_submit(data: AnomalyInput):
     """
-    Run ML prediction and submit to AstraFlare Backend Verification Engine.
-    The backend verifies schema, consistency, and commits to PostgreSQL.
+    Run ML prediction and submit payload to AstraFlare Backend Verification Engine.
     """
     pred = predictor.predict(
         lat=data.latitude,
@@ -86,12 +116,15 @@ def predict_and_submit(data: AnomalyInput):
         instrument=data.instrument or "VIIRS",
         confidence_raw=data.confidence_raw or "nominal",
         daynight=data.daynight or "D",
-        prior_detection_count=data.prior_detection_count or 1,
+        duration_hours=data.duration_hours or 0.0,
+        observation_count=data.observation_count or 1,
+        satellite_count=data.satellite_count or 1,
+        spatial_extent_m=data.spatial_extent_m or 0.0,
+        land_cover_code=data.land_cover_code or 40,
+        historical_count_30d=data.historical_count_30d or 0,
+        anomaly_id=data.anomaly_id,
     )
-    if data.anomaly_id:
-        pred["anomaly_id"] = data.anomaly_id
 
-    # Post to backend verification endpoint
     try:
         backend_resp = requests.post(
             f"{BACKEND_URL}/api/predictions/submit",
@@ -105,21 +138,19 @@ def predict_and_submit(data: AnomalyInput):
             "prediction": pred,
         }
     except Exception as e:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Failed to communicate with backend verification engine: {str(e)}",
-        )
+        return {
+            "success": False,
+            "warning": f"Backend communication failed: {str(e)}",
+            "prediction": pred,
+        }
 
 
 @app.post("/sync-active-anomalies")
 def sync_active_anomalies(limit: int = 50, day_range: int = 1):
     """
-    Pulls recent thermal anomalies from backend PostgreSQL/NASA FIRMS,
-    runs the ML prediction model on each, and submits them to the backend
-    verification engine in batch.
+    Syncs active anomalies from backend, runs ML inference, and commits verified records.
     """
     try:
-        # 1. Fetch anomalies from backend
         geojson_resp = requests.get(
             f"{BACKEND_URL}/api/anomalies/geojson?limit={limit}&dayRange={day_range}",
             timeout=15,
@@ -133,7 +164,6 @@ def sync_active_anomalies(limit: int = 50, day_range: int = 1):
         if not features:
             return {"success": True, "message": "No active anomalies to process", "processed": 0}
 
-        # 2. Run ML inference on all features
         predictions = []
         for feat in features:
             coords = feat.get("geometry", {}).get("coordinates", [0, 0])
@@ -152,7 +182,6 @@ def sync_active_anomalies(limit: int = 50, day_range: int = 1):
             )
             predictions.append(pred)
 
-        # 3. Submit batch to backend verification engine
         batch_resp = requests.post(
             f"{BACKEND_URL}/api/predictions/batch",
             json={"predictions": predictions},
@@ -170,7 +199,6 @@ def sync_active_anomalies(limit: int = 50, day_range: int = 1):
 
 
 if __name__ == "__main__":
-    # If called with argument 'sync', run one-off batch sync
     if len(sys.argv) > 1 and sys.argv[1] == "sync":
         print("🔄 Running one-off ML prediction & verification sync...")
         res = sync_active_anomalies(limit=60, day_range=1)

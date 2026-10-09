@@ -1,0 +1,128 @@
+{
+  "model_name": "AstraFlare-ThermalEventClassifier",
+  "model_version": "2.2.0",
+  "trained_at": "2026-10-09T14:00:29.030993+00:00",
+  "random_seed": 42,
+  "algorithm": "RandomForestClassifier",
+  "feature_columns": [
+    "duration_hours",
+    "observation_count",
+    "satellite_count",
+    "spatial_extent_m",
+    "max_frp",
+    "mean_frp",
+    "std_frp",
+    "max_brightness",
+    "mean_brightness",
+    "confidence_high_ratio",
+    "centroid_lat",
+    "centroid_lon",
+    "industrial_distance_m",
+    "industrial_site_count_1km",
+    "industrial_site_count_5km",
+    "land_cover_code",
+    "historical_count_30d",
+    "historical_mean_frp",
+    "frp_anomaly_zscore"
+  ],
+  "feature_count": 19,
+  "classes": [
+    "NATURAL_WILDLAND_FIRE",
+    "POSSIBLE_AGRICULTURAL_BURNING",
+    "UNKNOWN_REQUIRES_REVIEW"
+  ],
+  "split_strategy": "Temporal Holdout (75% train / 25% test)",
+  "split_date_utc": "2025-03-21 08:25:00+00:00",
+  "train_samples": 4124,
+  "test_samples": 1375,
+  "balanced_accuracy": 0.9974,
+  "macro_f1": 0.9976,
+  "baseline_comparison": {
+    "dummy_prior_balanced_accuracy": 0.3333,
+    "dummy_prior_macro_f1": 0.2124,
+    "balanced_accuracy_lift": 0.6641
+  },
+  "feature_importances": [
+    {
+      "feature": "max_frp",
+      "importance": 0.36895
+    },
+    {
+      "feature": "mean_frp",
+      "importance": 0.24958
+    },
+    {
+      "feature": "land_cover_code",
+      "importance": 0.17193
+    },
+    {
+      "feature": "centroid_lat",
+      "importance": 0.06965
+    },
+    {
+      "feature": "centroid_lon",
+      "importance": 0.04012
+    },
+    {
+      "feature": "max_brightness",
+      "importance": 0.02722
+    },
+    {
+      "feature": "mean_brightness",
+      "importance": 0.02607
+    },
+    {
+      "feature": "std_frp",
+      "importance": 0.02326
+    },
+    {
+      "feature": "industrial_distance_m",
+      "importance": 0.00729
+    },
+    {
+      "feature": "duration_hours",
+      "importance": 0.00568
+    },
+    {
+      "feature": "spatial_extent_m",
+      "importance": 0.0037
+    },
+    {
+      "feature": "confidence_high_ratio",
+      "importance": 0.00334
+    },
+    {
+      "feature": "observation_count",
+      "importance": 0.002
+    },
+    {
+      "feature": "satellite_count",
+      "importance": 0.00121
+    },
+    {
+      "feature": "industrial_site_count_1km",
+      "importance": 1e-05
+    },
+    {
+      "feature": "industrial_site_count_5km",
+      "importance": 0.0
+    },
+    {
+      "feature": "historical_count_30d",
+      "importance": 0.0
+    },
+    {
+      "feature": "historical_mean_frp",
+      "importance": 0.0
+    },
+    {
+      "feature": "frp_anomaly_zscore",
+      "importance": 0.0
+    }
+  ],
+  "scientific_limitations": [
+    "Trained on weak provisional labels; does not represent ground-truth physical verification.",
+    "Industrial fire instances (N=1 weak, N=6 audit) are too scarce for supervised ML; industrial risk is computed via deterministic proximity and physical rules rather than direct classification.",
+    "Model scores are uncalibrated probabilities; operational priority is computed independently."
+  ]
+}

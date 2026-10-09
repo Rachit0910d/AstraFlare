@@ -52,3 +52,10 @@ Thumbs.db
 !.vscode/extensions.json
 *.swp
 *.swo
+
+# 7. Large Data Archives (>50MB)
+ml/data/raw/
+ml/data/staging/
+ml/data/processed/event_dataset/
+ml/data/processed/phase1_clean_dataset/
+

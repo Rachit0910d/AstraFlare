@@ -1,0 +1,103 @@
+{
+  "model_version": "2.2.0",
+  "evaluation_timestamp": "2026-10-09T14:00:29.032014+00:00",
+  "classes": [
+    "NATURAL_WILDLAND_FIRE",
+    "POSSIBLE_AGRICULTURAL_BURNING",
+    "UNKNOWN_REQUIRES_REVIEW"
+  ],
+  "confusion_matrix": [
+    [
+      2,
+      0,
+      0
+    ],
+    [
+      0,
+      730,
+      0
+    ],
+    [
+      0,
+      5,
+      638
+    ]
+  ],
+  "classification_metrics": {
+    "NATURAL_WILDLAND_FIRE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "POSSIBLE_AGRICULTURAL_BURNING": {
+      "precision": 0.9931972789115646,
+      "recall": 1.0,
+      "f1-score": 0.9965870307167235,
+      "support": 730.0
+    },
+    "UNKNOWN_REQUIRES_REVIEW": {
+      "precision": 1.0,
+      "recall": 0.9922239502332815,
+      "f1-score": 0.9960967993754879,
+      "support": 643.0
+    },
+    "accuracy": 0.9963636363636363,
+    "macro avg": {
+      "precision": 0.9977324263038548,
+      "recall": 0.9974079834110938,
+      "f1-score": 0.9975612766974038,
+      "support": 1375.0
+    },
+    "weighted avg": {
+      "precision": 0.9963883735312307,
+      "recall": 0.9963636363636363,
+      "f1-score": 0.996362745033925,
+      "support": 1375.0
+    }
+  },
+  "balanced_accuracy": 0.9974079834110938,
+  "macro_f1": 0.9975612766974038,
+  "sample_failure_cases": [
+    {
+      "event_id": "evt_6667_24536_2025-04-07",
+      "true_target": "UNKNOWN_REQUIRES_REVIEW",
+      "predicted": "POSSIBLE_AGRICULTURAL_BURNING",
+      "confidence_score": 0.6771,
+      "frp": 8.89,
+      "industrial_distance_m": 83412.8
+    },
+    {
+      "event_id": "evt_10551_25339_2025-04-25",
+      "true_target": "UNKNOWN_REQUIRES_REVIEW",
+      "predicted": "POSSIBLE_AGRICULTURAL_BURNING",
+      "confidence_score": 0.4906,
+      "frp": 57.86,
+      "industrial_distance_m": 253750.9
+    },
+    {
+      "event_id": "evt_10863_24927_2025-04-29",
+      "true_target": "UNKNOWN_REQUIRES_REVIEW",
+      "predicted": "POSSIBLE_AGRICULTURAL_BURNING",
+      "confidence_score": 0.6043,
+      "frp": 45.8,
+      "industrial_distance_m": 405074.0
+    },
+    {
+      "event_id": "evt_5105_26174_2025-05-09",
+      "true_target": "UNKNOWN_REQUIRES_REVIEW",
+      "predicted": "POSSIBLE_AGRICULTURAL_BURNING",
+      "confidence_score": 0.5731,
+      "frp": 45.27,
+      "industrial_distance_m": 151486.4
+    },
+    {
+      "event_id": "evt_6989_28392_2025-12-06",
+      "true_target": "UNKNOWN_REQUIRES_REVIEW",
+      "predicted": "POSSIBLE_AGRICULTURAL_BURNING",
+      "confidence_score": 0.5673,
+      "frp": 9.4,
+      "industrial_distance_m": 162299.5
+    }
+  ]
+}
