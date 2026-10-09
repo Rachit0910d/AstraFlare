@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   Fire,
   Tree,
-  Warning,
   DownloadSimple,
   ArrowRight,
   ArrowLeft,
@@ -11,7 +10,6 @@ import {
   CheckCircle,
   Factory,
   Users,
-  Compass,
   MapPin,
   CaretDown,
   Globe,
