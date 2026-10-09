@@ -54,10 +54,11 @@ function findClosestSubdivision(lat: number, lng: number, subdivisions: CountryS
 }
 
 interface LiveMapProps {
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, incident?: any) => void;
+  onSelectIncident?: (incident: any) => void;
 }
 
-export default function LiveMap({ onNavigate }: LiveMapProps) {
+export default function LiveMap({ onNavigate, onSelectIncident }: LiveMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const baseLayerRef = useRef<L.TileLayer | null>(null);
@@ -81,11 +82,10 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
   // OpenStreetMap (OSM) Industries near hotspots state
   const [osmIndustries, setOsmIndustries] = useState<OSMIndustry[]>([]);
   const [isLoadingOsm, setIsLoadingOsm] = useState(false);
-  const [activeSideTab, setActiveSideTab] = useState<'states_cities' | 'osm_industries' | 'incidents'>('states_cities');
+  const [activeSideTab, setActiveSideTab] = useState<'incidents' | 'osm_industries'>('incidents');
   const [industryFilter, setIndustryFilter] = useState<'ALL' | 'THREAT' | 'SAFE'>('ALL');
   const [incidentSearchQuery, setIncidentSearchQuery] = useState('');
   const [incidentSeverityFilter, setIncidentSeverityFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'MODERATE'>('ALL');
-  const [incidentSort, setIncidentSort] = useState<'FRP' | 'RECENT'>('FRP');
 
   // Country selection state (database-backed from PostgreSQL)
   const [countries, setCountries] = useState<CountryOption[]>([]);
@@ -521,11 +521,8 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
       };
     });
 
-    if (incidentSort === 'RECENT') {
-      return list.sort((a, b) => b.time.localeCompare(a.time));
-    }
     return list.sort((a, b) => b.frp - a.frp);
-  }, [filteredAnomalies, availableSubdivisions, incidentSort]);
+  }, [filteredAnomalies, availableSubdivisions]);
 
   // Filtered incidents by user search and severity filter
   const displayedIncidents = useMemo(() => {
@@ -679,9 +676,26 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
         fillOpacity: 1.0,
       }).addTo(markersGroup);
 
-      // Interactive popup with real NASA satellite telemetry
+      const incObj = {
+        id: `inc-${lat.toFixed(4)}-${lng.toFixed(4)}`,
+        lat,
+        lng,
+        location: findClosestSubdivision(lat, lng, availableSubdivisions),
+        coordinates: `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
+        instrument: p.instrument || 'VIIRS',
+        satellite: p.satellite || 'Suomi NPP',
+        frp: p.frp || 0,
+        brightness: p.brightness || 0,
+        level: p.intensity === 'high' ? 'Critical' : p.intensity === 'medium' ? 'High' : 'Moderate',
+        time: p.acq_time ? `${p.acq_time} UTC` : 'NRT',
+        date: p.acq_date || 'Today',
+        confidence: p.confidence || 'Nominal',
+        daynight: p.daynight === 'D' ? 'Day' : 'Night',
+      };
+
+      const btnId = `btn-map-analyze-${lat.toFixed(3)}-${lng.toFixed(3)}`;
       const popupHtml = `
-        <div style="font-family:sans-serif;min-width:210px;padding:4px;">
+        <div style="font-family:sans-serif;min-width:215px;padding:4px;">
           <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:6px;">
             <div style="display:flex;align-items:center;gap:4px;">
               <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};"></span>
@@ -699,10 +713,28 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
             <div><strong>Acquisition:</strong> ${p.acq_date} ${p.acq_time ? p.acq_time + ' UTC' : ''}</div>
             <div><strong>Day/Night:</strong> ${p.daynight === 'D' ? '☀️ Daytime' : '🌙 Nighttime'}</div>
           </div>
+          <div style="margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;">
+            <button id="${btnId}" style="background:#ea580c;color:white;border:none;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
+              <span>View Predictive Analysis →</span>
+            </button>
+          </div>
         </div>
       `;
 
       core.bindPopup(popupHtml, { className: 'custom-firms-popup' });
+      core.on('popupopen', () => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          btn.onclick = () => {
+            try {
+              sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(incObj));
+            } catch {}
+            if (onSelectIncident) onSelectIncident(incObj);
+            if (onNavigate) onNavigate('Predictive Analysis', incObj);
+          };
+        }
+      });
+
       core.bindTooltip(
         `<div style="font-size:11px;font-weight:700;">FRP: ${p.frp.toFixed(1)} MW · ${p.instrument}</div><div style="font-size:9.5px;color:#9ca3af;">${p.acq_date} (${p.intensity.toUpperCase()})</div>`,
         { direction: 'top', className: 'bg-gray-900 text-white p-1 rounded border-0' }
@@ -959,8 +991,8 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
       });
     }
 
-    // Automatically highlight the States & Cities side list so the user sees all options
-    setActiveSideTab('states_cities');
+    // Automatically highlight the incidents side list
+    setActiveSideTab('incidents');
     loadThermalData(nationalSub.bbox.str, true);
   };
 
@@ -993,6 +1025,7 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
 
   // Focus directly on an incident hotspot in the boundary box
   const focusOnIncident = (inc: {
+    id?: string;
     lat: number;
     lng: number;
     location: string;
@@ -1005,11 +1038,18 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
     time: string;
     date: string;
     confidence: string;
+    daynight?: string;
   }) => {
+    try {
+      sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(inc));
+    } catch {}
+    if (onSelectIncident) {
+      onSelectIncident(inc);
+    }
     if (!mapInstanceRef.current) return;
     mapInstanceRef.current.flyTo([inc.lat, inc.lng], 12, { duration: 1.2 });
     const popupHtml = `
-      <div style="font-family:sans-serif;min-width:210px;padding:4px;">
+      <div style="font-family:sans-serif;min-width:215px;padding:4px;">
         <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:6px;">
           <strong style="font-size:13px;color:#dc2626;">🔥 Active Fire Hotspot</strong>
           <span style="font-size:10px;font-weight:700;background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px;">${inc.level}</span>
@@ -1023,12 +1063,27 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
           <div><strong>Satellite:</strong> ${inc.instrument} (${inc.satellite})</div>
           <div><strong>Confidence:</strong> ${inc.confidence}</div>
         </div>
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;">
+          <button id="btn-predictive-popup" style="background:#ea580c;color:white;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
+            <span>Predictive Analysis →</span>
+          </button>
+        </div>
       </div>
     `;
     L.popup({ offset: [0, -6], className: 'custom-firms-popup' })
       .setLatLng([inc.lat, inc.lng])
       .setContent(popupHtml)
       .openOn(mapInstanceRef.current);
+
+    setTimeout(() => {
+      const btn = document.getElementById('btn-predictive-popup');
+      if (btn) {
+        btn.onclick = () => {
+          if (onSelectIncident) onSelectIncident(inc);
+          if (onNavigate) onNavigate('Predictive Analysis', inc);
+        };
+      }
+    }, 50);
   };
 
   const selectSearchResult = (item: { name: string; lat: number; lng: number }) => {
@@ -1229,6 +1284,11 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                           <span className="text-[9.5px] px-1 py-0.5 rounded bg-gray-100 text-gray-500 font-normal shrink-0">
                             {sub.type}
                           </span>
+                          {(anomalyCountBySubdivision[sub.id] || 0) > 0 && (
+                            <span className="text-[9.5px] px-1.5 py-0.2 rounded-full font-black bg-red-100 text-red-600 shrink-0">
+                              {anomalyCountBySubdivision[sub.id]} {anomalyCountBySubdivision[sub.id] === 1 ? 'fire' : 'fires'}
+                            </span>
+                          )}
                         </div>
                         {selectedSubdivisionId === sub.id && (
                           <Check size={14} weight="bold" className="text-orange-600 shrink-0" />
@@ -1575,150 +1635,61 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
             </div>
           </div>
 
-          {/* Incidents, OSM Industries & States/Cities Tabbed Section */}
-          <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs flex-1 flex flex-col min-h-0">
-            {/* Tab switch header */}
-            <div className="flex items-center bg-gray-100/90 p-1 rounded-lg mb-3 shrink-0 gap-1">
-              <button
-                onClick={() => setActiveSideTab('states_cities')}
-                className={`flex-1 py-1 px-1.5 text-[11px] font-bold rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer truncate ${
-                  activeSideTab === 'states_cities'
-                    ? 'bg-white text-orange-600 shadow-xs'
-                    : 'text-gray-500 hover:text-gray-800'
-                }`}
-                title={`States & Cities in ${currentCountry.name}`}
-              >
-                <Compass size={13} weight="bold" />
-                <span className="truncate">States & Cities ({availableSubdivisions.length})</span>
-              </button>
-              <button
-                onClick={() => setActiveSideTab('osm_industries')}
-                className={`flex-1 py-1 px-1.5 text-[11px] font-bold rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer truncate ${
-                  activeSideTab === 'osm_industries'
-                    ? 'bg-white text-blue-600 shadow-xs'
-                    : 'text-gray-500 hover:text-gray-800'
-                }`}
-                title="Industrial Facilities Near Hotspots"
-              >
-                <Factory size={13} weight="fill" />
-                <span className="truncate">Industries ({filteredOsmIndustries.length})</span>
-              </button>
+          {/* Active Incidents & Industrial Vulnerability Hub */}
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-xs flex-1 flex flex-col min-h-0">
+            {/* Professional 2-Tab Segmented Control */}
+            <div className="flex items-center bg-slate-100/90 p-1 rounded-xl mb-3 shrink-0 gap-1 border border-slate-200/60 shadow-xs">
               <button
                 onClick={() => setActiveSideTab('incidents')}
-                className={`flex-1 py-1 px-1.5 text-[11px] font-bold rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer truncate ${
+                className={`flex-1 py-1.5 px-2 text-[12px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer truncate ${
                   activeSideTab === 'incidents'
-                    ? 'bg-white text-red-600 shadow-xs'
-                    : 'text-gray-500 hover:text-gray-800'
+                    ? 'bg-white text-red-600 shadow-xs border border-red-100/60'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
-                title="All Incidents within Boundary Box"
+                title="All Active Thermal Incidents"
               >
-                <Fire size={13} weight="fill" className="text-red-500 shrink-0" />
-                <span className="truncate">Incidents ({allIncidents.length})</span>
+                <Fire size={14} weight="fill" className={activeSideTab === 'incidents' ? 'text-red-500' : 'text-slate-400'} />
+                <span className="truncate">Incidents</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                  activeSideTab === 'incidents' ? 'bg-red-50 text-red-600 border border-red-200/60' : 'bg-slate-200 text-slate-700'
+                }`}>
+                  {allIncidents.length}
+                </span>
+              </button>
+
+              <button
+                onClick={() => setActiveSideTab('osm_industries')}
+                className={`flex-1 py-1.5 px-2 text-[12px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer truncate ${
+                  activeSideTab === 'osm_industries'
+                    ? 'bg-white text-blue-600 shadow-xs border border-blue-100/60'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                }`}
+                title="Industrial Facilities Near Hotspots (<50km)"
+              >
+                <Factory size={14} weight="fill" className={activeSideTab === 'osm_industries' ? 'text-blue-500' : 'text-slate-400'} />
+                <span className="truncate">Industries</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                  atRiskOsmCount > 0
+                    ? 'bg-red-500 text-white animate-pulse'
+                    : activeSideTab === 'osm_industries'
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
+                    : 'bg-slate-200 text-slate-700'
+                }`}>
+                  {filteredOsmIndustries.length}
+                </span>
               </button>
             </div>
-
-            {/* Content for States & Cities side list tab */}
-            {activeSideTab === 'states_cities' && (
-              <div className="flex-1 flex flex-col min-h-0">
-                {/* Search & Filter Header */}
-                <div className="mb-2 pb-2 border-b border-gray-100 shrink-0">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={subdivisionSearchQuery}
-                      onChange={(e) => setSubdivisionSearchQuery(e.target.value)}
-                      placeholder={`Search ${availableSubdivisions.length} states/cities in ${currentCountry.name}...`}
-                      className="w-full h-8 pl-8 pr-2.5 text-[11.5px] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 focus:bg-white transition-all"
-                    />
-                    <Compass size={14} className="absolute left-2.5 top-2 text-gray-400" />
-                    {subdivisionSearchQuery && (
-                      <button
-                        onClick={() => setSubdivisionSearchQuery('')}
-                        className="absolute right-2 top-2 text-[11px] text-gray-400 hover:text-gray-600"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between mt-2 text-[11px]">
-                    <span className="text-gray-500 font-medium">
-                      Showing {filteredSubdivisions.length} of {availableSubdivisions.length}
-                    </span>
-                    <span className="text-[10px] text-gray-400">Click to fly & scan</span>
-                  </div>
-                </div>
-
-                {/* List of subdivisions (states, provinces, cities) */}
-                <div className="space-y-1.5 overflow-y-auto pr-1 flex-1">
-                  {filteredSubdivisions.length === 0 ? (
-                    <div className="py-8 text-center text-[12px] text-gray-400">
-                      No matching state or city found for "{subdivisionSearchQuery}".
-                    </div>
-                  ) : (
-                    filteredSubdivisions.map((sub) => {
-                      const isSelected = selectedSubdivisionId === sub.id;
-                      const fireCount = anomalyCountBySubdivision[sub.id] || 0;
-
-                      return (
-                        <div
-                          key={sub.id}
-                          onClick={() => handleSubdivisionSelect(sub)}
-                          className={`p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
-                            isSelected
-                              ? 'bg-orange-50/70 border-orange-300 ring-1 ring-orange-400 shadow-xs'
-                              : 'bg-white hover:bg-gray-50 border-gray-200/90 hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-1.5">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-bold text-[12.5px] text-gray-900 truncate">
-                                {sub.name}
-                              </span>
-                              <span className="text-[9.5px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 font-semibold shrink-0">
-                                {sub.type}
-                              </span>
-                            </div>
-
-                            {/* Real-time Fire hotspot count badge */}
-                            {fireCount > 0 ? (
-                              <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500 text-white flex items-center gap-1 shadow-xs animate-in fade-in">
-                                <Fire size={11} weight="fill" />
-                                {fireCount} {fireCount === 1 ? 'Fire' : 'Fires'}
-                              </span>
-                            ) : (
-                              <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                Clear
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between text-[10.5px] text-gray-500">
-                            <span className="truncate">
-                              {sub.capital ? `Capital: ${sub.capital}` : sub.type === 'National' ? 'Entire Country Overview' : `${sub.type} Division`}
-                            </span>
-                            <span className={`font-semibold flex items-center gap-0.5 shrink-0 ${isSelected ? 'text-orange-600' : 'text-blue-600'}`}>
-                              {isSelected ? 'Active View' : 'Fly to'} <ArrowRight size={10} weight="bold" />
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Content for OSM Industries tab */}
             {activeSideTab === 'osm_industries' && (
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Sub-filter pills for OSM Industries */}
-                <div className="flex items-center gap-1.5 mb-2.5 pb-2 border-b border-gray-100 shrink-0">
+                <div className="flex items-center gap-1 mb-2.5 pb-2 border-b border-gray-100 shrink-0 overflow-x-auto">
                   <button
                     onClick={() => setIndustryFilter('ALL')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                       industryFilter === 'ALL'
-                        ? 'bg-slate-900 text-white'
+                        ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
@@ -1726,9 +1697,9 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                   </button>
                   <button
                     onClick={() => setIndustryFilter('THREAT')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                       industryFilter === 'THREAT'
-                        ? 'bg-red-600 text-white'
+                        ? 'bg-red-600 text-white shadow-xs'
                         : 'bg-red-50 text-red-600 hover:bg-red-100'
                     }`}
                   >
@@ -1736,64 +1707,78 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                   </button>
                   <button
                     onClick={() => setIndustryFilter('SAFE')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                       industryFilter === 'SAFE'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-blue-600 text-white shadow-xs'
                         : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
                     }`}
                   >
-                    Watch Zone 35-50km ({filteredOsmIndustries.length - atRiskOsmCount})
+                    Buffer 35-50km ({filteredOsmIndustries.length - atRiskOsmCount})
                   </button>
                 </div>
 
                 <div className="space-y-2.5 overflow-y-auto pr-1 flex-1">
                   {isLoadingOsm ? (
-                    <div className="text-center py-8 text-gray-400 text-[12px] flex flex-col items-center gap-2">
+                    <div className="text-center py-10 text-gray-400 text-[12px] flex flex-col items-center gap-2">
                       <Factory size={24} className="animate-bounce text-orange-500" />
-                      <span>Scanning for industries near active hotspots...</span>
+                      <span className="font-medium text-gray-600">Scanning for industries near active hotspots...</span>
                     </div>
                   ) : displayedOsmIndustries.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-[12px] px-3">
-                      <p className="font-semibold text-gray-600 mb-1">No Industries Near Hotspots</p>
-                      <p className="text-[11px] leading-relaxed">Only industrial assets located within 50 km of active fire hotspots are marked. No active hotspots are near facilities in this region.</p>
+                    <div className="text-center py-10 text-gray-400 text-[12px] px-3 flex flex-col items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                        ✓
+                      </div>
+                      <p className="font-bold text-gray-700 text-[13px]">All Industrial Perimeters Secure</p>
+                      <p className="text-[11px] text-gray-500 leading-relaxed max-w-[260px]">
+                        No registered industrial facilities or refineries are within 50 km of active satellite fire anomalies in this region.
+                      </p>
                     </div>
                   ) : (
                     displayedOsmIndustries.map((ind) => (
                       <div
                         key={ind.id}
                         onClick={() => focusOnOsmIndustry(ind)}
-                        className="border border-gray-100 hover:border-orange-200 rounded-lg p-2.5 hover:bg-orange-50/40 transition-all cursor-pointer group"
+                        className="rounded-xl border border-gray-200/90 hover:border-blue-400 hover:shadow-xs p-3 transition-all cursor-pointer group bg-white hover:bg-blue-50/20 flex flex-col gap-2"
+                        style={{ borderLeftWidth: '4px', borderLeftColor: ind.threatColor }}
                       >
                         <div className="flex items-start justify-between gap-1.5">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="text-sm shrink-0">🏭</span>
-                            <span className="text-[12px] font-bold text-gray-900 group-hover:text-orange-600 truncate">
+                            <span className="text-[13px] shrink-0">🏭</span>
+                            <span className="text-[12.5px] font-bold text-gray-900 group-hover:text-blue-600 truncate">
                               {ind.name}
                             </span>
                           </div>
                           <span
-                            className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded text-white shrink-0`}
+                            className="text-[9.5px] font-black px-2 py-0.5 rounded text-white shrink-0 shadow-2xs tracking-wide"
                             style={{ backgroundColor: ind.threatColor }}
                           >
                             {ind.threatLevel}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between text-[11px] text-gray-500 mt-1">
-                          <span className="truncate">{ind.category}</span>
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-gray-500 font-medium truncate">{ind.category}</span>
                           <span
-                            className={`font-bold shrink-0 ${
-                              ind.distanceKm > 0 && ind.distanceKm <= 35.0 ? 'text-red-600' : 'text-emerald-600'
+                            className={`font-black shrink-0 ${
+                              ind.distanceKm > 0 && ind.distanceKm <= 35.0 ? 'text-red-600' : 'text-emerald-700'
                             }`}
                           >
                             {ind.distanceKm > 0 ? `${ind.distanceKm} km to fire` : 'Perimeter Safe'}
                           </span>
                         </div>
 
-                        <div className="mt-1.5 pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10px]">
-                          <span className="text-gray-400">
+                        {/* Automated Countermeasure Directive */}
+                        {ind.action && (
+                          <div className="text-[10px] text-gray-700 bg-gray-50 border border-gray-150 rounded-lg px-2.5 py-1.5 leading-snug font-medium">
+                            <span className="text-gray-400 font-bold uppercase tracking-wider text-[9px] block mb-0.5">Directive:</span>
+                            {ind.action}
+                          </div>
+                        )}
+
+                        <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10.5px]">
+                          <span className="text-gray-500 text-[10px]">
                             {ind.nearestHotspot ? (
-                              <span>Fire Power: <strong>{ind.nearestHotspot.frp} MW</strong></span>
+                              <span>Fire FRP: <strong className="text-red-600 font-bold">{ind.nearestHotspot.frp} MW</strong></span>
                             ) : (
                               <span className="text-emerald-600 font-semibold">Perimeter Secure</span>
                             )}
@@ -1804,11 +1789,11 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="text-gray-500 hover:text-blue-600 font-medium flex items-center gap-0.5"
+                              className="text-gray-400 hover:text-blue-600 font-semibold flex items-center gap-0.5"
                             >
                               OSM <ArrowSquareOut size={10} />
                             </a>
-                            <span className="text-orange-600 font-bold flex items-center gap-0.5">
+                            <span className="text-blue-600 font-bold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
                               Locate <ArrowRight size={10} weight="bold" />
                             </span>
                           </div>
@@ -1830,10 +1815,10 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                       type="text"
                       value={incidentSearchQuery}
                       onChange={(e) => setIncidentSearchQuery(e.target.value)}
-                      placeholder={`Search ${allIncidents.length} incidents in boundary box...`}
-                      className="w-full h-8 pl-8 pr-7 text-[11.5px] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:bg-white transition-all"
+                      placeholder={`Search ${allIncidents.length} active fire incidents...`}
+                      className="w-full h-8 pl-8 pr-7 text-[11.5px] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:bg-white transition-all font-medium"
                     />
-                    <Fire size={14} className="absolute left-2.5 top-2 text-red-400" />
+                    <Fire size={14} className="absolute left-2.5 top-2 text-red-500" weight="fill" />
                     {incidentSearchQuery && (
                       <button
                         onClick={() => setIncidentSearchQuery('')}
@@ -1844,47 +1829,37 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                     )}
                   </div>
 
-                  {/* Filter Pills & Sort */}
-                  <div className="flex items-center justify-between gap-1 text-[10px]">
-                    <div className="flex items-center gap-1 overflow-x-auto">
-                      <button
-                        onClick={() => setIncidentSeverityFilter('ALL')}
-                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer whitespace-nowrap ${
-                          incidentSeverityFilter === 'ALL'
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        All ({allIncidents.length})
-                      </button>
-                      <button
-                        onClick={() => setIncidentSeverityFilter('CRITICAL')}
-                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer whitespace-nowrap ${
-                          incidentSeverityFilter === 'CRITICAL'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-red-50 text-red-600 hover:bg-red-100'
-                        }`}
-                      >
-                        Critical ({allIncidents.filter((i) => i.level === 'Critical').length})
-                      </button>
-                      <button
-                        onClick={() => setIncidentSeverityFilter('HIGH')}
-                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer whitespace-nowrap ${
-                          incidentSeverityFilter === 'HIGH'
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-orange-50 text-orange-600 hover:bg-orange-100'
-                        }`}
-                      >
-                        High ({allIncidents.filter((i) => i.level === 'High').length})
-                      </button>
-                    </div>
-
+                  {/* Filter Pills */}
+                  <div className="flex items-center gap-1 overflow-x-auto text-[10px]">
                     <button
-                      onClick={() => setIncidentSort(incidentSort === 'FRP' ? 'RECENT' : 'FRP')}
-                      className="text-[10px] text-gray-500 hover:text-gray-900 font-semibold shrink-0 cursor-pointer whitespace-nowrap"
-                      title="Toggle Sort Order"
+                      onClick={() => setIncidentSeverityFilter('ALL')}
+                      className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        incidentSeverityFilter === 'ALL'
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
                     >
-                      {incidentSort === 'FRP' ? 'Sort: Max FRP' : 'Sort: Recent'}
+                      All ({allIncidents.length})
+                    </button>
+                    <button
+                      onClick={() => setIncidentSeverityFilter('CRITICAL')}
+                      className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        incidentSeverityFilter === 'CRITICAL'
+                          ? 'bg-red-600 text-white shadow-xs'
+                          : 'bg-red-50 text-red-600 hover:bg-red-100'
+                      }`}
+                    >
+                      Critical ({allIncidents.filter((i) => i.level === 'Critical').length})
+                    </button>
+                    <button
+                      onClick={() => setIncidentSeverityFilter('HIGH')}
+                      className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        incidentSeverityFilter === 'HIGH'
+                          ? 'bg-orange-500 text-white shadow-xs'
+                          : 'bg-orange-50 text-orange-600 hover:bg-orange-100'
+                      }`}
+                    >
+                      High ({allIncidents.filter((i) => i.level === 'High').length})
                     </button>
                   </div>
                 </div>
@@ -1892,29 +1867,46 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
                 {/* List of all incidents within boundary box */}
                 <div className="space-y-2 overflow-y-auto pr-1 flex-1">
                   {displayedIncidents.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-[12px]">
-                      {allIncidents.length === 0
-                        ? 'No active fire incidents detected in the current boundary box.'
-                        : 'No incidents match your filter.'}
+                    <div className="text-center py-10 text-gray-400 text-[12px] flex flex-col items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold">
+                        🔥
+                      </div>
+                      <p className="font-bold text-gray-700 text-[13px]">No Active Incidents Detected</p>
+                      <p className="text-[11px] text-gray-500 leading-relaxed max-w-[260px]">
+                        {allIncidents.length === 0
+                          ? 'Satellite telemetry shows zero thermal fire anomalies in this area.'
+                          : 'No incidents match your active search query or filter.'}
+                      </p>
                     </div>
                   ) : (
                     displayedIncidents.map((inc) => (
                       <div
                         key={inc.id}
-                        onClick={() => focusOnIncident(inc)}
-                        className="p-2.5 rounded-xl border border-gray-200/90 hover:border-red-300 hover:bg-red-50/30 transition-all cursor-pointer flex flex-col gap-1.5 group"
+                        onClick={() => {
+                          try {
+                            sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(inc));
+                          } catch {}
+                          if (onSelectIncident) onSelectIncident(inc);
+                          if (onNavigate) onNavigate('Predictive Analysis', inc);
+                        }}
+                        className="p-3 rounded-xl border border-gray-200/90 hover:border-orange-500 hover:bg-orange-50/20 hover:shadow-xs transition-all cursor-pointer flex flex-col gap-1.5 group bg-white"
+                        style={{
+                          borderLeftWidth: '4px',
+                          borderLeftColor: inc.level === 'Critical' ? '#dc2626' : inc.level === 'High' ? '#ea580c' : '#f59e0b',
+                        }}
+                        title="Click to view Predictive Analysis for this anomaly"
                       >
                         <div className="flex items-center justify-between gap-1.5">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <span className={`shrink-0 ${inc.flameColor}`}>
                               <Fire size={15} weight="fill" />
                             </span>
-                            <span className="font-bold text-[12px] text-gray-900 truncate">
+                            <span className="font-bold text-[12.5px] text-gray-900 group-hover:text-orange-600 truncate">
                               {inc.location}
                             </span>
                           </div>
                           <span
-                            className={`px-2 py-0.5 rounded text-[9.5px] font-bold text-white leading-tight shrink-0 ${inc.levelBg}`}
+                            className={`px-2 py-0.5 rounded text-[9.5px] font-black text-white leading-tight shrink-0 shadow-2xs ${inc.levelBg}`}
                           >
                             {inc.level}
                           </span>
@@ -1922,24 +1914,38 @@ export default function LiveMap({ onNavigate }: LiveMapProps) {
 
                         <div className="text-[10.5px] text-gray-600 space-y-0.5">
                           <div className="flex items-center justify-between">
-                            <span className="font-mono text-gray-500 text-[10px]">{inc.coordinates}</span>
-                            <span className="font-bold text-red-600">
+                            <span className="font-mono text-gray-500 text-[10.5px] font-semibold">{inc.coordinates}</span>
+                            <span className="font-black text-red-600 text-[11px] flex items-center gap-0.5">
+                              <Fire size={12} weight="fill" className="text-red-500" />
                               {inc.frp.toFixed(1)} MW
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-[10px] text-gray-400">
-                            <span>{inc.instrument} · {inc.satellite}</span>
+                            <span className="font-medium text-gray-500">{inc.instrument} · {inc.satellite}</span>
                             <span>{inc.date} {inc.time}</span>
                           </div>
                         </div>
 
-                        <div className="pt-1 border-t border-gray-100 flex items-center justify-between text-[10.5px]">
-                          <span className="text-gray-400 text-[10px]">
-                            Confidence: <strong className="text-gray-600">{inc.confidence}</strong> · {inc.daynight}
+                        <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between text-[10.5px]">
+                          <span className="text-gray-500 text-[10px]">
+                            Confidence: <strong className="text-gray-700 font-bold">{inc.confidence}</strong> · {inc.daynight}
                           </span>
-                          <span className="text-blue-600 font-semibold flex items-center gap-0.5 group-hover:text-red-600 transition-colors">
-                            Locate <ArrowRight size={10} weight="bold" />
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                focusOnIncident(inc);
+                              }}
+                              className="text-gray-400 hover:text-gray-700 font-bold flex items-center gap-0.5 transition-colors cursor-pointer"
+                              title="Preview on Live Map without leaving"
+                            >
+                              Locate <ArrowRight size={10} weight="bold" />
+                            </button>
+                            <span className="px-2 py-0.5 rounded bg-orange-600 group-hover:bg-orange-700 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow-2xs">
+                              <span>Predictive Analysis</span>
+                              <ArrowRight size={10} weight="bold" />
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))

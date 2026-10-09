@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { List, X, Broadcast } from '@phosphor-icons/react';
 
-const NAV_LINKS = ['Home', 'Live Map', 'Predictive Analysis', 'Analytics', 'Report', 'Alert'];
+const NAV_LINKS = ['Home', 'Live Map', 'Predictive Analysis', 'Report', 'Alert'];
 
 interface HeaderProps {
   activePage?: string;

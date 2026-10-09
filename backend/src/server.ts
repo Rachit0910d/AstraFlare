@@ -1,3 +1,5 @@
+import net from 'net';
+import dns from 'dns';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
@@ -17,6 +19,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const DEFAULT_BBOX = process.env.DEFAULT_BBOX || '68,6,98,38';
+const inFlightIngestions = new Set<string>();
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -70,7 +73,7 @@ app.get('/api/anomalies/geojson', async (req: Request, res: Response) => {
     // Filter by day range (acq_date >= CURRENT_DATE - dayRange)
     const days = Math.min(Math.max(dayRange, 1), 7);
     params.push(days);
-    conditions.push(`acq_date >= (CURRENT_DATE - ($${params.length}::int - 1))`);
+    conditions.push(`acq_date >= (CURRENT_DATE - $${params.length}::int)`);
 
     // Filter by satellite / instrument
     if (source && source !== 'ALL') {
@@ -157,11 +160,21 @@ app.get('/api/anomalies/stats', async (req: Request, res: Response) => {
  * Trigger manual or scheduled ingestion
  */
 app.post('/api/ingest', async (req: Request, res: Response) => {
-  try {
-    const bbox = req.body?.bbox || DEFAULT_BBOX;
-    const dayRange = parseInt(req.body?.dayRange) || 1;
-    const sources = req.body?.sources || SUPPORTED_SOURCES;
+  const bbox = req.body?.bbox || DEFAULT_BBOX;
+  const dayRange = parseInt(req.body?.dayRange) || 1;
+  const sources = req.body?.sources || SUPPORTED_SOURCES;
+  const key = `${bbox}_${dayRange}`;
 
+  if (inFlightIngestions.has(key)) {
+    return res.json({
+      success: true,
+      message: 'Ingestion already in progress for this bounding box',
+      inFlight: true,
+    });
+  }
+
+  inFlightIngestions.add(key);
+  try {
     console.log(`🚀 Manual ingestion triggered for bbox: ${bbox}, dayRange: ${dayRange}`);
     const results = await ingestFirmsData(bbox, dayRange, sources);
 
@@ -175,6 +188,8 @@ app.post('/api/ingest', async (req: Request, res: Response) => {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('Ingestion error:', msg);
     res.status(500).json({ success: false, error: msg });
+  } finally {
+    inFlightIngestions.delete(key);
   }
 });
 
@@ -533,7 +548,7 @@ async function startServer(): Promise<void> {
 
     // Trigger initial ingestion for default India bounding box
     console.log('🔄 Running initial NASA FIRMS near real-time ingestion for India...');
-    ingestFirmsData(DEFAULT_BBOX, 1)
+    ingestFirmsData(DEFAULT_BBOX, 2)
       .then((res) => {
         console.log(`✅ Initial ingestion complete: ${res.insertedOrUpdated} records stored/updated`);
       })

@@ -3,35 +3,61 @@ import './index.css';
 import LandingPage from './pages/LandingPage';
 import LiveMap from './pages/LiveMap';
 import PredictiveAnalysis from './pages/PredictiveAnalysis';
-import Analytics from './pages/Analytics';
 import Report from './pages/Report';
 import Alert from './pages/Alert';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState<string>('LandingPage');
+  const [selectedIncident, setSelectedIncident] = useState<any>(() => {
+    try {
+      const saved = sessionStorage.getItem('astraflare_selected_incident');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleNavigate = (page: string, incident?: any) => {
+    if (incident) {
+      setSelectedIncident(incident);
+      try {
+        sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(incident));
+      } catch {}
+    }
+    setCurrentPage(page);
+  };
+
+  const handleSelectIncident = (incident: any) => {
+    setSelectedIncident(incident);
+    try {
+      sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(incident));
+    } catch {}
+  };
 
   if (currentPage === 'Live Map') {
-    return <LiveMap onNavigate={setCurrentPage} />;
-
+    return <LiveMap onNavigate={handleNavigate} onSelectIncident={handleSelectIncident} />;
   }
 
   if (currentPage === 'Predictive Analysis') {
-    return <PredictiveAnalysis onNavigate={setCurrentPage} />;
+    return (
+      <PredictiveAnalysis
+        onNavigate={handleNavigate}
+        selectedIncident={selectedIncident}
+        onSelectIncident={handleSelectIncident}
+      />
+    );
   }
 
-  if (currentPage === 'Analytics') {
-    return <Analytics onNavigate={setCurrentPage} />;
-  }
 
   if (currentPage === 'Report') {
-    return <Report onNavigate={setCurrentPage} />;
+    return <Report onNavigate={handleNavigate} />;
   }
 
   if (currentPage === 'Alert') {
-    return <Alert onNavigate={setCurrentPage} />;
+    return <Alert onNavigate={handleNavigate} />;
   }
 
-  return <LandingPage onNavigate={setCurrentPage} />;
+  return <LandingPage onNavigate={handleNavigate} />;
 };
 
 export default App;
