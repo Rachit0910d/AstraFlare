@@ -49,7 +49,6 @@ export interface ModelClassificationData {
   operationalRiskScore: number;
   decisionRationale: string;
   evidences: ModelEvidenceItem[];
-  modelAuditNotes: string[];
 }
 
 interface IncidentData {
@@ -422,12 +421,6 @@ function createDynamicReportFromIncident(raw: any): IncidentData {
     operationalRiskScore: opRiskScore,
     decisionRationale,
     evidences,
-    modelAuditNotes: [
-      'Independent Operational Risk: Risk scoring operates independently from model confidence to prevent dangerous false-negative suppression near critical facilities.',
-      'Causal Spatial Priors: Proximity to OpenStreetMap verified industrial assets acts as a decisive Bayesian prior distinguishing industrial flares from agricultural stubble.',
-      'Radiometric Signal Discrimination: Middle-infrared (MIR) band radiance is decoupled from longwave thermal infrared (TIR) to prevent false positives from solar heated tarmac.',
-      'Audit Compliance: All telemetry parameters and decision trees are fully logged for regulatory reporting under environmental protection protocols.',
-    ],
   };
 
   return {
@@ -625,11 +618,6 @@ const INCIDENTS_CATALOG: IncidentData[] = [
           icon: '🛰️',
         },
       ],
-      modelAuditNotes: [
-        'Wellhead structural fatigue caused by sustained 450+ MW radiative thermal umbrella.',
-        'Proximity to Maguri-Motapung wetland escalated ecological damage quotient.',
-        'High-density kill mud snubbing operations verified as the definitive capping mechanism.',
-      ],
     },
   },
   {
@@ -775,10 +763,6 @@ const INCIDENTS_CATALOG: IncidentData[] = [
           detail: 'Persistent detections verified over 25 days across 8 distinct forest ranges.',
           icon: '🛰️',
         },
-      ],
-      modelAuditNotes: [
-        'Tactical counter-firing operations successfully isolated fire line from human habitations.',
-        'Zero industrial facility damage recorded; primary impact concentrated on dry deciduous undergrowth.',
       ],
     },
   },
@@ -1245,17 +1229,6 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Model Audit Notes & Safety Standards */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-[11.5px]">
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-gray-600 pl-4 list-disc font-normal">
-                {currentIncident.modelClassification.modelAuditNotes.map((note, idx) => (
-                  <li key={idx} className="leading-relaxed">
-                    {note}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         )}
