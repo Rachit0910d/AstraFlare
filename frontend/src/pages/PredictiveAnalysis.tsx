@@ -24,7 +24,7 @@ import {
   FileText,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
-import { classifyAnomaly, type AnomalyClassificationCode } from '../utils/classification';
+import { classifyAnomaly } from '../utils/classification';
 
 export interface IncidentData {
   id?: string;
@@ -677,27 +677,10 @@ export default function PredictiveAnalysis({
     ];
   }, [activeIncident, nearbyFacilities]);
 
-  const [selectedClassification, setSelectedClassification] = useState<AnomalyClassificationCode | 'AUTO'>('AUTO');
-
-  // Reset override when a brand new incident is loaded unless that incident has explicit preset
-  useEffect(() => {
-    if (activeIncident?.classification) {
-      const code = activeIncident.classification as AnomalyClassificationCode;
-      if (['PERSISTENT_INDUSTRIAL_HEAT', 'LIKELY_INDUSTRIAL_INCIDENT', 'POSSIBLE_AGRICULTURAL_BURNING', 'NATURAL_WILDLAND_FIRE', 'UNKNOWN_REQUIRES_REVIEW'].includes(code)) {
-        setSelectedClassification(code);
-        return;
-      }
-    }
-    setSelectedClassification('AUTO');
-  }, [activeIncident?.id]);
-
   // Canonical anomaly classification result using single source of truth
   const classificationResult = useMemo(() => {
-    const incToClassify = selectedClassification !== 'AUTO'
-      ? { ...activeIncident, classification: selectedClassification }
-      : activeIncident;
-    return classifyAnomaly(incToClassify, nearbyFacilities);
-  }, [activeIncident, nearbyFacilities, selectedClassification]);
+    return classifyAnomaly(activeIncident, nearbyFacilities);
+  }, [activeIncident, nearbyFacilities]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc] text-gray-900 font-sans">
@@ -793,35 +776,11 @@ export default function PredictiveAnalysis({
                 <p className="text-[11px] font-semibold text-gray-500 leading-none">
                   Thermal Classification
                 </p>
-                <select
-                  value={selectedClassification === 'AUTO' ? classificationResult.code : selectedClassification}
-                  onChange={(e) => {
-                    const newCode = e.target.value as AnomalyClassificationCode;
-                    setSelectedClassification(newCode);
-                    setActiveIncident((prev) => ({
-                      ...prev,
-                      classification: newCode,
-                      classification_display: newCode === 'PERSISTENT_INDUSTRIAL_HEAT'
-                        ? 'Persistent Industrial Heat'
-                        : newCode === 'LIKELY_INDUSTRIAL_INCIDENT'
-                        ? 'Possible Industrial Flare'
-                        : newCode === 'NATURAL_WILDLAND_FIRE'
-                        ? 'Natural Wildland Fire'
-                        : newCode === 'POSSIBLE_AGRICULTURAL_BURNING'
-                        ? 'Agricultural Burning'
-                        : 'Satellite Thermal Anomaly',
-                    }));
-                    showToast(`Classification set to: ${newCode.replace(/_/g, ' ')}`);
-                  }}
-                  className={`text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border cursor-pointer outline-none transition-colors ${classificationResult.badgeBg} ${classificationResult.badgeColor}`}
-                  title="Override or verify AI classification model label"
+                <span
+                  className={`text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${classificationResult.badgeBg} ${classificationResult.badgeColor}`}
                 >
-                  <option value="PERSISTENT_INDUSTRIAL_HEAT">🏭 Persistent Industrial Heat</option>
-                  <option value="LIKELY_INDUSTRIAL_INCIDENT">🔥 Possible Industrial Flare</option>
-                  <option value="POSSIBLE_AGRICULTURAL_BURNING">🌾 Agricultural Burning</option>
-                  <option value="NATURAL_WILDLAND_FIRE">🌲 Natural Wildland Fire</option>
-                  <option value="UNKNOWN_REQUIRES_REVIEW">🛰️ Satellite Anomaly</option>
-                </select>
+                  {classificationResult.category}
+                </span>
               </div>
               <p className="text-[16px] font-black text-gray-900 leading-tight truncate" title={classificationResult.label}>
                 {classificationResult.label}
