@@ -120,7 +120,7 @@ export default function PredictiveAnalysis({
     try {
       const saved = sessionStorage.getItem('astraflare_selected_incident');
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return DEFAULT_FALLBACK_INCIDENT;
   });
 
@@ -134,7 +134,7 @@ export default function PredictiveAnalysis({
         if (saved) {
           setActiveIncident(JSON.parse(saved));
         }
-      } catch {}
+      } catch { }
     }
   }, [propIncident]);
 
@@ -219,22 +219,22 @@ export default function PredictiveAnalysis({
               threat === 'Critical'
                 ? 'bg-red-50 text-red-600 border border-red-200'
                 : threat === 'High'
-                ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                : 'bg-amber-50 text-amber-700 border border-amber-200';
+                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                  : 'bg-amber-50 text-amber-700 border border-amber-200';
 
             const action =
               dist <= 2.0
                 ? 'Activate Foam Deluge & Evacuate'
                 : dist <= 5.0
-                ? 'Isolate High-Voltage & Cool Perimeter'
-                : 'Alert Station & Continuous Watch';
+                  ? 'Isolate High-Voltage & Cool Perimeter'
+                  : 'Alert Station & Continuous Watch';
 
             const actionColor =
               threat === 'Critical'
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : threat === 'High'
-                ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                : 'bg-amber-600 hover:bg-amber-700 text-white';
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                  : 'bg-amber-600 hover:bg-amber-700 text-white';
 
             return {
               name: item.name || 'Industrial Processing Complex',
@@ -262,7 +262,7 @@ export default function PredictiveAnalysis({
             const currentSaved = sessionStorage.getItem('astraflare_selected_incident');
             const parsed = currentSaved ? JSON.parse(currentSaved) : {};
             sessionStorage.setItem('astraflare_selected_incident', JSON.stringify({ ...parsed, ...activeIncident, nearbyFacilities: mapped }));
-          } catch {}
+          } catch { }
         } else {
           // Synthetic high-fidelity facilities situated nearby if area has sparse OSM data
           const synthetic: NearbyFacility[] = [
@@ -471,7 +471,7 @@ export default function PredictiveAnalysis({
           if (onSelectIncident) onSelectIncident(reportPayload);
           try {
             sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(reportPayload));
-          } catch {}
+          } catch { }
           if (onNavigate) onNavigate('Report', reportPayload);
         };
       }
@@ -580,7 +580,7 @@ export default function PredictiveAnalysis({
       if (onSelectIncident) onSelectIncident(clickedPoint);
       try {
         sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(clickedPoint));
-      } catch {}
+      } catch { }
       showToast(`Selected point: ${newLat.toFixed(4)}°N, ${newLng.toFixed(4)}°E. Analyzing nearby hazards...`);
     });
 
@@ -726,7 +726,7 @@ export default function PredictiveAnalysis({
                 if (onSelectIncident) onSelectIncident(reportPayload);
                 try {
                   sessionStorage.setItem('astraflare_selected_incident', JSON.stringify(reportPayload));
-                } catch {}
+                } catch { }
                 if (onNavigate) onNavigate('Report', reportPayload);
               }}
               className="flex items-center gap-1.5 h-9 px-4 bg-orange-600 hover:bg-orange-700 text-white text-[13px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
@@ -760,36 +760,25 @@ export default function PredictiveAnalysis({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           {/* Card 1: AI Fire Classification & Uncalibrated Score */}
           <div className="bg-white border border-gray-200/80 rounded-xl p-4 shadow-xs flex items-center gap-3.5">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-              classificationResult.code === 'PERSISTENT_INDUSTRIAL_HEAT'
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${classificationResult.code === 'PERSISTENT_INDUSTRIAL_HEAT'
                 ? 'bg-amber-50 text-amber-700'
                 : classificationResult.code === 'LIKELY_INDUSTRIAL_INCIDENT'
-                ? 'bg-red-50 text-red-700'
-                : classificationResult.code === 'NATURAL_WILDLAND_FIRE'
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'bg-orange-50 text-orange-700'
-            }`}>
+                  ? 'bg-red-50 text-red-700'
+                  : classificationResult.code === 'NATURAL_WILDLAND_FIRE'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-orange-50 text-orange-700'
+              }`}>
               <Crosshair size={26} weight="bold" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-1 mb-1">
-                <p className="text-[11px] font-semibold text-gray-500 leading-none">
-                  Thermal Classification
-                </p>
-                <span
-                  className={`text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${classificationResult.badgeBg} ${classificationResult.badgeColor}`}
-                >
-                  {classificationResult.category}
-                </span>
-              </div>
+              <p className="text-[11px] font-semibold text-gray-500 leading-none mb-1">
+                Thermal Classification
+              </p>
               <p className="text-[16px] font-black text-gray-900 leading-tight truncate" title={classificationResult.label}>
                 {classificationResult.label}
               </p>
               <p className="text-[11px] font-bold text-slate-500 leading-none mt-1">
-                ● Model score (uncalibrated): {classificationResult.uncalibratedScore}%
-              </p>
-              <p className="text-[10px] text-gray-400 mt-1 font-medium truncate" title={classificationResult.subLabel}>
-                {classificationResult.subLabel}
+                ● Model score : {classificationResult.uncalibratedScore}%
               </p>
             </div>
           </div>
@@ -887,11 +876,10 @@ export default function PredictiveAnalysis({
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-3 py-1 text-[11.5px] font-semibold rounded-md transition-all cursor-pointer ${
-                        activeTab === tab
+                      className={`px-3 py-1 text-[11.5px] font-semibold rounded-md transition-all cursor-pointer ${activeTab === tab
                           ? 'bg-white text-gray-900 shadow-2xs'
                           : 'text-gray-500 hover:text-gray-900'
-                      }`}
+                        }`}
                     >
                       {tab}
                     </button>
@@ -1015,11 +1003,10 @@ export default function PredictiveAnalysis({
                 <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg">
                   <button
                     onClick={() => setVulnerableTab('industries')}
-                    className={`px-3 py-1 text-[11.5px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-                      vulnerableTab === 'industries'
+                    className={`px-3 py-1 text-[11.5px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${vulnerableTab === 'industries'
                         ? 'bg-white text-orange-600 shadow-2xs'
                         : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                      }`}
                   >
                     <Factory size={13} weight="fill" />
                     <span>
@@ -1028,11 +1015,10 @@ export default function PredictiveAnalysis({
                   </button>
                   <button
                     onClick={() => setVulnerableTab('settlements')}
-                    className={`px-3 py-1 text-[11.5px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-                      vulnerableTab === 'settlements'
+                    className={`px-3 py-1 text-[11.5px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${vulnerableTab === 'settlements'
                         ? 'bg-white text-orange-600 shadow-2xs'
                         : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                      }`}
                   >
                     <MapPin size={13} weight="fill" />
                     <span>Downwind Population</span>
