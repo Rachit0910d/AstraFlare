@@ -736,15 +736,6 @@ export default function PredictiveAnalysis({
               <span>Generate Incident Report</span>
               <ArrowRight size={13} weight="bold" />
             </button>
-
-            {/* Return to Live Map Button */}
-            <button
-              onClick={() => onNavigate && onNavigate('Live Map')}
-              className="flex items-center gap-1.5 h-9 px-3.5 bg-white border border-gray-200 hover:border-gray-300 hover:text-orange-600 text-[13px] font-semibold text-gray-700 rounded-lg shadow-xs transition-colors cursor-pointer"
-            >
-              <span>View in Live Map</span>
-              <ArrowRight size={13} weight="bold" />
-            </button>
           </div>
         </div>
 
