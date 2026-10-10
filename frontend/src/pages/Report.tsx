@@ -5,7 +5,6 @@ import {
   DownloadSimple,
   ArrowRight,
   ArrowLeft,
-  ShareNetwork,
   FilePdf,
   CheckCircle,
   Factory,
@@ -855,15 +854,6 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleShareReport = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      showToast('Report link copied to clipboard!');
-    } else {
-      showToast('Report ready to share.');
-    }
-  };
-
   const handleDownloadPdf = () => {
     window.print();
   };
@@ -1028,14 +1018,6 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
 
           {/* Right: Quick Action Buttons */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              onClick={handleShareReport}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-bold text-[12.5px] shadow-2xs transition-all cursor-pointer"
-            >
-              <ShareNetwork size={15} weight="bold" />
-              <span>Share Report</span>
-            </button>
-
             <button
               onClick={handleDownloadPdf}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-950 hover:bg-black text-white font-bold text-[12.5px] shadow-sm transition-all cursor-pointer"
