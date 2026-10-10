@@ -13,6 +13,10 @@ import {
   Gauge,
   TrendUp,
   ShieldCheck,
+  Buildings,
+  PaperPlaneRight,
+  Calculator,
+  XCircle,
 } from '@phosphor-icons/react';
 import Header from '../components/Header';
 import { classifyAnomaly } from '../utils/classification';
@@ -51,6 +55,17 @@ export interface AnalystAlertItem {
   operationalSummary: string;
   // Raw classification hint for the canonical engine
   classificationHint?: string;
+  nearbyAuthority?: {
+    name: string;
+    distance: string;
+    channel: string;
+    jurisdiction: string;
+    etaEstimate: string;
+    recommendedUnits: string;
+    projectedSpread: string;
+  };
+  reportState?: 'Draft' | 'Sent' | 'Cancelled';
+  reportSentAt?: string;
 }
 
 const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
@@ -81,6 +96,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'Multiple contiguous pixel anomalies detected in forest buffer. Radiative emission increased by 42% since prior orbital pass. High spread velocity probable under prevailing easterly breeze.',
     classificationHint: 'NATURAL_WILDLAND_FIRE',
+    nearbyAuthority: {
+      name: 'Assam State Disaster Management Authority (ASDMA) - Dibrugarh & Divisional Forest Office',
+      distance: '3.4 km from hotspot',
+      channel: 'Emergency Operations Center (EOC) Direct Gateway',
+      jurisdiction: 'Upper Assam Forest & Wildlife Conservation Circle',
+      etaEstimate: '~18 mins emergency mobilization',
+      recommendedUnits: '4 Wildfire Rapid Tenders + 1 Recon Drone Squad',
+      projectedSpread: '1.8 km/h northeastward under 14 km/h prevailing wind',
+    },
+    reportState: 'Draft',
   },
   {
     id: 'ALT-2025-0911',
@@ -109,6 +134,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'Persistent subsurface thermal venting co-located with active coal extraction seam. Radiative power exhibits low variance over 72-hour observation window.',
     classificationHint: 'PERSISTENT_INDUSTRIAL_HEAT',
+    nearbyAuthority: {
+      name: 'Directorate General of Mines Safety (DGMS) & Dhanbad District Fire Control',
+      distance: '1.2 km from hotspot',
+      channel: 'Industrial Mining Incident Dispatch Network',
+      jurisdiction: 'BCCL Coal Mining Safety Zone 2',
+      etaEstimate: '~12 mins rapid response',
+      recommendedUnits: '2 Industrial Smouldering Foam Units + Mining Safety Squad',
+      projectedSpread: 'Stationary subsurface containment within pit sector',
+    },
+    reportState: 'Draft',
   },
   {
     id: 'ALT-2025-0910',
@@ -137,6 +172,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'Sudden high-temperature cluster located near national park boundary. Smoke plume detected in companion optical imagery. Urgent ground ranger verification recommended.',
     classificationHint: 'NATURAL_WILDLAND_FIRE',
+    nearbyAuthority: {
+      name: 'Kaziranga National Park Command & Golaghat District Administration',
+      distance: '1.1 km from hotspot',
+      channel: 'Wildlife Protection & Forest Ranger Frequency',
+      jurisdiction: 'Eastern Assam Wildlife Division',
+      etaEstimate: '~22 mins riverine ranger deployment',
+      recommendedUnits: '3 Eco-Sensitive Buffer Patrol Units + Aerial Thermal Drone',
+      projectedSpread: '2.1 km/h expansion across grassland corridor',
+    },
+    reportState: 'Draft',
   },
   {
     id: 'ALT-2025-0909',
@@ -165,6 +210,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'High localized emission consistent with planned industrial exhaust stack venting. No uncontrolled perimeter spread observed in peripheral 500m buffer.',
     classificationHint: 'LIKELY_INDUSTRIAL_INCIDENT',
+    nearbyAuthority: {
+      name: 'Korba Industrial Safety Directorate & NTPC Emergency Command',
+      distance: '0.8 km from hotspot',
+      channel: 'Super Thermal Plant Direct Telemetry Link',
+      jurisdiction: 'Chhattisgarh State Industrial Safety Circle',
+      etaEstimate: '~8 mins on-site industrial response',
+      recommendedUnits: '1 High-Pressure Industrial Flare Suppression Unit',
+      projectedSpread: 'Controlled point flare venting within perimeter bund',
+    },
+    reportState: 'Draft',
   },
   {
     id: 'ALT-2025-0908',
@@ -193,6 +248,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'Low radiative intensity thermal anomaly consistent with stubble / field residue burning. Rapid thermal dissipation confirmed on subsequent orbital sweep.',
     classificationHint: 'POSSIBLE_AGRICULTURAL_BURNING',
+    nearbyAuthority: {
+      name: 'Tinsukia District Civil Defense & Agricultural Revenue Circle',
+      distance: '2.6 km from hotspot',
+      channel: 'District Administrative Radio Network',
+      jurisdiction: 'Tinsukia Rural Agricultural Monitoring Unit',
+      etaEstimate: '~15 mins rural fire squad',
+      recommendedUnits: '1 Rural Water Tender + Agricultural Extension Officer',
+      projectedSpread: '0.4 km/h low-intensity stubble smouldering',
+    },
+    reportState: 'Draft',
   },
   {
     id: 'ALT-2025-0907',
@@ -221,6 +286,16 @@ const INITIAL_ANALYST_ALERTS: AnalystAlertItem[] = [
     operationalSummary:
       'Continuous thermal radiation characteristic of industrial smouldering overburden and processing boilers. Risk to wildland vegetative ecosystems assessed as Low.',
     classificationHint: 'PERSISTENT_INDUSTRIAL_HEAT',
+    nearbyAuthority: {
+      name: 'Singrauli District Emergency Control & MP Pollution Control Board',
+      distance: '2.1 km from hotspot',
+      channel: 'State Environmental Emergency Hotline',
+      jurisdiction: 'Northern Coalfields Environmental Compliance Zone',
+      etaEstimate: '~14 mins industrial patrol',
+      recommendedUnits: '2 Heavy Dust & Smoulder Suppression Water Bowsers',
+      projectedSpread: 'Localised pit overburden smoulder with low spread risk',
+    },
+    reportState: 'Draft',
   },
 ];
 
@@ -233,10 +308,61 @@ export default function Alert({ onNavigate }: AlertProps) {
   const [classificationFilter, setClassificationFilter] = useState<string>('All');
   const [copiedCoords, setCopiedCoords] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showEstimateMap, setShowEstimateMap] = useState<Record<string, boolean>>({});
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Transmit SITREP to the jurisdictional authority nearby the hotspot
+  const handleSendReport = () => {
+    if (!selectedAlert) return;
+    const authName = selectedAlert.nearbyAuthority?.name || 'Local District Emergency Authority';
+    const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setAlerts((prev) =>
+      prev.map((a) =>
+        a.id === selectedAlert.id
+          ? {
+              ...a,
+              reportState: 'Sent',
+              reportSentAt: `Today, ${nowStr}`,
+              status: a.status === 'Unreviewed' ? 'Under Review' : a.status,
+            }
+          : a
+      )
+    );
+    showToast(`Official SITREP successfully transmitted to ${authName}`);
+  };
+
+  // Toggle/compute authority impact and response resource estimation
+  const handleEstimate = () => {
+    if (!selectedAlert) return;
+    const nextState = !showEstimateMap[selectedAlert.id];
+    setShowEstimateMap((prev) => ({
+      ...prev,
+      [selectedAlert.id]: nextState,
+    }));
+    if (nextState) {
+      showToast('Impact and resource mobilization estimate calculated.');
+    }
+  };
+
+  // Cancel or retract the dispatched report to the nearby authority
+  const handleCancelReport = () => {
+    if (!selectedAlert) return;
+    const authName = selectedAlert.nearbyAuthority?.name || 'Local District Emergency Authority';
+    setAlerts((prev) =>
+      prev.map((a) =>
+        a.id === selectedAlert.id
+          ? {
+              ...a,
+              reportState: 'Cancelled',
+            }
+          : a
+      )
+    );
+    showToast(`Report dispatch to ${authName} cancelled.`);
   };
 
   // Resolve currently selected alert
@@ -640,17 +766,24 @@ export default function Alert({ onNavigate }: AlertProps) {
                       {/* Status Indicator */}
                       <div className="mt-2 flex items-center justify-between text-[11px] text-gray-400 pt-1.5 border-t border-gray-100/60">
                         <span>{item.satellite} • {item.instrument}</span>
-                        <span
-                          className={`font-semibold ${
-                            item.status === 'Unreviewed'
-                              ? 'text-red-500'
-                              : item.status === 'Under Review'
-                              ? 'text-amber-600'
-                              : 'text-gray-500'
-                          }`}
-                        >
-                          {item.status}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {item.reportState === 'Sent' && (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                              Report Sent
+                            </span>
+                          )}
+                          <span
+                            className={`font-semibold ${
+                              item.status === 'Unreviewed'
+                                ? 'text-red-500'
+                                : item.status === 'Under Review'
+                                ? 'text-amber-600'
+                                : 'text-gray-500'
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -859,7 +992,127 @@ export default function Alert({ onNavigate }: AlertProps) {
                     </p>
                   </div>
 
-                  {/* 5. Primary Action Dock */}
+                  {/* 5. Jurisdictional Authority & Hotspot Dispatch */}
+                  <div className="border border-gray-200/90 rounded-xl p-4 bg-white shadow-2xs space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-100">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <Buildings size={18} weight="duotone" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60">
+                              Nearby Jurisdictional Authority
+                            </span>
+                            <span className="text-[11px] font-semibold text-gray-500">
+                              {selectedAlert.nearbyAuthority?.distance}
+                            </span>
+                          </div>
+                          <h4 className="text-[13.5px] font-bold text-gray-950 mt-1">
+                            {selectedAlert.nearbyAuthority?.name}
+                          </h4>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            Channel: {selectedAlert.nearbyAuthority?.channel} • {selectedAlert.nearbyAuthority?.jurisdiction}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Dispatch Status Pill */}
+                      <div className="self-start sm:self-auto shrink-0">
+                        {selectedAlert.reportState === 'Sent' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <CheckCircle size={13} weight="fill" />
+                            <span>Report Sent ({selectedAlert.reportSentAt || 'Transmitted'})</span>
+                          </span>
+                        ) : selectedAlert.reportState === 'Cancelled' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                            <XCircle size={13} weight="fill" className="text-slate-500" />
+                            <span>Report Cancelled</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            <Clock size={12} />
+                            <span>Pending Dispatch</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Authority Impact & Resource Estimation Drawer */}
+                    {showEstimateMap[selectedAlert.id] && (
+                      <div className="p-3.5 rounded-lg bg-slate-50/80 border border-slate-200 space-y-2 animate-in fade-in duration-150 text-[11.5px]">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/80">
+                          <span className="font-bold text-gray-800 flex items-center gap-1.5">
+                            <Calculator size={14} className="text-orange-600" weight="bold" />
+                            Hotspot Authority Impact &amp; Resource Mobilization Estimate
+                          </span>
+                          <span className="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            Calibrated
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                          <div className="bg-white p-2.5 rounded-md border border-gray-200/80 shadow-2xs">
+                            <span className="text-gray-400 block text-[10.5px]">Emergency Response Arrival</span>
+                            <p className="font-bold text-gray-900 mt-0.5">{selectedAlert.nearbyAuthority?.etaEstimate}</p>
+                          </div>
+                          <div className="bg-white p-2.5 rounded-md border border-gray-200/80 shadow-2xs">
+                            <span className="text-gray-400 block text-[10.5px]">Recommended Suppression Units</span>
+                            <p className="font-bold text-gray-900 mt-0.5">{selectedAlert.nearbyAuthority?.recommendedUnits}</p>
+                          </div>
+                          <div className="bg-white p-2.5 rounded-md border border-gray-200/80 shadow-2xs">
+                            <span className="text-gray-400 block text-[10.5px]">Perimeter Spread Projection</span>
+                            <p className="font-bold text-gray-900 mt-0.5">{selectedAlert.nearbyAuthority?.projectedSpread}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons: Send Report, Estimate, Cancel Report */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* 1. Send Report */}
+                        <button
+                          onClick={handleSendReport}
+                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-[12px] font-bold rounded-lg shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+                          title="Transmit verified situational report to the nearby jurisdictional authority"
+                        >
+                          <PaperPlaneRight size={14} weight="bold" />
+                          <span>Send Report</span>
+                        </button>
+
+                        {/* 2. Estimate */}
+                        <button
+                          onClick={handleEstimate}
+                          className={`px-3.5 py-2 border text-[12px] font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                            showEstimateMap[selectedAlert.id]
+                              ? 'bg-orange-50 border-orange-300 text-orange-700'
+                              : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                          }`}
+                          title="Compute arrival time, resource mobilization, and perimeter spread estimate"
+                        >
+                          <Calculator size={14} weight="bold" />
+                          <span>Estimate</span>
+                        </button>
+
+                        {/* 3. Cancel Report */}
+                        <button
+                          onClick={handleCancelReport}
+                          className="px-3.5 py-2 bg-white hover:bg-red-50 hover:text-red-600 border border-gray-200 text-gray-600 text-[12px] font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                          title="Cancel or recall the situational report dispatch"
+                        >
+                          <XCircle size={14} weight="bold" />
+                          <span>Cancel Report</span>
+                        </button>
+                      </div>
+
+                      <span className="text-[11px] text-gray-400 font-medium ml-auto">
+                        Transmits direct encrypted telemetry payload to nearest authority
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 6. Primary Action Dock */}
                   <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2.5">
                     <div className="flex items-center gap-2">
                       <button
