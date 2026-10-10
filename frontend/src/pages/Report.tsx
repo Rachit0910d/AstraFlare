@@ -5,7 +5,6 @@ import {
   DownloadSimple,
   ArrowRight,
   ArrowLeft,
-  CheckCircle,
   Factory,
   Users,
   MapPin,
@@ -1288,58 +1287,6 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
           </div>
         </div>
 
-        {/* ─── Fire Suppression Directives (From Handwritten Sketch: "What action should they take to stop that fire") ─── */}
-        <div className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-2xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-[16px]">
-                🛡️
-              </div>
-              <div>
-                <h3 className="text-[18px] font-black text-gray-950 tracking-tight">
-                  Fire Suppression Directives & Recommended Countermeasures
-                </h3>
-                <p className="text-[12px] text-gray-500 font-medium">
-                  Tactical response instructions to isolate the blowout, protect populations, and suppress active inferno
-                </p>
-              </div>
-            </div>
-            <span className="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
-              ✓ Verified Protocols
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
-            {currentIncident.actions.map((act, index) => (
-              <div
-                key={index}
-                className="p-4 rounded-xl border border-gray-200 hover:border-orange-500 bg-slate-50/50 hover:bg-orange-50/20 transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-[20px]">{act.icon}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-white border border-gray-200 text-gray-700 shadow-2xs">
-                      {act.priority}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-[13.5px] text-gray-900 group-hover:text-orange-600 transition-colors mb-1">
-                    {act.title}
-                  </h4>
-                  <p className="text-[12px] text-gray-600 leading-relaxed font-normal">
-                    {act.desc}
-                  </p>
-                </div>
-                <div className="mt-3 pt-2.5 border-t border-gray-200/60 flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400 font-medium">Protocol Step {index + 1}</span>
-                  <span className="text-emerald-600 font-bold flex items-center gap-1">
-                    <CheckCircle size={13} weight="fill" />
-                    {act.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
