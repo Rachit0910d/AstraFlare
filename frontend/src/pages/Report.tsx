@@ -1220,11 +1220,7 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
                       </p>
                     </div>
 
-                    {/* Benchmark rule footer */}
-                    <div className="mt-3 pt-2 border-t border-gray-100 text-[10px] text-gray-400 font-medium">
-                      <span className="font-bold text-gray-500">Benchmark: </span>
-                      {ev.benchmarkRule}
-                    </div>
+
                   </div>
                 ))}
               </div>
