@@ -5,15 +5,12 @@ import {
   DownloadSimple,
   ArrowRight,
   ArrowLeft,
-  FilePdf,
   CheckCircle,
   Factory,
   Users,
   MapPin,
-  Globe,
   ShieldCheck,
   Clock,
-  Printer,
   Sparkle,
   Crosshair,
 } from '@phosphor-icons/react';
@@ -1251,11 +1248,7 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
             </div>
 
             {/* Model Audit Notes & Safety Standards */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-[11.5px] space-y-1.5">
-              <p className="font-bold text-gray-700 flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-emerald-600" weight="bold" />
-                <span>Model Safety, Operational Decoupling & Regulatory Audit Trail:</span>
-              </p>
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-[11.5px]">
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-gray-600 pl-4 list-disc font-normal">
                 {currentIncident.modelClassification.modelAuditNotes.map((note, idx) => (
                   <li key={idx} className="leading-relaxed">
@@ -1372,71 +1365,6 @@ export default function Report({ onNavigate, selectedIncident: propIncident }: R
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* ─── Downloadable Reports Section ─── */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <DownloadSimple size={18} weight="bold" className="text-gray-800" />
-              <h3 className="text-[15px] font-black text-gray-950">Exportable Dossier Files</h3>
-            </div>
-            <span className="text-[11.5px] text-gray-400">PDF, GeoJSON & CSV formats supported</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <button
-              onClick={handleDownloadPdf}
-              className="p-3.5 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
-            >
-              <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <FilePdf size={22} weight="fill" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[13px] font-bold text-gray-900 truncate">Executive Briefing (PDF)</p>
-                <p className="text-[11px] text-gray-400">Official Government Brief · 2.4 MB</p>
-              </div>
-            </button>
-
-            <button
-              onClick={handleDownloadPdf}
-              className="p-3.5 rounded-xl border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
-            >
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Tree size={22} weight="fill" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[13px] font-bold text-gray-900 truncate">Ecological Audit</p>
-                <p className="text-[11px] text-gray-400">Wetland Flora/Fauna · 1.8 MB</p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onNavigate && onNavigate('Live Map')}
-              className="p-3.5 rounded-xl border border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
-            >
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Globe size={22} weight="fill" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[13px] font-bold text-gray-900 truncate">GIS Vector Shapefile</p>
-                <p className="text-[11px] text-gray-400">GeoJSON Impact Polygons · 840 KB</p>
-              </div>
-            </button>
-
-            <button
-              onClick={handleDownloadPdf}
-              className="p-3.5 rounded-xl border border-gray-200 hover:border-orange-400 hover:bg-orange-50/30 transition-all flex items-center gap-3 text-left cursor-pointer group bg-white shadow-2xs"
-            >
-              <div className="w-10 h-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Printer size={22} weight="bold" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[13px] font-bold text-gray-900 truncate">Printable Archive</p>
-                <p className="text-[11px] text-gray-400">Formatted for A4 Export</p>
-              </div>
-            </button>
           </div>
         </div>
       </div>
